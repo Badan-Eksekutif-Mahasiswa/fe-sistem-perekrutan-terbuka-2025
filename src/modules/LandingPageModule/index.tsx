@@ -1,7 +1,13 @@
+import Hero from "./components/Hero";
+import WhatIsSpt from "./components/WhatIsSpt";
+import Regist from "./components/Regist";
+
 const LandingPageModule = () => {
   return (
     <>
-      <p>Landing Page</p>
+      <Hero />
+      <WhatIsSpt />
+      <Regist />
     </>
   );
 };
