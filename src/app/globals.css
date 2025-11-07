@@ -75,129 +75,86 @@
   --font-mono: var(--font-geist-mono);
   --font-jakarta: var(--font-jakarta-sans);
 
-   /* Heading Styles */
-  --text-h1: 120px; /* 60px / 16 = 3.75rem */
-  --text-h1--line-height: 1; /* 60px / 60px = 1 (unitless) */
-  --text-h1--font-weight: 600;
+  /* Text */
+  --text-h1: 2rem;
+  --text-h1--font-weight: 800;
+  --text-h1--line-height: normal;
+  --text-h1--letter-spacing: 2%;
 
-  --text-h2: 3rem; /* 48px / 16 = 3rem */
-  --text-h2--line-height: 1; /* 48px / 48px = 1 (unitless) */
-  --text-h2--font-weight: 600;
+  --text-h2: 1.75rem;
+  --text-h2--font-weight: 800;
+  --text-h2--line-height: normal;
+  --text-h2--letter-spacing: 4%;
 
-  --text-h3: 2.25rem; /* 36px / 16 = 2.25rem */
-  --text-h3--line-height: 1.11; /* 40px / 36px = ~1.11 (unitless) */
-  --text-h3--font-weight: 600;
+  --text-h3: 1.5rem;
+  --text-h3--font-weight: 800;
+  --text-h3--line-height: normal;
+  --text-h3--letter-spacing: 1%;
 
-  --text-h4: 1.875rem; /* 30px / 16 = 1.875rem */
-  --text-h4--line-height: 1.2; /* 36px / 30px = 1.2 (unitless) */
-  --text-h4--font-weight: 600;
+  --text-h4: 1.25rem;
+  --text-h4--font-weight: 800;
+  --text-h4--line-height: normal;
+  --text-h4--letter-spacing: 1%;
 
-  --text-h5: 1.5rem; /* 24px / 16 = 1.5rem */
-  --text-h5--line-height: 1.33; /* 32px / 24px = ~1.33 (unitless) */
-  --text-h5--font-weight: 600;
+  --text-h5: 1rem;
+  --text-h5--font-weight: 800;
+  --text-h5--line-height: normal;
+  --text-h5--letter-spacing: 1%;
 
-  --text-h6: 1.25rem; /* 20px / 16 = 1.25rem */
-  --text-h6--line-height: 1.4; /* 28px / 20px = 1.4 (unitless) */
-  --text-h6--font-weight: 600;
+  --text-h6: 0.75rem;
+  --text-h6--font-weight: 800;
+  --text-h6--line-height: normal;
+  --text-h6--letter-spacing: 1%;
 
-  --text-h7: 1rem; /* 16px / 16 = 1rem */
-  --text-h7--line-height: 1.5; /* 24px / 16px = 1.5 (unitless) */
-  --text-h7--font-weight: 600;
-
-  --text-h8: 0.875rem; /* 14px / 16 = 0.875rem */
-  --text-h8--line-height: 1.428; /* 20px / 14px = ~1.428 (unitless) */
-  --text-h8--font-weight: 600;
-
-  --text-h9: 0.75rem; /* 12px / 16 = 0.75rem */
-  --text-h9--line-height: 1.333; /* 16px / 12px = ~1.333 (unitless) */
-  --text-h9--font-weight: 600;
-
-  /* Sub-Heading Styles */
-  --text-s1: 3.75rem; /* 60px / 16 = 3.75rem */
-  --text-s1--line-height: 1; /* 60px / 60px = 1 (unitless) */
-  --text-s1--font-weight: 700;
-
-  --text-s2: 3rem; /* 48px / 16 = 3rem */
-  --text-s2--line-height: 1; /* 48px / 48px = 1 (unitless) */
-  --text-s2--font-weight: 700;
-
-  --text-s3: 2.25rem; /* 36px / 16 = 2.25rem */
-  --text-s3--line-height: 1.11; /* 40px / 36px = ~1.11 (unitless) */
-  --text-s3--font-weight: 700;
-
-  --text-s4: 1.875rem; /* 30px / 16 = 1.875rem */
-  --text-s4--line-height: 1.2; /* 36px / 30px = 1.2 (unitless) */
-  --text-s4--font-weight: 700;
-
-  --text-s5: 1.5rem; /* 24px / 16 = 1.5rem */
-  --text-s5--line-height: 1.33; /* 32px / 24px = ~1.33 (unitless) */
-  --text-s5--font-weight: 700;
-
-  --text-s6: 1.25rem; /* 20px / 16 = 1.25rem */
-  --text-s6--line-height: 1.4; /* 28px / 20px = 1.4 (unitless) */
-  --text-s6--font-weight: 700;
-
-  --text-s7: 1rem; /* 16px / 16 = 1rem */
-  --text-s7--line-height: 1.5; /* 24px / 16px = 1.5 (unitless) */
-  --text-s7--font-weight: 700;
-  --text-s7--letter-spacing: 0; /* 0.05em for slight letter spacing */
-
-  --text-s8: 0.875rem; /* 14px / 16 = 0.875rem */
-  --text-s8--line-height: 1.428; /* 20px / 14px = ~1.428 (unitless) */
-  --text-s8--font-weight: 700;
-
-  --text-s9: 0.75rem; /* 12px / 16 = 0.75rem */
-  --text-s9--line-height: 1.333; /* 16px / 12px = ~1.333 (unitless) */
-  --text-s9--font-weight: 700;
-
-  --text-m1: 24px;
+  --text-m1: 1.5rem;
   --text-m1--font-weight: 600;
+  --text-m1--line-height: normal;
+  --text-m1--letter-spacing: 1%;
 
-  --text-m2: 20px;
+  --text-m2: 1.25rem;
   --text-m2--font-weight: 600;
+  --text-m2--line-height: normal;
+  --text-m2--letter-spacing: 1%;
 
-  --text-m3: 16px;
+  --text-m3: 1rem;
   --text-m3--font-weight: 600;
+  --text-m3--line-height: normal;
+  --text-m3--letter-spacing: 1%;
 
-  --text-m4: 12px;
+  --text-m4: 0.75rem;
   --text-m4--font-weight: 600;
+  --text-m4--line-height: normal;
+  --text-m4--letter-spacing: 1%;
 
-  /* Body/Paragraph Styles (Extended to B9, consistent naming and units) */
-  --text-b1: 1.5rem; /* 24px / 16 = 1.5rem */
-  --text-b1--line-height: 1.5; /* 36px / 24px = 1.5 (unitless) */
-  --text-b1--font-weight: 400;
+  --text-p1: 1.5rem;
+  --text-p1--font-weight: 400;
+  --text-p1--line-height: normal;
+  --text-p1--letter-spacing: 1%;
 
-  --text-b2: 1rem; /* 16px / 16 = 1rem */
-  --text-b2--line-height: 1.5; /* 24px / 16px = 1.5 (unitless) */
-  --text-b2--font-weight: 400;
+  --text-p2: 1.25rem;
+  --text-p2--font-weight: 400;
+  --text-p2--line-height: normal;
+  --text-p2--letter-spacing: 1%;
 
-  --text-b3: 0.75rem; /* 12px / 16 = 0.75rem */
-  --text-b3--line-height: 1.5; /* 18px / 12px = 1.5 (unitless) */
-  --text-b3--font-weight: 400;
+  --text-p3: 1.125rem;
+  --text-p3--font-weight: 400;
+  --text-p3--line-height: normal;
+  --text-p3--letter-spacing: 1%;
 
-  --text-b4: 0.5rem; /* 8px / 16 = 0.5rem */
-  --text-b4--line-height: 1.5; /* 12px / 8px = 1.5 (unitless) */
-  --text-b4--font-weight: 400;
+  --text-p4: 1rem;
+  --text-p4--font-weight: 400;
+  --text-p4--line-height: normal;
+  --text-p4--letter-spacing: 1%;
 
-  --text-b5: 0.4375rem; /* 7px / 16 = 0.4375rem */
-  --text-b5--line-height: 1.5; /* 10.5px / 7px = 1.5 (unitless) */
-  --text-b5--font-weight: 400;
+  --text-p5: 0.875rem;
+  --text-p5--font-weight: 400;
+  --text-p5--line-height: normal;
+  --text-p5--letter-spacing: 1%;
 
-  --text-b6: 0.375rem; /* 6px / 16 = 0.375rem */
-  --text-b6--line-height: 1.5; /* 9px / 6px = 1.5 (unitless) */
-  --text-b6--font-weight: 400;
-
-  --text-b7: 0.3125rem; /* 5px / 16 = 0.3125rem */
-  --text-b7--line-height: 1.5; /* 7.5px / 5px = 1.5 (unitless) */
-  --text-b7--font-weight: 400;
-
-  --text-b8: 0.25rem; /* 4px / 16 = 0.25rem */
-  --text-b8--line-height: 1.5; /* 6px / 4px = 1.5 (unitless) */
-  --text-b8--font-weight: 400;
-
-  --text-b9: 0.1875rem; /* 3px / 16 = 0.1875rem */
-  --text-b9--line-height: 1.5; /* 4.5px / 3px = 1.5 (unitless) */
-  --text-b9--font-weight: 400;
+  --text-p6: 0.75rem;
+  --text-p6--font-weight: 400;
+  --text-p6--line-height: normal;
+  --text-p6--letter-spacing: 1%;
 
   --color-primary-500: var(--primary-500);
   --color-primary-400: var(--primary-400);
