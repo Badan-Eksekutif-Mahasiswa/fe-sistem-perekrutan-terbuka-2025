@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import Calendar from "@/components/elements/Calendar";
 import { Diamond } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,8 @@ import {
 import { toast } from "sonner";
 
 export default function Home() {
+  const { show } = useToast();
+
   return (
     <div className="flex flex-col items-center bg-primary-500/80">
       <p className="text-h1 text-white font-jakarta">Design System</p>
@@ -98,6 +101,13 @@ export default function Home() {
               <p>Add to library</p>
             </TooltipContent>
           </Tooltip>
+        </div>
+        <div className="flex gap-5">
+          <Button onClick={() => show("info", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat.")}>Info</Button>
+          <Button onClick={() => show("success", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat.")}>Success</Button>
+          <Button onClick={() => show("warning", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat.")}>Warning</Button>
+          <Button onClick={() => show("error", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat.")}>Error</Button>
+          <Button onClick={() => show("loading")}>Loading</Button>
         </div>
       </div>
     </div>

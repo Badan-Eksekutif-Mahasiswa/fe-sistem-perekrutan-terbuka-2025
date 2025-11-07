@@ -34,7 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${jakartaSans.variable} antialiased`}
       >
         <main>{children}</main>
-        <Toaster />
+        <Toaster position="top-right" expand={false} />
       </body>
     </html>
   );
