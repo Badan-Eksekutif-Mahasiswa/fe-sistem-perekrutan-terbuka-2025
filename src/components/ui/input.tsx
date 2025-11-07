@@ -17,7 +17,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       ? React.cloneElement(
           icon as React.ReactElement,
           {
-            className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4",
+            className: "absolute left-3 text-primary-300 top-1/2 transform -translate-y-1/2 w-4",
           } as React.SVGProps<SVGSVGElement>
         )
       : null;
@@ -38,8 +38,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             type={type}
             className={cn(
-              "disabled:opacity-40 px-3 py-2 text-primary-500 focus:ring-2 focus:ring-offset-0 focus:ring-primary-100  flex w-full font-jakarta rounded-xl border-2 font-normal bg-neutral-50 hover:bg-neutral-100 focus:bg-neutral-200 text-base file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-primary-500/80 focus-visible:outline-none disabled:cursor-not-allowed  transition-all duration-500",
-              icon ? "pl-10" : prefix ? "pl-12" : "pl-3",
+              "disabled:opacity-40 px-3 py-3 text-primary-300 focus:ring-2 focus:ring-offset-0 focus:ring-primary-100  flex w-full font-jakarta rounded-xl border-2 font-normal bg-neutral-50 hover:bg-neutral-100 focus:bg-neutral-200 text-p5 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-primary-300 focus-visible:outline-none disabled:cursor-not-allowed  transition-all duration-500",
+              icon ? "pl-8" : prefix ? "pl-12" : "pl-3",
               error
                 ? "border-red-400 text-red-400"
                 : "border-primary-300 hover:border-primary-400 focus:border-primary-[#C3D1A7]/10",

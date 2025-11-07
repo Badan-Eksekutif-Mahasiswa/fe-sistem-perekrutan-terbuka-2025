@@ -2,21 +2,19 @@
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import Calendar from "@/components/elements/Calendar";
+import { Diamond } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import Countdown from "@/components/elements/Countdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -32,35 +30,43 @@ export default function Home() {
     <div className="flex flex-col items-center bg-primary-500/80">
       <p className="text-h1 text-white font-jakarta">Design System</p>
       <div className="px-6 space-x-6 space-y-5">
-        <Input placeholder="Placeholder" label="Anjay gg gaming lu tai"/>
-        <Button variant={"primary"}>Halow Semua</Button>
-        <Button variant={"secondary"}>Halow Semua</Button>
-        <Button variant={"ghost"}>Halow Semua</Button>
-        <Button variant={"destructive"}>Halow Semua</Button>
+        <Input
+          placeholder="Placeholder"
+          icon={<Search />}
+          label="Anjay gg gaming lu tai"
+        />
+        <Button variant={"primary"}>
+          <Diamond />
+          Halow Semua
+        </Button>
+        <Button variant={"secondary"}>
+          <Diamond />
+          Halow Semua
+        </Button>
+        <Button variant={"ghost"}>
+          <Diamond />
+          Halow Semua
+        </Button>
+        <Button variant={"destructive"}>
+          <Diamond />
+          Halow Semua
+        </Button>
         <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger>Halooww</DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="start">
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  Profile
-                  <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Billing
-                  <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Settings
-                  <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Keyboard shortcuts
-                  <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a fruit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>ajfneaifneaifna</SelectLabel>
+                <SelectItem value="apple">Apple</SelectItem>
+                <SelectItem value="banana">Banana</SelectItem>
+                <SelectItem value="blueberry">Blueberry</SelectItem>
+                <SelectItem value="grapes">Grapes</SelectItem>
+                <SelectItem value="pineapple">Pineapple</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
         <div className="w-fit">
           <Countdown
