@@ -29,8 +29,8 @@ import { toast } from "sonner";
 
 export default function Home() {
   return (
-    <div className="flex flex-col bg-primary-500/80">
-      <p className="text-secondary-500 font-jakarta">Hello SPT</p>
+    <div className="flex flex-col items-center bg-primary-500/80">
+      <p className="text-h1 text-white font-jakarta">Design System</p>
       <div className="px-6 space-x-6 space-y-5">
         <Input placeholder="Placeholder" label="Anjay gg gaming lu tai"/>
         <Button variant={"primary"}>Halow Semua</Button>
@@ -62,7 +62,7 @@ export default function Home() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="bg-black w-fit">
+        <div className="w-fit">
           <Countdown
             targetDate={new Date("2025-12-22T00:00:00+07:00")}
             displayDate={true}
