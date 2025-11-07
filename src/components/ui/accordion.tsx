@@ -25,9 +25,9 @@ function AccordionItem({
     <AccordionPrimitive.Item
       data-slot="accordion-item"
       className={cn(
-        "last:border-b-0 mx-5 my-2  px-9 rounded-3xl",
+        "mx-5 my-2 rounded-xl border-1 border-primary-300",
         variant === "primary" &&
-          "data-[state=open]:bg-primary-100 data-[state=open]:border-2 data-[state=open]:border-primary-400 data-[state=open]:text-primary-500 text-white bg-primary-400",
+          "text-white bg-linear-to-r from-primary-200 to-primary-400 ",
         variant === "secondary" &&
           "data-[state=open]:bg-secondary-100 data-[state=open]:border-2 data-[state=open]:border-secondary-400 data-[state=open]:text-secondary-500 text-white bg-secondary-400",
         className
@@ -47,7 +47,7 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "focus-visible:border-ring text-lg max-md:text-sm cursor-pointer md:text-xl text-tertiary-5 font-semibold font-jakarta focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left transition-all outline-none  focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
+          "focus-visible:border-ring text-xl max-md:text-lg  shadow-sm px-4 data-[state=open]:bg-primary-200 data-[state=closed]:bg-linear-to-r data-[state=closed]:from-primary-200 data-[state=closed]:to-primary-400 rounded-xl cursor-pointer md:text-xl text-tertiary-5 font-semibold font-jakarta focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4  py-4 text-left transition-all outline-none  focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
           className
         )}
         {...props}
@@ -67,7 +67,7 @@ function AccordionContent({
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className=" data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-tertiary-5 font-questrial text-md"
+      className=" data-[state=closed]:animate-accordion-up mt-2 px-4 data-[state=open]:animate-accordion-down overflow-hidden text-sm max-md:text-xs font-questrial text-md"
       {...props}
     >
       <div className={cn("pt-0 pb-4", className)}>{children}</div>

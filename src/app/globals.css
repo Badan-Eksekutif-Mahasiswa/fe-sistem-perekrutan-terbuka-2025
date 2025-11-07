@@ -4,6 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Colors */
   --primary-500: #1d2642;
   --primary-400: #324173;
   --primary-300: #475ca3;
@@ -26,6 +27,12 @@
   --neutral-300: #d2d2d2;
   --neutral-200: #e8e8e8;
   --neutral-100: #ffffff;
+
+  --red-500: #82181a;
+  --red-300: #fb2c36;
+  --red-400: #c10007;
+  --red-200: #ff6467;
+  --red-100: #ffc9c9;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -68,6 +75,87 @@
   --font-mono: var(--font-geist-mono);
   --font-jakarta: var(--font-jakarta-sans);
 
+  /* Text */
+  --text-h1: 2rem;
+  --text-h1--font-weight: 800;
+  --text-h1--line-height: normal;
+  --text-h1--letter-spacing: 2%;
+
+  --text-h2: 1.75rem;
+  --text-h2--font-weight: 800;
+  --text-h2--line-height: normal;
+  --text-h2--letter-spacing: 4%;
+
+  --text-h3: 1.5rem;
+  --text-h3--font-weight: 800;
+  --text-h3--line-height: normal;
+  --text-h3--letter-spacing: 1%;
+
+  --text-h4: 1.25rem;
+  --text-h4--font-weight: 800;
+  --text-h4--line-height: normal;
+  --text-h4--letter-spacing: 1%;
+
+  --text-h5: 1rem;
+  --text-h5--font-weight: 800;
+  --text-h5--line-height: normal;
+  --text-h5--letter-spacing: 1%;
+
+  --text-h6: 0.75rem;
+  --text-h6--font-weight: 800;
+  --text-h6--line-height: normal;
+  --text-h6--letter-spacing: 1%;
+
+  --text-m1: 1.5rem;
+  --text-m1--font-weight: 600;
+  --text-m1--line-height: normal;
+  --text-m1--letter-spacing: 1%;
+
+  --text-m2: 1.25rem;
+  --text-m2--font-weight: 600;
+  --text-m2--line-height: normal;
+  --text-m2--letter-spacing: 1%;
+
+  --text-m3: 1rem;
+  --text-m3--font-weight: 600;
+  --text-m3--line-height: normal;
+  --text-m3--letter-spacing: 1%;
+
+  --text-m4: 0.75rem;
+  --text-m4--font-weight: 600;
+  --text-m4--line-height: normal;
+  --text-m4--letter-spacing: 1%;
+
+  --text-p1: 1.5rem;
+  --text-p1--font-weight: 400;
+  --text-p1--line-height: normal;
+  --text-p1--letter-spacing: 1%;
+
+  --text-p2: 1.25rem;
+  --text-p2--font-weight: 400;
+  --text-p2--line-height: normal;
+  --text-p2--letter-spacing: 1%;
+
+  --text-p3: 1.125rem;
+  --text-p3--font-weight: 400;
+  --text-p3--line-height: normal;
+  --text-p3--letter-spacing: 1%;
+
+  --text-p4: 1rem;
+  --text-p4--font-weight: 400;
+  --text-p4--line-height: normal;
+  --text-p4--letter-spacing: 1%;
+
+  --text-p5: 0.875rem;
+  --text-p5--font-weight: 400;
+  --text-p5--line-height: normal;
+  --text-p5--letter-spacing: 1%;
+
+  --text-p6: 0.75rem;
+  --text-p6--font-weight: 400;
+  --text-p6--line-height: normal;
+  --text-p6--letter-spacing: 1%;
+
   --color-primary-500: var(--primary-500);
   --color-primary-400: var(--primary-400);
   --color-primary-300: var(--primary-300);
@@ -79,6 +167,13 @@
   --color-secondary-300: var(--secondary-300);
   --color-secondary-200: var(--secondary-200);
   --color-secondary-100: var(--secondary-100);
+
+  --color-red-500: var(--red-500);
+  --color-red-400: var(--red-400);
+  --color-red-300: var(--red-300);
+
+  --color-red-200: var(--red-200);
+  --color-red-100: var(--red-100);
 
   --color-neutral-1000: var(--neutral-1000);
   --color-neutral-900: var(--neutral-900);
