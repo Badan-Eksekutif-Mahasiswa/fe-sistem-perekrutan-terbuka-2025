@@ -1,7 +1,8 @@
+"use client";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronDownIcon } from "lucide-react";
+import Calendar from "@/components/elements/Calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +18,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Countdown from "@/components/elements/Countdown";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 export default function Home() {
   return (
     <>
       <p className="text-secondary-500 font-jakarta">Hello SPT</p>
-      <div className="px-6 space-x-6">
+      <div className="px-6 space-x-6 space-y-5">
         <Input placeholder="Placeholder" />
         <Button variant={"primary"}>Halow Semua</Button>
         <Button variant={"secondary"}>Halow Semua</Button>
@@ -58,6 +67,31 @@ export default function Home() {
             targetDate={new Date("2025-12-22T00:00:00+07:00")}
             displayDate={true}
           />
+        </div>
+        <div>
+          <Calendar />
+        </div>
+        <div>
+          <Tabs defaultValue="account">
+            <TabsList className="w-xl">
+              <TabsTrigger value="account">Tab</TabsTrigger>
+              <TabsTrigger value="password">Tab</TabsTrigger>
+              <TabsTrigger value="test">Tab</TabsTrigger>
+              <TabsTrigger value="test2">Tab</TabsTrigger>
+              <TabsTrigger value="test3">Tab</TabsTrigger>
+              <TabsTrigger value="test4">Tab</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        <div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button>Hover</Button>
+            </TooltipTrigger>
+            <TooltipContent variant="primary">
+              <p>Add to library</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
     </>
