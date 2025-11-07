@@ -30,7 +30,7 @@ export default function Home() {
   const { show } = useToast();
 
   return (
-    <div className="flex flex-col items-center bg-primary-500/80">
+    <div className="flex flex-col items-center">
       <p className="text-h1 text-white font-jakarta">Design System</p>
       <div className="px-6 space-x-6 space-y-5">
         <Input
@@ -103,10 +103,46 @@ export default function Home() {
           </Tooltip>
         </div>
         <div className="flex gap-5">
-          <Button onClick={() => show("info", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat.")}>Info</Button>
-          <Button onClick={() => show("success", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat.")}>Success</Button>
-          <Button onClick={() => show("warning", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat.")}>Warning</Button>
-          <Button onClick={() => show("error", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat.")}>Error</Button>
+          <Button
+            onClick={() =>
+              show(
+                "info",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat."
+              )
+            }
+          >
+            Info
+          </Button>
+          <Button
+            onClick={() =>
+              show(
+                "success",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat."
+              )
+            }
+          >
+            Success
+          </Button>
+          <Button
+            onClick={() =>
+              show(
+                "warning",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat."
+              )
+            }
+          >
+            Warning
+          </Button>
+          <Button
+            onClick={() =>
+              show(
+                "error",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta at tortor id placerat."
+              )
+            }
+          >
+            Error
+          </Button>
           <Button onClick={() => show("loading")}>Loading</Button>
         </div>
       </div>

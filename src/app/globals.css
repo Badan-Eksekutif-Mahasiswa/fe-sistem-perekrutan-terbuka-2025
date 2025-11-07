@@ -34,23 +34,29 @@
   --red-200: #ff6467;
   --red-100: #ffc9c9;
 
-  --blue-100: #BEDBFF;
-  --blue-200: #51A2FF;
-  --blue-300: #2B7FFF;
-  --blue-400: #1447E6;
-  --blue-500: #1C398E;
+  --blue-100: #bedbff;
+  --blue-200: #51a2ff;
+  --blue-300: #2b7fff;
+  --blue-400: #1447e6;
+  --blue-500: #1c398e;
 
-  --green-100: #B9F8CF;
-  --green-200: #7BF1A8;
-  --green-300: #00C950;
-  --green-400: #00A63E;
+  --green-100: #b9f8cf;
+  --green-200: #7bf1a8;
+  --green-300: #00c950;
+  --green-400: #00a63e;
   --green-500: #016630;
 
-  --yellow-100: #FEE685;
-  --yellow-200: #FFDF20;
-  --yellow-300: #F0B100;
-  --yellow-400: #D08700;
-  --yellow-500: #A65F00;
+  --yellow-100: #fee685;
+  --yellow-200: #ffdf20;
+  --yellow-300: #f0b100;
+  --yellow-400: #d08700;
+  --yellow-500: #a65f00;
+
+  --gradient-card: linear-gradient(
+    90deg,
+    var(--primary-200, rgba(111, 130, 192, 0.7)) 0%,
+    var(--primary-400, rgba(50, 65, 115, 0.7)) 100%
+  );
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -210,6 +216,8 @@
   --color-yellow-400: var(--yellow-400);
   --color-yellow-500: var(--yellow-500);
 
+  --background-image-gradient-card: var(--gradient-card);
+
   --color-neutral-1000: var(--neutral-1000);
   --color-neutral-900: var(--neutral-900);
   --color-neutral-800: var(--neutral-800);
@@ -325,5 +333,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: var(--primary-400);
   }
 }
