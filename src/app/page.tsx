@@ -29,14 +29,14 @@ import { toast } from "sonner";
 
 export default function Home() {
   return (
-    <>
+    <div className="flex flex-col bg-primary-500/80">
       <p className="text-secondary-500 font-jakarta">Hello SPT</p>
       <div className="px-6 space-x-6 space-y-5">
-        <Input placeholder="Placeholder" />
+        <Input placeholder="Placeholder" label="Anjay gg gaming lu tai"/>
         <Button variant={"primary"}>Halow Semua</Button>
         <Button variant={"secondary"}>Halow Semua</Button>
-        <Button variant={"tertiary"}>Halow Semua</Button>
-        <Button variant={"red"}>Halow Semua</Button>
+        <Button variant={"ghost"}>Halow Semua</Button>
+        <Button variant={"destructive"}>Halow Semua</Button>
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger>Halooww</DropdownMenuTrigger>
@@ -94,6 +94,6 @@ export default function Home() {
           </Tooltip>
         </div>
       </div>
-    </>
+    </div>
   );
 }
