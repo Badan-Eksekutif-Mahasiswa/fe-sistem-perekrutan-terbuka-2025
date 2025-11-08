@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="font-jakarta bg-gradient-card flex border-t border-primary-300 justify-between items-center max-md:flex-col gap-5 px-20 py-8 max-lg:px-10 max-md:px-5">
+    <footer className="relative overflow-hidden font-jakarta bg-gradient-card flex border-t border-primary-300 justify-between items-center max-md:flex-col gap-5 px-20 py-8 max-lg:px-10 max-md:px-5">
       <div className="flex flex-col gap-4 max-md:items-center">
         <div className="relative w-[390px] max-md:w-[250px] h-[100px] max-md:h-[70px]">
           <Image
@@ -39,6 +39,15 @@ const Footer = () => {
           alt="Logo Footer"
           layout="fill"
           objectFit="contain"
+        />
+      </div>
+
+      <div className="absolute right-0 max-md:translate-x-30 w-200 max-md:w-100 h-200 max-md:h-100">
+        <Image
+          src="/assets/puzzle.webp"
+          alt="decor"
+          fill
+          className="object-contain opacity-60"
         />
       </div>
     </footer>
