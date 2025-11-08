@@ -145,6 +145,22 @@ export default function Home() {
           </Button>
           <Button onClick={() => show("loading")}>Loading</Button>
         </div>
+
+        {/* Animated Puzzle Demo Link */}
+        <div className="mt-8 p-4 border border-neutral-300 rounded-lg">
+          <h3 className="text-h3 text-white font-jakarta mb-2">
+            New Component
+          </h3>
+          <p className="text-neutral-400 mb-4">
+            Check out the new Animated Puzzle component with clean animations
+          </p>
+          <Button
+            variant="primary"
+            onClick={() => window.open("/puzzle-demo", "_blank")}
+          >
+            View Puzzle Demo
+          </Button>
+        </div>
       </div>
     </div>
   );

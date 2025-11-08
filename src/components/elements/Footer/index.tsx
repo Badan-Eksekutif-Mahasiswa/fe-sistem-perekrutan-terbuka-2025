@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { socmed } from "./const";
 import Link from "next/link";
+import AnimatedPuzzle from "../AnimatedPuzzle";
 
 const Footer = () => {
   return (
@@ -42,13 +43,8 @@ const Footer = () => {
         />
       </div>
 
-      <div className="absolute right-0 max-md:translate-x-30 w-200 max-md:w-100 h-200 max-md:h-100">
-        <Image
-          src="/assets/puzzle.webp"
-          alt="decor"
-          fill
-          className="object-contain opacity-60"
-        />
+      <div className="absolute right-60">
+        <AnimatedPuzzle width={300} height={600} className="opacity-50 rotate-45" />
       </div>
     </footer>
   );
