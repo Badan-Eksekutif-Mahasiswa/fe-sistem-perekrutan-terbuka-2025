@@ -8,7 +8,7 @@ import { data } from "./const";
 const Navbar = () => {
   return (
     <>
-      <div className="w-full px-12 max-lg:px-10 max-sm:px-8 pt-6 max-lg:pt-4">
+      <nav className="w-full px-12 max-lg:px-10 max-sm:px-8 pt-6 max-lg:pt-4">
         <div className="w-full border border-primary-300 bg-gradient-card rounded-full flex justify-between items-center px-6 py-2 bg-">
           <div className="relative aspect-[188/64] w-30">
             <Image
@@ -23,7 +23,7 @@ const Navbar = () => {
               <Link
                 key={item.title}
                 href={item.href}
-                className="flex group items-center gap-2 text-m3 text-neutral-50"
+                className="flex group hover:underline items-center gap-2 text-m3 text-neutral-50"
               >
                 <Diamond className="w-4 h-4 group-hover:fill-white" />
                 {item.title}
@@ -35,7 +35,7 @@ const Navbar = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </nav>
     </>
   );
 };

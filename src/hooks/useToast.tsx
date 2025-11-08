@@ -16,7 +16,7 @@ export const useToast = () => {
       const toastId = id ?? crypto.randomUUID(); // Auto generate jika tidak ada
 
       const base = (
-        <div className="p-[1px] rounded-xl max-w-sm w-fit min-w-80">
+        <div className="p-[1px] bg-primary-500 rounded-xl max-w-sm w-fit min-w-80">
           <div
             className={`w-full h-full rounded-xl border ${
               type === "info"
