@@ -67,7 +67,7 @@ export default function DesignSystem() {
   );
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen py-20 text-white">
       {/* Header */}
       <header className="py-12 text-center border-b border-neutral-100/10">
         <h1 className="text-h1  font-jakarta">Design System</h1>
