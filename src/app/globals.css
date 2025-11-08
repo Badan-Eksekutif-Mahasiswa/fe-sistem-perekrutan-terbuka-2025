@@ -334,7 +334,6 @@
   body {
     @apply bg-background text-foreground;
     background: var(--primary-400);
-    color: var(--color-neutral-50);
     font-family: var(--font-jakarta);
   }
 }

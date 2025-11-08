@@ -5,9 +5,9 @@ import AnimatedPuzzle from "../AnimatedPuzzle";
 
 const Footer = () => {
   return (
-    <footer className="relative overflow-hidden font-jakarta bg-gradient-card flex border-t border-primary-300 justify-between items-center max-md:flex-col gap-5 px-20 py-8 max-lg:px-10 max-md:px-5">
-      <div className="flex flex-col gap-4 max-md:items-center">
-        <div className="relative w-[390px] max-md:w-[250px] h-[100px] max-md:h-[70px]">
+    <footer className="relative text-neutral-50 overflow-hidden font-jakarta bg-gradient-card flex border-t border-primary-300 justify-between items-center max-md:flex-col gap-5 px-20 py-8 max-lg:px-10 max-md:px-5">
+      <div className="flex z-10 flex-col gap-4 max-md:items-center">
+        <div className="relative z-10 w-[390px] max-md:w-[250px] h-[100px] max-md:h-[70px]">
           <Image
             src="/logo-warnai.webp"
             alt="Logo Footer"
@@ -18,7 +18,7 @@ const Footer = () => {
         <h2 className="text-h3 max-md:text-h5">
           Badan Eksekutif Mahasiswa UI 2025
         </h2>
-        <div className="flex gap-6 max-md:gap-4 items-center">
+        <div className="flex z-10 gap-6 max-md:gap-4 items-center">
           {socmed.map((item) => (
             <Link
               key={item.name}
@@ -30,7 +30,7 @@ const Footer = () => {
             </Link>
           ))}
         </div>
-        <p className="text-m4">
+        <p className="text-m4 z-10">
           © Biro Multimedia BEM UI 2025. All Rights Reserved
         </p>
       </div>
@@ -43,8 +43,8 @@ const Footer = () => {
         />
       </div>
 
-      <div className="absolute right-60">
-        <AnimatedPuzzle width={300} height={600} className="opacity-50 rotate-45" />
+      <div className="absolute z-0 right-60 max-md:-bottom-20 max-md:right-0">
+        <AnimatedPuzzle width={300} height={600} className="opacity-40 rotate-45" />
       </div>
     </footer>
   );

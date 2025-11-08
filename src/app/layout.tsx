@@ -35,11 +35,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${jakartaSans.variable} antialiased`}
       >
-        <main>
-          <Navbar />
-          {children}
-          <Footer />
-        </main>
+        <Navbar />
+        <main className="pt-24 max-lg:pt-22 max-md:pt-20 pb-10">{children}</main>
+        <Footer />
 
         <Toaster position="top-right" expand={false} />
       </body>

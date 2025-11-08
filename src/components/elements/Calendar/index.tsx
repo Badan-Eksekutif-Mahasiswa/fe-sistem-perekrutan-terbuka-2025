@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -203,18 +202,18 @@ const Calendar: React.FC<CalendarProps> = ({
                     "text-neutral-600": !isCurrentMonth,
 
                     // Today styling
-                    "after:content-[''] after:z-0 after:absolute after:w-full after:bg-linear-to-r after:from-secondary-200 after:to-secondary-400 after:h-full after:rounded-sm after:top-0 after:left-0 after:border-1 after:border-primary-200":
+                    "after:content-[''] after:z-0 after:absolute after:w-full after:h-full after:rounded-xl after:top-0 after:left-0 after:border-2 after:border-neutral-50":
                       isToday && !selected,
 
                     // Selected range styling - connected without rounded corners
                     " text-white": selected,
 
                     // Only round the start and end dates of each range
-                    "rounded-l-sm border-l-2 border-y-2 border-primary-200":
+                    "rounded-l-lg border-l-2 border-y-2 border-secondary-200":
                       status.isStart && status.inRange,
-                    "rounded-r-sm border-r-2  border-y-2 border-primary-200  ":
+                    "rounded-r-lg border-r-2  border-y-2 border-secondary-200  ":
                       status.isEnd && status.inRange,
-                    "border-y-2 border-primary-200":
+                    "border-y-2 border-secondary-200":
                       !status.isStart && status.inRange && !status.isEnd, // Single day range
 
                     // Disabled styling
