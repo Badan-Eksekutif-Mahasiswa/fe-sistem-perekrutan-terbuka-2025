@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,8 +44,40 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import FileInput from "@/components/elements/FileInput";
+
 export default function DesignSystem() {
   const { show } = useToast();
+
+  const [myFiles, setMyFiles] = useState<File[] | null>(null);
+  const [fileError, setFileError] = useState<string | undefined>(undefined);
+
+  const handleFileChange = (files: File[] | null) => {
+    console.log("handleFileChange called with files:", files);
+    if (files && files.length > 0) {
+      console.log(
+        "Validating file size for:",
+        files[0].name,
+        "size:",
+        files[0].size
+      );
+      if (files[0].size > 10 * 1024 * 1024) {
+        // Validasi 10MB
+        console.log("File too large, rejecting");
+        setFileError("File terlalu besar, maks 10MB.");
+        setMyFiles(null);
+      } else {
+        console.log("File validation passed, accepting files");
+        setFileError(undefined);
+        setMyFiles(files);
+        console.log("Files selected:", files);
+      }
+    } else {
+      console.log("No files received, clearing state");
+      setFileError(undefined);
+      setMyFiles(null);
+    }
+  };
 
   const ComponentSection = ({
     title,
@@ -116,6 +149,17 @@ export default function DesignSystem() {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-4">
+                <h4 className="font-jakarta">Input Files</h4>
+                <FileInput
+                  name="dokumen"
+                  multiple={true}
+                  accept="image/png, .pdf"
+                  onFilesChange={handleFileChange}
+                  files={myFiles}
+                  error={fileError}
+                />
               </div>
             </div>
           </ComponentSection>
@@ -349,7 +393,7 @@ export default function DesignSystem() {
             </div>
             <div className="mt-8 space-y-4">
               <h4 className="text-m3  font-jakarta">Card Component</h4>
-              <Card className="w-lg">
+              <Card className=" w-auto max-w-lg">
                 <CardHeader>
                   <CardTitle>Lorem Ipsum</CardTitle>
                 </CardHeader>
