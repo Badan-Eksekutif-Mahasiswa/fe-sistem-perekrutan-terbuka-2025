@@ -44,13 +44,30 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationLast,
+  PaginationFirst,
+} from "@/components/ui/pagination";
+
 import FileInput from "@/components/elements/FileInput";
+import { mockCardsData } from "./const";
 
 export default function DesignSystem() {
   const { show } = useToast();
 
   const [myFiles, setMyFiles] = useState<File[] | null>(null);
   const [fileError, setFileError] = useState<string | undefined>(undefined);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 3;
 
   const handleFileChange = (files: File[] | null) => {
     console.log("handleFileChange called with files:", files);
@@ -76,6 +93,43 @@ export default function DesignSystem() {
       console.log("No files received, clearing state");
       setFileError(undefined);
       setMyFiles(null);
+    }
+  };
+
+  // Pagination utility functions
+  const getCurrentPageItems = () => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return mockCardsData.slice(startIndex, endIndex);
+  };
+
+  const getPaginationInfo = () => {
+    const totalPages = Math.ceil(mockCardsData.length / ITEMS_PER_PAGE);
+    return {
+      currentPage,
+      totalPages,
+      hasNext: currentPage < totalPages,
+      hasPrev: currentPage > 1,
+      totalItems: mockCardsData.length,
+    };
+  };
+
+  const handlePageChange = (page: number) => {
+    const { totalPages } = getPaginationInfo();
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (getPaginationInfo().hasPrev) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (getPaginationInfo().hasNext) {
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
@@ -392,37 +446,93 @@ export default function DesignSystem() {
               </div>
             </div>
             <div className="mt-8 space-y-4">
-              <h4 className="text-m3  font-jakarta">Card Component</h4>
-              <Card className=" w-auto max-w-lg">
-                <CardHeader>
-                  <CardTitle>Lorem Ipsum</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <img
-                    src="/placeholder-1.webp"
-                    alt="placeholder"
-                    className="object-fill"
-                  />
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Doloremque sit facere molestias dicta porro impedit, maxime
-                    tempore quibusdam ratione laudantium unde optio quo fugit,
-                    neque qui! Possimus error odit libero!
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button className="flex-1" variant={"secondary"}>
-                    <Diamond />
-                    Button
-                    <Diamond />
-                  </Button>
-                  <Button className="flex-1" variant={"primary"}>
-                    <Diamond />
-                    Button
-                    <Diamond />
-                  </Button>
-                </CardFooter>
-              </Card>
+              <h4 className="text-m3  font-jakarta">
+                Card Component with Pagination
+              </h4>
+              <div className="flex flex-wrap justify-center gap-10">
+                {getCurrentPageItems().map((card, index) => (
+                  <Card key={index} className="w-full max-w-sm">
+                    <CardHeader>
+                      <CardTitle>{card.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <img
+                        src={card.image}
+                        alt={card.title}
+                        className="w-full h-32 object-cover rounded-md mb-3"
+                      />
+                      {card.description}
+                    </CardContent>
+                    <CardFooter className="gap-2">
+                      <Button className="flex-1" variant={"secondary"}>
+                        <Diamond className="w-3 h-3" />
+                        View
+                      </Button>
+                      <Button className="flex-1" variant={"primary"}>
+                        <Diamond className="w-3 h-3" />
+                        Action
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationFirst
+                      onClick={() => handlePageChange(1)}
+                      className={
+                        !getPaginationInfo().hasPrev
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={handlePrevPage}
+                      className={
+                        !getPaginationInfo().hasPrev
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                  {[1, 2, 3].map((page, i) => (
+                    <PaginationItem key={i}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={handleNextPage}
+                      className={
+                        !getPaginationInfo().hasNext
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLast
+                      onClick={() =>
+                        handlePageChange(getPaginationInfo().totalPages)
+                      }
+                      className={
+                        !getPaginationInfo().hasNext
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           </ComponentSection>
         </div>
