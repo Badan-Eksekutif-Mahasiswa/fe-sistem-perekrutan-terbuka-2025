@@ -29,6 +29,13 @@ import {
 
 import Countdown from "@/components/elements/Countdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+  CardTitle,
+} from "@/components/ui/card";
 
 import {
   Tooltip,
@@ -339,6 +346,39 @@ export default function DesignSystem() {
               <div className="flex justify-center">
                 <Calendar />
               </div>
+            </div>
+            <div className="mt-8 space-y-4">
+              <h4 className="text-m3  font-jakarta">Card Component</h4>
+              <Card className="w-lg">
+                <CardHeader>
+                  <CardTitle>Lorem Ipsum</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <img
+                    src="/placeholder-1.webp"
+                    alt="placeholder"
+                    className="object-fill"
+                  />
+                  <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Doloremque sit facere molestias dicta porro impedit, maxime
+                    tempore quibusdam ratione laudantium unde optio quo fugit,
+                    neque qui! Possimus error odit libero!
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button className="flex-1" variant={"secondary"}>
+                    <Diamond />
+                    Button
+                    <Diamond />
+                  </Button>
+                  <Button className="flex-1" variant={"primary"}>
+                    <Diamond />
+                    Button
+                    <Diamond />
+                  </Button>
+                </CardFooter>
+              </Card>
             </div>
           </ComponentSection>
         </div>

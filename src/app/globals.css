@@ -58,6 +58,18 @@
     var(--primary-400, rgba(50, 65, 115, 0.7)) 100%
   );
 
+  --gradient-button-primary: linear-gradient(
+    90deg,
+    var(--primary-200, rgba(111, 130, 192, 0.7)) 0%,
+    var(--primary-400, rgba(50, 65, 115, 0.7)) 100%
+  );
+
+  --gradient-button-secondary: linear-gradient(
+    90deg,
+    var(--primary-200, rgba(229, 209, 110, 1)) 0%,
+    var(--primary-400, rgba(173, 154, 55, 1)) 100%
+  );
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -217,6 +229,9 @@
   --color-yellow-500: var(--yellow-500);
 
   --background-image-gradient-card: var(--gradient-card);
+  --gradient-card: var(--gradient-card);
+  --gradient-button-primary: var(--gradient-button-primary);
+  --gradient-button-secondary: var(--gradient-button-secondary);
 
   --color-neutral-1000: var(--neutral-1000);
   --color-neutral-900: var(--neutral-900);
