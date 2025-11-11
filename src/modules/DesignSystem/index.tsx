@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/pagination";
 
 import FileInput from "@/components/elements/FileInput";
+import ContactPerson from "@/components/elements/ContactPerson";
 import { mockCardsData } from "./const";
 
 export default function DesignSystem() {
@@ -535,6 +536,9 @@ export default function DesignSystem() {
               </Pagination>
             </div>
           </ComponentSection>
+        </div>
+        <div className="mt-8">
+          <ContactPerson />
         </div>
       </main>
     </div>

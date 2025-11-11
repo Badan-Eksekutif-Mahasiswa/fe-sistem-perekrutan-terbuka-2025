@@ -44,7 +44,11 @@ const Footer = () => {
       </div>
 
       <div className="absolute z-0 right-60 max-md:-bottom-20 max-md:right-0">
-        <AnimatedPuzzle width={300} height={600} className="opacity-40 rotate-45" />
+        <AnimatedPuzzle
+          width={300}
+          height={600}
+          className="opacity-40 rotate-45"
+        />
       </div>
     </footer>
   );
