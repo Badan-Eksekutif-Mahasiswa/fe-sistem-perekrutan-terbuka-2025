@@ -538,7 +538,22 @@ export default function DesignSystem() {
           </ComponentSection>
         </div>
         <div className="mt-8">
-          <ContactPerson />
+          <ContactPerson
+            title="Apakah kamu butuh bantuan?"
+            description="Hubungi contact person kami"
+            contact={[
+              {
+                name: "Fauzan",
+                method: "Line",
+                link: "https://line.me/ti/p/~muhammadfauzan",
+              },
+              {
+                name: "Dewi",
+                method: "WhatsApp",
+                link: "https://wa.me/6281234567890",
+              },
+            ]}
+          />
         </div>
       </main>
     </div>
