@@ -2,17 +2,7 @@ import Image from "next/image";
 import { BookmarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DiamondIcon } from "lucide-react";
-
-type EventType = {
-  title: string;
-  logo: string;
-  desc: string;
-  status: "Dibuka" | "Akan Datang" | "Ditutup";
-  startedAt: Date;
-  closedAt: Date;
-  categories: readonly string[];
-  isSaved: boolean;
-};
+import type { EventType } from "../type";
 
 type EventCardProps = {
   event: EventType;

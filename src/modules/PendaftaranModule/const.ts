@@ -21,12 +21,12 @@ const Events = [
     status: "Dibuka",
     startedAt: new Date("2025-08-11"),
     closedAt: new Date("2025-08-21"),
-    categories: ["Universitas", "Kepanitiaan", "Umum"],
+    categories: ["Umum", "Pra-Kampus"],
     isSaved: false,
   },
 
   {
-    title: "Staff Semarak Apresiasi",
+    title: "Staff SUS",
     logo: "/placeholders/logo-event.webp",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis minus quis aperiam at error ducimus eveniet nemo optio illo. Tempora et corrupti eius reiciendis recusandae laudantium dolores possimus iusto dolore?",
     status: "Akan Datang",
@@ -37,7 +37,7 @@ const Events = [
   },
 
   {
-    title: "Staff Semarak Apresiasi",
+    title: "Staff Bahlil",
     logo: "/placeholders/logo-event.webp",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis minus quis aperiam at error ducimus eveniet nemo optio illo. Tempora et corrupti eius reiciendis recusandae laudantium dolores possimus iusto dolore?",
     status: "Ditutup",

@@ -2,11 +2,7 @@
 import { useState } from "react";
 import { SquareIcon, SquareCheckBigIcon } from "lucide-react";
 import AnimatedPuzzle from "@/components/elements/AnimatedPuzzle";
-
-type FilterCategoryType = {
-  type: string;
-  categories: string[];
-};
+import type { FilterCategoryType } from "../type";
 
 type FilterCardProps = {
   filterCategory: FilterCategoryType[];
@@ -29,7 +25,7 @@ const FilterCard = ({
   };
 
   return (
-    <div className="text-white w-md overflow-hidden p-6 border-1 h-fit bg-gradient-card relative text-start border-primary-300 flex flex-col rounded-xl gap-5">
+    <div className="text-white min-w-0 w-full max-w-sm overflow-hidden p-6 border-1 h-fit bg-gradient-card relative text-start border-primary-300 flex flex-col rounded-xl gap-5">
       <h2 className="text-h2">Filter</h2>
       <div className="flex flex-col p-2 gap-4">
         {filterCategory.map((category, i) => (
