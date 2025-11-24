@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { socmed } from "./const";
 import Link from "next/link";
 import AnimatedPuzzle from "../AnimatedPuzzle";
@@ -11,7 +11,7 @@ const Footer = () => {
           <Image
             src="/logo-warnai.webp"
             alt="Logo Footer"
-            fill
+            layout="fill"
             className="object-contain"
           />
         </div>

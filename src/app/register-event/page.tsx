@@ -1,7 +1,7 @@
 import PendaftaranModule from "@/modules/PendaftaranModule";
 
-const Page = () => {
+const StaffRegistrationPage = () => {
   return <PendaftaranModule />;
 };
 
-export default Page;
+export default StaffRegistrationPage;
