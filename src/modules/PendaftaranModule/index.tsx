@@ -1,23 +1,27 @@
 "use client";
 import { useState } from "react";
 import FilterCard from "./components/FilterCard";
-import { FilterCategory } from "./const";
+import { FilterCategory, Events } from "./const";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SearchIcon, ArrowUpDown, DiamondIcon, XIcon } from "lucide-react";
 
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
+import EventCard from "./components/EventCard";
 
 const PendaftaranModule = () => {
   const [selectedCategoties, setSelectedCategories] = useState<
     Record<string, boolean>
   >({});
 
+  const eventDibuka = Events.filter((e) => e.status === "Dibuka");
+  const eventAkanDatang = Events.filter((e) => e.status === "Akan Datang");
+
   return (
     <main className="min-h-screen mt-32">
       <div className="py-10 px-20 text-center gap-5 justify-center text-white flex flex-col">
         <h1 className="text-h1">Cari Lowongan</h1>
-        <p className="text-p6">
+        <p className="text-p4">
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aliquid
           dicta vero dolorem eligendi sunt vitae facilis, maxime quae
           exercitationem praesentium incidunt quia illo nisi, voluptates
@@ -30,12 +34,17 @@ const PendaftaranModule = () => {
             setSelectedCategory={setSelectedCategories}
           />
           <div className="flex flex-col w-full">
-            <Tabs defaultValue="overview" className="gap-5 w-full">
-              <TabsList className="w-full ">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="features">Features</TabsTrigger>
-                <TabsTrigger value="pricing">Pricing</TabsTrigger>
-                <TabsTrigger value="support">Support</TabsTrigger>
+            <Tabs defaultValue="overview" className="gap-5  w-full">
+              <TabsList className="w-full md:h-14">
+                <TabsTrigger className="md:h-14 w-full" value="semua">
+                  Semua
+                </TabsTrigger>
+                <TabsTrigger className="md:h-14" value="dibuka">
+                  Dibuka
+                </TabsTrigger>
+                <TabsTrigger className="md:h-14" value="akan datang">
+                  Akan Datang
+                </TabsTrigger>
               </TabsList>
               <div className="flex w-full gap-2.5">
                 <Input className="grow min-w-0" />
@@ -51,7 +60,12 @@ const PendaftaranModule = () => {
                 {Object.keys(selectedCategoties)
                   .filter((k) => selectedCategoties[k])
                   .map((k) => (
-                    <Button key={k} variant="ghost">
+                    <Button
+                      className="rounded-full"
+                      key={k}
+                      size={"md"}
+                      variant="ghost"
+                    >
                       <DiamondIcon /> {k}
                     </Button>
                   ))}
@@ -62,37 +76,20 @@ const PendaftaranModule = () => {
                   }`}
                 />
               </div>
-              <TabsContent
-                value="overview"
-                className="mt-4 p-4 bg-neutral-100/5 rounded-lg"
-              >
-                <p className="text-p4 text-neutral-200">
-                  Overview content goes here.
-                </p>
+              <TabsContent value="semua" className="space-y-5">
+                {Events.map((e, i) => (
+                  <EventCard event={e} key={i} />
+                ))}
               </TabsContent>
-              <TabsContent
-                value="features"
-                className="mt-4 p-4 bg-neutral-100/5 rounded-lg"
-              >
-                <p className="text-p4 text-neutral-200">
-                  Features content goes here.
-                </p>
+              <TabsContent value="dibuka" className="space-y-5">
+                {eventDibuka.map((e, i) => (
+                  <EventCard event={e} key={i} />
+                ))}
               </TabsContent>
-              <TabsContent
-                value="pricing"
-                className="mt-4 p-4 bg-neutral-100/5 rounded-lg"
-              >
-                <p className="text-p4 text-neutral-200">
-                  Pricing content goes here.
-                </p>
-              </TabsContent>
-              <TabsContent
-                value="support"
-                className="mt-4 p-4 bg-neutral-100/5 rounded-lg"
-              >
-                <p className="text-p4 text-neutral-200">
-                  Support content goes here.
-                </p>
+              <TabsContent value="akan datang" className="space-y-5">
+                {eventAkanDatang.map((e, i) => (
+                  <EventCard event={e} key={i} />
+                ))}
               </TabsContent>
             </Tabs>
           </div>
