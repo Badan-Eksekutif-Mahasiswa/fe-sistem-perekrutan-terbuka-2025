@@ -2,18 +2,17 @@ import * as React from "react";
 import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 
-import { TriangleAlert, UploadCloud } from "lucide-react"; // Menambahkan ikon
+import { TriangleAlert, Trash2Icon } from "lucide-react";
 
-// Definisikan props untuk FileInput
 export interface FileInputProps {
   label?: string;
   error?: string;
-  className?: string; // Untuk styling div terluar (wrapper)
+  className?: string;
   name?: string;
   multiple?: boolean;
-  accept?: string; // Misal: "image/*", ".pdf", "video/mp4"
+  accept?: string;
   files: File[] | null;
-  onFilesChange: (files: File[] | null) => void; // Handler untuk mengirim file ke parent
+  onFilesChange: (files: File[] | null) => void;
 }
 
 const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
@@ -22,34 +21,26 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
     ref
   ) => {
     const [isDragging, setIsDragging] = useState(false);
-    // const [selectedFiles, setSelectedFiles] = useState<File[] | null>(null);
 
-    // Ref ini untuk input file yang kita sembunyikan
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Menggabungkan ref yang di-forward dengan ref internal jika diperlukan
     React.useImperativeHandle(ref, () => inputRef.current!);
 
-    // Fungsi pusat untuk menangani file
     const handleFiles = (files: FileList | null) => {
       console.log("handleFiles called with files:", files);
       if (files && files.length > 0) {
         console.log("Files received:", files.length, "files");
         const fileArray = Array.from(files);
-        // setSelectedFiles(fileArray);
-        onFilesChange(fileArray); // Kirim file ke komponen parent
+        onFilesChange(fileArray);
       } else {
         console.log("No files or empty file list");
-        // setSelectedFiles(null);
         onFilesChange(null);
       }
-      // Reset input file untuk memungkinkan upload file yang sama berulang
       if (inputRef.current) {
         inputRef.current.value = "";
       }
     };
 
-    // Handler untuk event drag-and-drop
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
@@ -72,19 +63,16 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
       handleFiles(e.dataTransfer.files);
     };
 
-    // Handler untuk klik
     const handleClick = () => {
       console.log("Click detected, opening file dialog");
       inputRef.current?.click();
     };
 
-    // Handler untuk input file yang tersembunyi
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       console.log("Input change detected");
       handleFiles(e.target.files);
     };
 
-    // Menampilkan nama file
     const getFileNames = () => {
       if (!files || files.length === 0) {
         return null;
@@ -95,11 +83,17 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
       return `${files.length} files selected`;
     };
 
+    const deleteFile = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      onFilesChange(null);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    };
+
     return (
       <div className={cn("space-y-1", className)}>
-        {/* Menggunakan komponen Label Anda */}
-
-        {/* Ini adalah dropzone yang terlihat */}
         <div
           className={` p-4 rounded-xl
             ${isDragging ? "bg-primary-200/30" : "bg-neutral-50"}
@@ -108,11 +102,8 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
           <div
             className={cn(
               "relative flex w-full flex-col items-center justify-center font-jakarta rounded-xl border-2 border-primary-200 border-dashed p-8 transition-all duration-300 cursor-pointer",
-              // Styling dari komponen Input Anda
               error && "border-red-400 text-red-400",
-              // Styling saat di-drag
               isDragging ? " border-primary-100" : " hover:bg-neutral-100",
-              // Styling saat ada file
               files
                 ? "border-primary-300 text-primary-300 hover:border-primary-400"
                 : "border-neutral-300 text-neutral-1000 hover:border-neutral-400"
@@ -122,7 +113,12 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            {/* Input file asli yang disembunyikan */}
+            <Trash2Icon
+              className={`w-fit absolute ${
+                !files && "hidden"
+              } right-5 top-5 text-primary-300 cursor-pointer z-40 `}
+              onClick={deleteFile}
+            />
             <input
               type="file"
               ref={inputRef}
@@ -130,10 +126,9 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
               multiple={multiple}
               accept={accept}
               onChange={onInputChange}
-              className="hidden" // SANGAT PENTING
+              className="hidden"
             />
 
-            {/* Konten Dropzone */}
             <div className="text-center space-y-2">
               <img
                 src={"/logo-clean.webp"}
@@ -160,7 +155,6 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
           </div>
         </div>
 
-        {/* Menampilkan error, sama seperti komponen Input Anda */}
         {error && (
           <div className="flex gap-2 items-center text-red-400">
             <TriangleAlert className="w-4" />
