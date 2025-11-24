@@ -10,19 +10,17 @@ type FilterCategoryType = {
 
 type FilterCardProps = {
   filterCategory: FilterCategoryType[];
+  selectedCategory: Record<string, boolean>;
+  setSelectedCategory: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
 };
 
-const FilterCard = ({ filterCategory }: FilterCardProps) => {
-  const [selectedCategory, setSelectedCategory] = useState(() => {
-    const initial: Record<string, boolean> = {};
-    filterCategory.forEach((group) => {
-      group.categories.forEach((c) => {
-        initial[c] = false;
-      });
-    });
-    return initial;
-  });
-
+const FilterCard = ({
+  filterCategory,
+  selectedCategory,
+  setSelectedCategory,
+}: FilterCardProps) => {
   const toggleSelected = (name: string) => {
     setSelectedCategory((prev) => ({
       ...prev,
@@ -31,7 +29,7 @@ const FilterCard = ({ filterCategory }: FilterCardProps) => {
   };
 
   return (
-    <div className="text-white  overflow-hidden p-6 border-1 h-fit bg-gradient-card relative text-start border-primary-300 flex flex-col rounded-xl gap-5">
+    <div className="text-white w-md overflow-hidden p-6 border-1 h-fit bg-gradient-card relative text-start border-primary-300 flex flex-col rounded-xl gap-5">
       <h2 className="text-h2">Filter</h2>
       <div className="flex flex-col p-2 gap-4">
         {filterCategory.map((category, i) => (
