@@ -34,6 +34,53 @@
   --red-200: #ff6467;
   --red-100: #ffc9c9;
 
+  --blue-100: #bedbff;
+  --blue-200: #51a2ff;
+  --blue-300: #2b7fff;
+  --blue-400: #1447e6;
+  --blue-500: #1c398e;
+
+  --green-100: #b9f8cf;
+  --green-200: #7bf1a8;
+  --green-300: #00c950;
+  --green-400: #00a63e;
+  --green-500: #016630;
+
+  --yellow-100: #fee685;
+  --yellow-200: #ffdf20;
+  --yellow-300: #f0b100;
+  --yellow-400: #d08700;
+  --yellow-500: #a65f00;
+
+  --gradient-card: linear-gradient(
+    90deg,
+    var(--primary-200, rgba(111, 130, 192, 0.7)) 0%,
+    var(--primary-400, rgba(50, 65, 115, 0.7)) 100%
+  );
+  --gradient-card-blur: linear-gradient(
+    90deg,
+    var(--Colors-Primary-200, rgba(111, 130, 192, 0.4)) 0%,
+    var(--Colors-Primary-400, rgba(50, 65, 115, 0.4)) 100%
+  );
+
+  --gradient-card-glass: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary-200), transparent 30%) 0%,
+    color-mix(in srgb, var(--primary-400), transparent 30%) 100%
+  );
+
+  --gradient-button-primary: linear-gradient(
+    90deg,
+    var(--primary-200, rgba(111, 130, 192, 0.7)) 0%,
+    var(--primary-400, rgba(50, 65, 115, 0.7)) 100%
+  );
+
+  --gradient-button-secondary: linear-gradient(
+    90deg,
+    var(--primary-200, rgba(229, 209, 110, 1)) 0%,
+    var(--primary-400, rgba(173, 154, 55, 1)) 100%
+  );
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -168,12 +215,42 @@
   --color-secondary-200: var(--secondary-200);
   --color-secondary-100: var(--secondary-100);
 
-  --color-red-500: var(--red-500);
-  --color-red-400: var(--red-400);
-  --color-red-300: var(--red-300);
-
-  --color-red-200: var(--red-200);
   --color-red-100: var(--red-100);
+  --color-red-200: var(--red-200);
+  --color-red-300: var(--red-300);
+  --color-red-400: var(--red-400);
+  --color-red-500: var(--red-500);
+
+  --color-blue-100: var(--blue-100);
+  --color-blue-200: var(--blue-200);
+  --color-blue-300: var(--blue-300);
+  --color-blue-400: var(--blue-400);
+  --color-blue-500: var(--blue-500);
+
+  --color-green-100: var(--green-100);
+  --color-green-200: var(--green-200);
+  --color-green-300: var(--green-300);
+  --color-green-400: var(--green-400);
+  --color-green-500: var(--green-500);
+
+  --color-yellow-100: var(--yellow-100);
+  --color-yellow-200: var(--yellow-200);
+  --color-yellow-300: var(--yellow-300);
+  --color-yellow-400: var(--yellow-400);
+  --color-yellow-500: var(--yellow-500);
+
+  --bg-main: var(--primary-500);
+
+  --background-image-gradient-card: var(--gradient-card);
+  --background-image-gradient-card-glass: var(--gradient-card-glass);
+
+  --gradient-card: var(--gradient-card);
+  --gradient-card-glass: var(--gradient-card-glass);
+
+  --gradient-button-primary: var(--gradient-button-primary);
+  --gradient-button-secondary: var(--gradient-button-secondary);
+  --background-image-gradient-card-blur: var(--gradient-card-blur);
+  --gradient-card-blur: var(--gradient-card-blur);
 
   --color-neutral-1000: var(--neutral-1000);
   --color-neutral-900: var(--neutral-900);
@@ -218,6 +295,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  --animate-infinite-scroll-1: infinite-scroll-1 24s linear infinite;
+  --animate-infinite-scroll-2: infinite-scroll-2 24s linear infinite;
+  --animate-infinite-scroll-3: infinite-scroll-3 24s linear infinite;
 }
 
 .dark {
@@ -290,5 +371,31 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: var(--bg-main);
+    font-family: var(--font-jakarta);
+  }
+}
+@keyframes infinite-scroll-1 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes infinite-scroll-2 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes infinite-scroll-3 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-168rem);
   }
 }

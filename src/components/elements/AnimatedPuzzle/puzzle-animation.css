@@ -1,0 +1,295 @@
+/* Puzzle Animation Styles */
+.puzzle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+
+  /* No background - transparent */
+  background: transparent;
+}
+
+.animated-puzzle {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+
+  /* CSS Custom Properties for dynamic theming */
+  --primary-color: #ffffff;
+  --secondary-color: #64b5f6;
+  --animation-duration: 4s;
+  --piece-delay: 1s;
+}
+
+.puzzle-piece {
+  opacity: 0;
+  transform: scale(0.8) translateZ(-50px);
+  animation: puzzleSequence 12s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.puzzle-path {
+  stroke: var(--primary-color);
+  fill: var(--primary-color);
+  fill-opacity: 0.1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Keyframe Animations - Sequential Appear and Disappear */
+@keyframes puzzleSequence {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateZ(-50px);
+  }
+  5% {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+  55% {
+    opacity: 0;
+    transform: scale(0.8) translateZ(-50px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateZ(-50px);
+  }
+}
+
+/* Hover Effects */
+.puzzle-piece:hover .puzzle-path {
+  stroke: var(--color-neutral-50);
+  fill: var(--color-neutral-50);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 10px var(--secondary-color));
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .puzzle-container {
+    padding: 20px;
+  }
+
+  .animated-puzzle {
+    max-width: 90vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .animated-puzzle {
+    max-width: 95vw;
+  }
+}
+
+/* Animation variants removed - only using fill animation */
+
+/* Sequential Animation Timing - Appear and Disappear */
+.puzzle-piece:nth-child(1) {
+  animation-delay: 0s;
+}
+.puzzle-piece:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.puzzle-piece:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.puzzle-piece:nth-child(4) {
+  animation-delay: 0.6s;
+}
+.puzzle-piece:nth-child(5) {
+  animation-delay: 0.8s;
+}
+.puzzle-piece:nth-child(6) {
+  animation-delay: 1s;
+}
+.puzzle-piece:nth-child(7) {
+  animation-delay: 1.2s;
+}
+.puzzle-piece:nth-child(8) {
+  animation-delay: 1.4s;
+}
+.puzzle-piece:nth-child(9) {
+  animation-delay: 1.6s;
+}
+.puzzle-piece:nth-child(10) {
+  animation-delay: 1.8s;
+}
+.puzzle-piece:nth-child(11) {
+  animation-delay: 2s;
+}
+.puzzle-piece:nth-child(12) {
+  animation-delay: 2.2s;
+}
+.puzzle-piece:nth-child(13) {
+  animation-delay: 2.4s;
+}
+.puzzle-piece:nth-child(14) {
+  animation-delay: 2.6s;
+}
+.puzzle-piece:nth-child(15) {
+  animation-delay: 2.8s;
+}
+.puzzle-piece:nth-child(16) {
+  animation-delay: 3s;
+}
+.puzzle-piece:nth-child(17) {
+  animation-delay: 3.2s;
+}
+.puzzle-piece:nth-child(18) {
+  animation-delay: 3.4s;
+}
+.puzzle-piece:nth-child(19) {
+  animation-delay: 3.6s;
+}
+.puzzle-piece:nth-child(20) {
+  animation-delay: 3.8s;
+}
+.puzzle-piece:nth-child(21) {
+  animation-delay: 4s;
+}
+.puzzle-piece:nth-child(22) {
+  animation-delay: 4.2s;
+}
+.puzzle-piece:nth-child(23) {
+  animation-delay: 4.4s;
+}
+.puzzle-piece:nth-child(24) {
+  animation-delay: 4.6s;
+}
+.puzzle-piece:nth-child(25) {
+  animation-delay: 4.8s;
+}
+.puzzle-piece:nth-child(26) {
+  animation-delay: 5s;
+}
+.puzzle-piece:nth-child(27) {
+  animation-delay: 5.2s;
+}
+.puzzle-piece:nth-child(28) {
+  animation-delay: 5.4s;
+}
+.puzzle-piece:nth-child(29) {
+  animation-delay: 5.6s;
+}
+.puzzle-piece:nth-child(30) {
+  animation-delay: 5.8s;
+}
+.puzzle-piece:nth-child(31) {
+  animation-delay: 6s;
+}
+.puzzle-piece:nth-child(32) {
+  animation-delay: 6.2s;
+}
+.puzzle-piece:nth-child(33) {
+  animation-delay: 6.4s;
+}
+
+/* Active State Effects */
+.puzzle-container.active .puzzle-path {
+  stroke: var(--secondary-color);
+  fill: var(--secondary-color);
+  fill-opacity: 0.15;
+  filter: drop-shadow(0 0 15px var(--secondary-color));
+}
+
+/* Infinite Loop Animation */
+.puzzle-container.infinite-loop .puzzle-piece {
+  animation-iteration-count: infinite;
+}
+
+/* Sparkle Effect */
+.puzzle-container.show-sparkles .puzzle-piece::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--secondary-color);
+  border-radius: 50%;
+  opacity: 0;
+  animation: sparkle 3s ease-in-out infinite;
+  animation-delay: calc(var(--piece-index) * var(--piece-delay) + 1s);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+@keyframes sparkle {
+  0%,
+  90%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Wave Animation Effect */
+.puzzle-container.wave-effect .puzzle-piece {
+  animation: puzzleWave calc(var(--animation-duration) * 3) ease-in-out infinite;
+  animation-delay: calc(var(--piece-index) * 0.1s);
+}
+
+@keyframes puzzleWave {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-10px) scale(1.02);
+  }
+  50% {
+    transform: translateY(0) scale(1);
+  }
+  75% {
+    transform: translateY(5px) scale(0.98);
+  }
+}
+
+/* Completion Effect */
+.puzzle-container.completed .puzzle-path {
+  stroke: var(--secondary-color);
+  fill: var(--secondary-color);
+  fill-opacity: 0.3;
+  filter: drop-shadow(0 0 20px var(--secondary-color)) brightness(1.2);
+  animation: completionGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes completionGlow {
+  0% {
+    filter: drop-shadow(0 0 20px var(--secondary-color)) brightness(1.2);
+  }
+  100% {
+    filter: drop-shadow(0 0 30px var(--secondary-color)) brightness(1.4);
+  }
+}
+
+/* Advanced Puzzle Layout Styling */
+.puzzle-container.complex-layout {
+  /* No background - transparent */
+  background: transparent;
+}
+
+/* Performance Optimizations for Large Puzzle */
+.puzzle-piece {
+  contain: layout style paint;
+  transform-origin: center center;
+}
+
+.puzzle-path {
+  shape-rendering: geometricPrecision;
+  text-rendering: optimizeSpeed;
+}
