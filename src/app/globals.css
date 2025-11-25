@@ -57,6 +57,11 @@
     var(--primary-200, rgba(111, 130, 192, 0.7)) 0%,
     var(--primary-400, rgba(50, 65, 115, 0.7)) 100%
   );
+  --gradient-card-blur: linear-gradient(
+    90deg,
+    var(--Colors-Primary-200, rgba(111, 130, 192, 0.4)) 0%,
+    var(--Colors-Primary-400, rgba(50, 65, 115, 0.4)) 100%
+  );
 
   --gradient-button-primary: linear-gradient(
     90deg,
@@ -234,6 +239,8 @@
   --gradient-card: var(--gradient-card);
   --gradient-button-primary: var(--gradient-button-primary);
   --gradient-button-secondary: var(--gradient-button-secondary);
+  --background-image-gradient-card-blur: var(--gradient-card-blur);
+  --gradient-card-blur: var(--gradient-card-blur);
 
   --color-neutral-1000: var(--neutral-1000);
   --color-neutral-900: var(--neutral-900);
