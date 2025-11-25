@@ -3,6 +3,7 @@ import About from "./section/About";
 import HowTo from "./section/HowTo";
 import ContactPerson from "@/components/elements/ContactPerson";
 import Partners from "./section/Partners";
+import FrequentlyAsked from "./section/Frequently";
 
 const LandingModules = () => {
   return (
@@ -29,6 +30,7 @@ const LandingModules = () => {
           ]}
         />
       </div>
+      <FrequentlyAsked />
     </main>
   );
 };
