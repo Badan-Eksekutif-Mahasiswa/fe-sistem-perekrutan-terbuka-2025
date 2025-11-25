@@ -25,9 +25,9 @@ const FilterCard = ({
   };
 
   return (
-    <div className="text-white min-w-0 w-full max-w-sm overflow-hidden p-6 border-1 h-fit bg-gradient-card relative text-start border-primary-300 flex flex-col rounded-xl gap-5">
-      <h2 className="text-h2">Filter</h2>
-      <div className="flex flex-col p-2 gap-4">
+    <div className="text-white min-w-0 w-full lg:max-w-sm overflow-hidden p-6 border-1 h-fit bg-gradient-card-glass backdrop-blur-sm relative text-start border-primary-300 flex flex-col rounded-xl gap-5">
+      <h2 className="text-h2 max-md:text-center">Filter</h2>
+      <div className="flex lg:flex-col flex-wrap justify-between p-2 gap-4">
         {filterCategory.map((category, i) => (
           <div key={i} className="space-y-2">
             <h4 className="text-h4">{category.type}</h4>
@@ -57,7 +57,7 @@ const FilterCard = ({
           </div>
         ))}
       </div>
-      <div className="absolute z-0 inset-0 flex justify-end -bottom-96 -right-60 items-center pointer-events-none">
+      <div className="absolute z-0 inset-0 flex justify-end -bottom-96 -right-30 lg:-right-60 items-center pointer-events-none">
         <AnimatedPuzzle
           width={800}
           height={700}
