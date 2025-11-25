@@ -58,6 +58,12 @@
     var(--primary-400, rgba(50, 65, 115, 0.7)) 100%
   );
 
+  --gradient-card-glass: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary-200), transparent 30%) 0%,
+    color-mix(in srgb, var(--primary-400), transparent 30%) 100%
+  );
+
   --gradient-button-primary: linear-gradient(
     90deg,
     var(--primary-200, rgba(111, 130, 192, 0.7)) 0%,
@@ -229,7 +235,11 @@
   --color-yellow-500: var(--yellow-500);
 
   --background-image-gradient-card: var(--gradient-card);
+  --background-image-gradient-card-glass: var(--gradient-card-glass);
+
   --gradient-card: var(--gradient-card);
+  --gradient-card-glass: var(--gradient-card-glass);
+
   --gradient-button-primary: var(--gradient-button-primary);
   --gradient-button-secondary: var(--gradient-button-secondary);
 

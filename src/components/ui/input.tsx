@@ -17,13 +17,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       ? React.cloneElement(
           icon as React.ReactElement,
           {
-            className: "absolute left-3 text-primary-300 top-1/2 transform -translate-y-1/2 w-4",
+            className:
+              "absolute left-3 text-primary-300 top-1/2 transform -translate-y-1/2 w-4",
           } as React.SVGProps<SVGSVGElement>
         )
       : null;
 
     return (
-      <div className="space-y-1">
+      <div className={cn("space-y-1 w-full", className)}>
         <Label className="text-neutral-50 font-jakarta">{label}</Label>
         <div className="relative">
           {icon && clonedIcon}

@@ -154,7 +154,6 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
             </div>
           </div>
         </div>
-
         {error && (
           <div className="flex gap-2 items-center text-red-400">
             <TriangleAlert className="w-4" />
