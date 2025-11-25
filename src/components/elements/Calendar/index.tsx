@@ -227,11 +227,11 @@ const Calendar: React.FC<CalendarProps> = ({
             );
           })}
         </div>
-        <div className="w-full border-b mt-3" />
+        <div className="w-full border-b max-lg:border-b-0 max-md:border-b mt-3" />
       </div>
 
       {/* Schedule */}
-      <div className="w-full justify-center font-jakarta text-p6 mx-auto flex flex-col gap-2 text-neutral-100 shadow-lg px-6 py-2 pb-6">
+      <div className="w-full max-lg:border-l max-md:border-l-0 justify-center font-jakarta text-p6 mx-auto flex flex-col gap-2 text-neutral-100 shadow-lg px-6 py-2 pb-6">
         {ranges.map((range, index) => (
           <div key={index} className="flex ">
             <p className=" bg-clip-text font-bold bg-gradient-kiwi">

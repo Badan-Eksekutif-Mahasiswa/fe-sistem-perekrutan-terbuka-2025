@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Info, UserPen } from "lucide-react";
+import OnGoing from "./OnGoing";
 
 const Hero = () => {
   const parallaxRef = useRef<HTMLDivElement>(null);
@@ -77,7 +78,8 @@ const Hero = () => {
       </div>
 
       <div className="relative min-h-screen bg-[var(--bg-main)] z-10">
-        <div className="absolute top-0 -translate-y-[85%] w-full aspect-[5866/3110] pointer-events-none">
+        {/* Parallax effect */}
+        <div className="absolute top-0 z-1 -translate-y-[85%] w-full aspect-[5866/3110] pointer-events-none">
           <Image
             src="/hero-parallax.webp"
             alt="Hero Background"
@@ -85,6 +87,12 @@ const Hero = () => {
             className="object-contain"
             priority
           />
+        </div>
+        {/* End parallax Effect */}
+
+        {/* About Section */}
+        <div className="relative z-10">
+          <OnGoing />
         </div>
       </div>
     </section>
