@@ -27,22 +27,22 @@ const Hero = () => {
       {/* Background image full cover with parallax */}
       <div
         ref={parallaxRef}
-        className="absolute -translate-y-100 inset-0 will-change-transform"
+        className="absolute -translate-y-100 max-lg:-translate-y-200 inset-0 will-change-transform"
       >
         <Image
           src="/hero.webp"
           alt="Hero Background"
           fill
-          className="object-cover max-lg:hidden"
+          className="object-cover"
           priority
         />
-        <Image
+        {/* <Image
           src="/hero-mobile.webp"
           alt="Hero Background"
           fill
           className="object-cover hidden max-lg:block"
           priority
-        />
+        /> */}
       </div>
 
       {/* Konten di atas gambar */}
