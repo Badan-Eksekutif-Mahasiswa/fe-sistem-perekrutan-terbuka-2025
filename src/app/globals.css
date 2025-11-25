@@ -285,6 +285,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  --animate-infinite-scroll-1: infinite-scroll-1 24s linear infinite;
+  --animate-infinite-scroll-2: infinite-scroll-2 24s linear infinite;
+  --animate-infinite-scroll-3: infinite-scroll-3 24s linear infinite;
 }
 
 .dark {
@@ -359,5 +363,29 @@
     @apply bg-background text-foreground;
     background: var(--bg-main);
     font-family: var(--font-jakarta);
+  }
+}
+@keyframes infinite-scroll-1 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes infinite-scroll-2 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes infinite-scroll-3 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-168rem);
   }
 }
