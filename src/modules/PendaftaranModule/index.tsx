@@ -4,9 +4,21 @@ import FilterCard from "./components/FilterCard";
 import { FilterCategory, Events } from "./const";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { SearchIcon, ArrowUpDown, DiamondIcon, XIcon } from "lucide-react";
+import {
+  SearchIcon,
+  ArrowUpDown,
+  DiamondIcon,
+  XIcon,
+  Check,
+} from "lucide-react";
 
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import EventCard from "./components/EventCard";
 
 import type { EventType } from "./type";
@@ -18,10 +30,10 @@ const PendaftaranModule = () => {
 
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-
   const [filteredEvent, setFilteredEvent] =
     useState<readonly EventType[]>(Events);
   const [activeTab, setActiveTab] = useState("semua");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   const handleSearchQuery = () => {
     setSearchQuery(inputValue);
@@ -34,15 +46,16 @@ const PendaftaranModule = () => {
     }
   };
 
+  // useEffect for filtering and Sorting
   useEffect(() => {
     const activeCategories = Object.keys(selectedCategoties).filter(
       (key) => selectedCategoties[key]
     );
 
-    const results = Events.filter((e) => {
+    let results = Events.filter((e) => {
       const isCategoryMatch =
         activeCategories.length === 0 ||
-        e.categories.some((cat) => activeCategories.includes(cat));
+        e.categories.some((c) => activeCategories.includes(c));
 
       const isSearchMatch = e.title
         .toLowerCase()
@@ -51,8 +64,19 @@ const PendaftaranModule = () => {
       return isCategoryMatch && isSearchMatch;
     });
 
+    results = results.sort((a, b) => {
+      const dateA = new Date(a.startedAt).getTime();
+      const dateB = new Date(b.startedAt).getTime();
+      console.log(dateA, dateB);
+      if (sortOrder === "newest") {
+        return dateB - dateA;
+      } else {
+        return dateA - dateB;
+      }
+    });
+
     setFilteredEvent(results);
-  }, [selectedCategoties, searchQuery]);
+  }, [selectedCategoties, searchQuery, sortOrder]);
 
   const eventDibuka = filteredEvent.filter((e) => e.status === "Dibuka");
   const eventAkanDatang = filteredEvent.filter(
@@ -107,9 +131,23 @@ const PendaftaranModule = () => {
                 >
                   Cari <SearchIcon />
                 </Button>
-                <Button variant="ghost" className=" ">
-                  <ArrowUpDown />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className=" ">
+                      <ArrowUpDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40" align="start">
+                    <DropdownMenuItem onClick={() => setSortOrder("newest")}>
+                      Sort by Newest
+                      {sortOrder === "newest" && <Check size={16} />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortOrder("oldest")}>
+                      Sory by Oldest
+                      {sortOrder === "oldest" && <Check size={16} />}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <div className="flex text-center items-center flex-wrap gap-2.5">
                 <h4 className="text-h4">Filter Terpasang: </h4>
