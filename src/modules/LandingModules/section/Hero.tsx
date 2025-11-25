@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { Info, UserPen } from "lucide-react";
 
 const Hero = () => {
   const parallaxRef = useRef<HTMLDivElement>(null);
@@ -44,8 +45,35 @@ const Hero = () => {
       </div>
 
       {/* Konten di atas gambar */}
-      <div className="relative min-h-screen flex flex-col justify-center items-center z-20">
-        <Button>Tes</Button>
+      <div className="relative text-white min-h-screen flex flex-col gap-4 text-center justify-center items-center z-20">
+        <div className="relative aspect-square w-30">
+          <Image
+            src="/logo-clean.webp"
+            alt="logo"
+            fill
+            className="object-contain"
+          />
+        </div>
+        <h1 className="text-4xl font-bold">Sistem Perekrutan Terbuka</h1>
+        <p className="text-m3">by BEM UI 2025</p>
+        <div className="relative aspect-auto w-70 h-10">
+          <Image
+            src="/warnai-angan.png"
+            alt="logo"
+            fill
+            className="object-contain"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Button>
+            <UserPen />
+            Mulai Daftar
+          </Button>
+          <Button variant={"secondary"}>
+            <Info />
+            Tentang SPT
+          </Button>
+        </div>
       </div>
 
       <div className="relative min-h-screen bg-[var(--bg-main)] z-10">
