@@ -7,7 +7,7 @@ const Loader = () => {
         <Image
           src="/logo-clean.webp"
           alt="loader"
-          fill
+          layout="fill"
           className="object-contain"
         />
       </div>
