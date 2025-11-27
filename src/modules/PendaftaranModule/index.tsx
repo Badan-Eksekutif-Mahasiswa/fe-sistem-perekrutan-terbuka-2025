@@ -213,8 +213,8 @@ const PendaftaranModule = () => {
               {/* Event Cards */}
               <div className="space-y-5 mt-5">
                 {paginatedEvents.length > 0 ? (
-                  paginatedEvents.map((e) => (
-                    <EventCard event={e} key={e.title} />
+                  paginatedEvents.map((e, i) => (
+                    <EventCard event={e} index={i + 1} key={e.title} />
                   ))
                 ) : (
                   <p className="text-neutral-400 mt-10">

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
-    <main className="relative w-screen min-h-screen bg-linear-to-b from-secondary-300 to-secondary-100">
+    <main className="relative w-screen overflow-hidden min-h-screen bg-linear-to-b from-secondary-300 to-secondary-100">
       <div className="w-7xl max-md:hidden absolute top-16 right-20 h-[139px] z-10">
         <Image src={"/events/sky-assets.webp"} layout="fill" alt="Sky Assets" />
       </div>
@@ -37,7 +37,7 @@ const Hero = () => {
       />
 
       {/* Child Hill */}
-      <div className="w-full h-full">
+      <div className="w-full h-full max-md:bottom-[600px] absolute md:bottom-30">
         <Image
           src={"/events/hill.webp"}
           layout="fill"
@@ -47,17 +47,27 @@ const Hero = () => {
       </div>
 
       {/* Main Hill */}
-      <div className="w-full h-full absolute -bottom-22">
+      <div className="w-[105%] h-full max-md:hidden absolute bottom-0 -translate-x-1/2 left-1/2">
         <Image
-          src={"/events/hill-2.png"}
+          src={"/events/hill-main.webp"}
           layout="fill"
           alt="hill"
           className="object-contain object-bottom "
         />
       </div>
 
+      <div className="absolute md:hidden bottom-0 w-full h-[560px] bg-primary-500 z-10"></div>
+      <div className="w-[105%] md:hidden h-full absolute bottom-[530px] -translate-x-1/2 left-1/2 z-20">
+        <Image
+          src={"/events/hill-main-mobile.webp"}
+          layout="fill"
+          alt="hill"
+          className="object-contain object-bottom"
+        />
+      </div>
+
       {/* Main Content */}
-      <div className="flex px-5 py-10 mt-16 lg:px-36 lg:py-0 lg:gap-40 z-50 w-full h-screen max-lg:flex-col flex-row gap-12 lg:justify-between items-center">
+      <div className="flex px-5 py-10 max-md:mt-20 lg:px-36 lg:py-0 lg:gap-40 z-50 w-full h-screen max-lg:flex-col flex-row gap-12 lg:justify-between items-center">
         <div
           className="flex flex-col text-center z-50 items-center gap-5
          lg:gap-15 text-white"
@@ -73,7 +83,7 @@ const Hero = () => {
             />
           </div>
           <p className="text-p4 lg:text-p3">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat
+            Lorem ipsum dolor, sit amet consectetur adipisipcing elit. Quaerat
             laudantium alias obcaecati sequi. Pariatur eligendi laboriosam natus
             vitae nihil, eius excepturi ut quia, ipsam, magnam expedita quisquam
             repellendus! Laudantium, vero!
