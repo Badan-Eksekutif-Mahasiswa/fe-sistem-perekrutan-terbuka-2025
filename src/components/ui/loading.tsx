@@ -17,7 +17,7 @@ export const LoadingSpinner = ({
 
   return (
     <div
-      className={`animate-spin rounded-full border-b-2 border-blue-600 ${sizeClasses[size]} ${className}`}
+      className={`animate-spin rounded-full border-b-2 border-primary-500 ${sizeClasses[size]} ${className}`}
     />
   );
 };
