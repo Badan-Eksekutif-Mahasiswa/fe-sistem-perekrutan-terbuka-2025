@@ -1,0 +1,78 @@
+"use client";
+
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { User, AuthContextType } from "@/types/auth";
+import { authApi } from "@/lib/auth";
+import { toast } from "sonner";
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const checkAuth = async () => {
+    try {
+      setIsLoading(true);
+      const response = await authApi.getSession();
+
+      if (response.success && response.user) {
+        setUser(response.user);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const login = (redirectPath?: string) => {
+    authApi.login(redirectPath);
+  };
+
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      const response = await authApi.logout();
+
+      if (response.success) {
+        setUser(null);
+        toast.success("Logged out successfully");
+        // Redirect to home page after logout
+        window.location.href = "/";
+      } else {
+        toast.error(response.message || "Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("An error occurred during logout");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const value: AuthContextType = {
+    user,
+    isLoading,
+    login,
+    logout,
+    checkAuth,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
