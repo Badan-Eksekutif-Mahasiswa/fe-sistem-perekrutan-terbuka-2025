@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
-    <main className="relative w-screen overflow-x-hidden bg-primary-500 bg-linear-to-b from-secondary-300 to-secondary-100">
+    <main id="hero-section" className="relative w-screen overflow-x-hidden bg-primary-500 bg-linear-to-b from-secondary-300 to-secondary-100">
       <div className="w-7xl max-md:hidden absolute top-16 right-20 h-[139px] z-10">
         <Image src={"/events/sky-assets.webp"} layout="fill" alt="Sky Assets" />
       </div>
