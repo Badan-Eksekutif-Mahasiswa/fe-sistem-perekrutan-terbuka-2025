@@ -21,6 +21,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const Divisi = () => {
   const [indexDivisi, setIndexDivisi] = useState(0);
   const divisiDipilih = divisiData[indexDivisi];
+  const bphNames =
+    divisiDipilih.bphName.length > 1
+      ? `${divisiDipilih.bphName.slice(0, -1).join(", ")} & ${
+          divisiDipilih.bphName[divisiDipilih.bphName.length - 1]
+        }`
+      : divisiDipilih.bphName[0];
 
   return (
     <main className="min-h-screen flex px-5 py-2.5 gap-5 md:px-20 md:py-10 md:gap-10 flex-col items-center">
@@ -84,9 +90,7 @@ const Divisi = () => {
                   <h3 className="text-h3 ">
                     PIC & VPIC <br /> {divisiDipilih.nama}
                   </h3>
-                  <p className="text-p3">
-                    {divisiDipilih.bphName[0]}, {divisiDipilih.bphName[1]}
-                  </p>
+                  <p className="text-p3">{bphNames}</p>
                 </CardContent>
               </Card>
               <div className="flex flex-row gap-3 justify-between">
@@ -174,9 +178,7 @@ const Divisi = () => {
                   <h3 className="text-h3 ">
                     PIC & VPIC <br /> {divisiDipilih.nama}
                   </h3>
-                  <p className="text-p3">
-                    {divisiDipilih.bphName[0]} & Kak {divisiDipilih.bphName[1]}
-                  </p>
+                  <p className="text-p3">{bphNames}</p>
                 </CardContent>
               </Card>
               <div className="flex w-full flex-row gap-3 justify-between">
