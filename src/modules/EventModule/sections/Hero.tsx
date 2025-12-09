@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
-    <main className="relative w-screen overflow-hidden min-h-screen bg-linear-to-b from-secondary-300 to-secondary-100">
+    <main className="relative w-screen overflow-x-hidden bg-primary-500 bg-linear-to-b from-secondary-300 to-secondary-100">
       <div className="w-7xl max-md:hidden absolute top-16 right-20 h-[139px] z-10">
         <Image src={"/events/sky-assets.webp"} layout="fill" alt="Sky Assets" />
       </div>
@@ -25,7 +25,7 @@ const Hero = () => {
         width={74}
         height={109}
         alt="hill"
-        className="absolute max-md:hidden z-0 animate-float left-40 bottom-80"
+        className="absolute max-md:hidden z-0 animate-float left-40 bottom-96"
       />
 
       <Image
@@ -67,7 +67,7 @@ const Hero = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex px-5 py-10 max-md:mt-20 lg:px-36 lg:py-0 lg:gap-40 z-50 w-full h-screen max-lg:flex-col flex-row gap-12 lg:justify-between items-center">
+      <div className="flex px-5 py-10 max-lg:mt-20 md:px-20 lg:px-36 lg:py-0 lg:gap-40 z-50 w-full min-h-screen max-lg:flex-col flex-row gap-12 lg:justify-between items-center">
         <div
           className="flex flex-col text-center z-50 items-center gap-5
          lg:gap-15 text-white"
@@ -75,7 +75,7 @@ const Hero = () => {
           <h1 className="font-extrabold font-jakarta text-h2 lg:text-6xl tracking-wide leading-normal  text-shadow-lg text-shadow-black">
             Staff Semarak Apresiasi <br /> 2025
           </h1>
-          <div className="relative w-32 h-32 lg:w-72 lg:h-72">
+          <div className="relative w-32 h-32 md:w-72 md:h-72">
             <Image
               src={"/placeholders/logo-event.webp"}
               alt="Logo"
@@ -89,7 +89,7 @@ const Hero = () => {
             repellendus! Laudantium, vero!
           </p>
         </div>
-        <Card className="text-center z-50 justify-center flex flex-col p-6 gap-6">
+        <Card className="text-center w-full z-20 justify-center flex flex-col p-6 gap-6">
           <CardHeader>
             <CardTitle>
               Pendaftaran Ditutup <br /> dalam
