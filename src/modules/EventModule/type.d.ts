@@ -14,7 +14,19 @@ type DivisiDataType = {
   desc: string;
   jobdesc: string;
   bphName: string[];
-  bphIamge: string;
+  bphImage: string;
 };
 
-export type { EventTimelineType, TimelineMarkerProps, DivisiDataType };
+type TestimonyType = {
+  profilePicture: string;
+  name: string;
+  jabatan: string;
+  desc: string;
+};
+
+export type {
+  EventTimelineType,
+  TimelineMarkerProps,
+  DivisiDataType,
+  TestimonyType,
+};

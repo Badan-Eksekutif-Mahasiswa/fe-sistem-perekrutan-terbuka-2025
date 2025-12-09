@@ -12,7 +12,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -29,7 +28,7 @@ const Divisi = () => {
       : divisiDipilih.bphName[0];
 
   return (
-    <main className="min-h-screen flex px-5 py-2.5 gap-5 md:px-20 md:py-10 md:gap-10 flex-col items-center">
+    <main className=" min-h-screen justify-center flex px-5 py-2.5 gap-5 md:px-20 md:py-10 md:gap-10 flex-col items-center">
       <h1 className="text-h3 md:text-h1 text-white">Divisi-Divisi Kami</h1>
       {/*  Details Divisi Desktop */}
       <div className="flex max-md:hidden flex-col lg:flex-row gap-6">
@@ -75,11 +74,11 @@ const Divisi = () => {
 
         {/* Divisi Content */}
         <div className="flex gap-5 flex-col">
-          <div className="flex flex-col lg:flex-row gap-5">
+          <div className="flex flex-col items-center lg:flex-row gap-5">
             <div className="flex gap-5 flex-col w-fit">
               <Card className="text-center w-fit rounded-3xl z-20 justify-center flex flex-col">
                 <CardContent className="gap-2 px-3 py-3">
-                  <div className="max-lg:w-[72vw] w-72 h-72 relative rounded-lg overflow-hidden">
+                  <div className="max-lg:w-[72vw] w-96 h-72 relative rounded-lg overflow-hidden">
                     <Image
                       src={"/placeholder-1.webp"}
                       alt="Gambar PIC"
@@ -154,13 +153,13 @@ const Divisi = () => {
           <TabsContent value="deskripsi" className="mt-4 text-white">
             <div className="bg-gradient-card border-1 rounded-3xl flex-1 border-primary-300 p-6 gap-4 flex flex-col ">
               <h2 className="text-h2">Deskripsi Divisi</h2>
-              <p className="text-p3 ">{divisiDipilih.desc}</p>
+              <p className="text-p4 ">{divisiDipilih.desc}</p>
             </div>
           </TabsContent>
           <TabsContent value="jobdesk" className="mt-4 text-white ">
             <div className="bg-gradient-card border-1 rounded-3xl flex-1 border-primary-300 p-6 gap-4 flex flex-col ">
               <h2 className="text-h2">Jobdesk</h2>
-              <p className="text-p3 ">{divisiDipilih.jobdesc}</p>
+              <p className="text-p4 ">{divisiDipilih.jobdesc}</p>
             </div>
           </TabsContent>
           <TabsContent value="kontak" className="mt-4 text-white">
