@@ -1,11 +1,11 @@
 import Hero from "./sections/Hero";
-import Timeline from "./sections/Timeline";
+import TimelineSection from "./sections/TimelineSection";
 
 const EventModule = () => {
   return (
     <main className="min-h-screen">
       <Hero />
-      {/* <Timeline /> */}
+      <TimelineSection />
     </main>
   );
 };
