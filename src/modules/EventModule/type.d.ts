@@ -9,4 +9,12 @@ type TimelineMarkerProps = {
   isLast: boolean;
 };
 
-export type { EventTimelineType, TimelineMarkerProps };
+type DivisiDataType = {
+  nama: string;
+  desc: string;
+  jobdesc: string;
+  bphName: string[];
+  bphIamge: string;
+};
+
+export type { EventTimelineType, TimelineMarkerProps, DivisiDataType };

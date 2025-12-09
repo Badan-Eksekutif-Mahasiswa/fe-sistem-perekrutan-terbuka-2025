@@ -1,5 +1,4 @@
 import React from "react";
-import { ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
 import type { EventTimelineType, TimelineMarkerProps } from "../type";
 import { timelineData } from "../const";
 import { Button } from "@/components/ui/button";
@@ -36,11 +35,11 @@ const TimelineMarker = ({ isEven, isLast }: TimelineMarkerProps) => {
   );
 };
 
-const TimelineSection = () => {
+const Timeline = () => {
   return (
     <>
       <h1 className="text-center text-h1 text-white mb-5">Timeline</h1>
-      <main className="w-full min-h-screen bg-primary-500 flex flex-col gap-10 py-10  overflow-x-auto">
+      <main className="w-full bg-primary-500 flex flex-col gap-10 py-10  overflow-x-auto">
         <div className="relative w-max px-10 md:px-20 md:pr-40 ">
           <div className="flex justify-between items-stretch w-full relative z-10">
             {timelineData.map((item, index) => {
@@ -81,4 +80,4 @@ const TimelineSection = () => {
   );
 };
 
-export default TimelineSection;
+export default Timeline;
