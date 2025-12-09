@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { ChevronRightIcon, ChevronLeftIcon, Pause } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/carousel";
 import { TestimonyType } from "@/modules/EventModule/type";
 import { testimoniData } from "@/modules/EventModule/const";
-import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 
 type CarouselElementProps = {
   testimonyData: TestimonyType[];
@@ -20,6 +20,7 @@ type CarouselElementProps = {
 
 const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   const handleNext = () => {
     setActiveIndex((prev) => (prev + 1) % testimonyData.length);
@@ -30,6 +31,16 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
       (prev) => (prev - 1 + testimonyData.length) % testimonyData.length
     );
   };
+
+  useEffect(() => {
+    if (isPaused) return;
+
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % testimonyData.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isPaused, testimonyData.length]);
 
   const getSlideStyles = (index: number) => {
     const total = testimoniData.length;
@@ -57,7 +68,11 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
 
   return (
     <>
-      <div className="w-full max-lg:hidden flex items-center justify-center gap-44 py-24">
+      <div
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        className="w-full max-lg:hidden flex items-center justify-center gap-44 py-24"
+      >
         <button
           onClick={handlePrev}
           className="flex-shrink-0 left-10 z-50 w-12 h-12 rounded-full bg-gradient-card text-white flex items-center justify-center cursor-pointer"
@@ -121,7 +136,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
       <div className="h-full lg:hidden">
         <Carousel
           opts={{ loop: true, align: "center" }}
-          className="max-md:w-11/16 max-w-sm mx-auto "
+          className="max-md:w-11/16 max-w-xl  mx-auto"
         >
           <CarouselContent className="items-stretch">
             {testimoniData.map((item: TestimonyType, index) => {
