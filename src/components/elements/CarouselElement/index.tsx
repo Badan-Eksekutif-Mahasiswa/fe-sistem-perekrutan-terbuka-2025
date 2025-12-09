@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/carousel";
 import { TestimonyType } from "@/modules/EventModule/type";
 import { testimoniData } from "@/modules/EventModule/const";
-import Autoplay from "embla-carousel-autoplay";
 
 type CarouselElementProps = {
   testimonyData: TestimonyType[];
@@ -138,10 +137,13 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
           opts={{ loop: true, align: "center" }}
           className="max-md:w-11/16 max-w-xl  mx-auto"
         >
-          <CarouselContent className="items-stretch">
+          <CarouselContent className="items-stretch pt-20">
             {testimoniData.map((item: TestimonyType, index) => {
               return (
-                <CarouselItem key={index} className="mx-10 flex h-full">
+                <CarouselItem
+                  key={index}
+                  className="mx-10 flex h-full relative"
+                >
                   <div className="p-1 h-full">
                     <Card className="w-full h-full flex-1 flex flex-col  ">
                       <CardContent className="flex items-center justify-center p-1">

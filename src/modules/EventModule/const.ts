@@ -211,3 +211,12 @@ export const testimoniData = [
     desc: "Proses mencari sponsor sangat terbantu dengan materi dan presentasi yang mereka siapkan. Semuanya terlihat profesional, mudah dipahami, dan punya branding yang kuat. Banyak calon sponsor memuji materi tersebut, dan itu berkontribusi besar dalam keberhasilan negosiasi. Mereka nggak cuma kerja rapi—but actually elevate the whole project.",
   },
 ];
+
+export const documentationData = [
+  "https://placekitten.com/600/400",
+  "https://placebear.com/600/400",
+  "https://placebeard.it/600x400",
+  "https://place-puppy.com/600x400",
+  "https://fakeimg.pl/600x400/?text=Random+Image",
+  "https://placehold.co/600x400",
+];
