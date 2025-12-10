@@ -6,6 +6,7 @@ import {
   QuestionSectionSubmit,
   Section,
   ApplicationStatusResponse,
+  MyApplicationsResponse,
 } from "@/types/registration";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
@@ -159,6 +160,24 @@ export const registrationApi = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || "Failed to get application status");
+    }
+
+    return response.json();
+  },
+
+  // GET: Get my applications
+  async getMyApplications(): Promise<MyApplicationsResponse> {
+    const response = await fetch(`${BASE_URL}/registration/my-applications`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to get my applications");
     }
 
     return response.json();

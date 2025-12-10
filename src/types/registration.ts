@@ -132,3 +132,43 @@ export interface ApplicationStatusResponse {
     selectedDivisions?: SelectedDivision[];
   };
 }
+
+export type SelectionStage =
+  | "DOCUMENT_SCREENING"
+  | "INTERVIEW"
+  | "ACCEPTED"
+  | "REJECTED";
+
+export interface ApplicationDivision {
+  divisionId: string;
+  divisionName: string;
+  priority: number;
+  stage: SelectionStage | null;
+}
+
+export interface MyApplication {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  eventLogo: string | null;
+  typeOfEvent: string;
+  eventLevel: string;
+  openRegistration: string;
+  closeRegistration: string;
+  isSubmitted: boolean;
+  submittedAt: string | null;
+  lastEditedAt: string;
+  stage: SelectionStage | null;
+  selectedDivisions: ApplicationDivision[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MyApplicationsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    applications: MyApplication[];
+    total: number;
+  };
+}

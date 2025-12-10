@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getEventById } from "@/lib/api/event";
 import RegistrationFormModule from "@/modules/RegistrationFormModule";
 import Loader from "@/components/elements/Loader";
+import ProtectedRoute from "@/components/elements/ProtectedRoute";
 
 type RegistrationFormPageProps = {
   params: Promise<{
@@ -19,9 +20,11 @@ export default async function RegistrationFormPage({
     const event = await getEventById(id);
 
     return (
-      <Suspense fallback={<Loader />}>
-        <RegistrationFormModule event={event} />
-      </Suspense>
+      <ProtectedRoute>
+        <Suspense fallback={<Loader />}>
+          <RegistrationFormModule event={event} />
+        </Suspense>
+      </ProtectedRoute>
     );
   } catch (error) {
     console.error("Error loading event:", error);
