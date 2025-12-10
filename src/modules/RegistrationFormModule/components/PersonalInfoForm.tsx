@@ -14,12 +14,14 @@ interface PersonalInfoFormProps {
   data: PersonalInfoData;
   onLineChange: (value: string) => void;
   onDivisionSelect: (divisionId: string, priority: number) => void;
+  isReadOnly?: boolean;
 }
 
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
   data,
   onLineChange,
   onDivisionSelect,
+  isReadOnly = false,
 }) => {
   const [selectedDivisions, setSelectedDivisions] = React.useState<string[]>(
     data.selectedDivisions.map((d) => d.divisionId)
@@ -84,6 +86,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
           value={data.line}
           onChange={(e) => onLineChange(e.target.value)}
           placeholder="Masukkan ID Line Anda"
+          disabled={isReadOnly}
         />
       </div>
 
@@ -111,6 +114,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
                   onValueChange={(value) =>
                     handleDivisionSelect(value, priority)
                   }
+                  disabled={isReadOnly}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue

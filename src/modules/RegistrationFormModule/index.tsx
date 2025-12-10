@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PersonalInfoForm } from "./components/PersonalInfoForm";
 import { QuestionItem } from "./components/QuestionItem";
+import { SubmitConfirmationDialog } from "./components/SubmitConfirmationDialog";
 import { registrationApi } from "@/lib/api/registration";
 import Loader from "@/components/elements/Loader";
+import { useRouter } from "next/navigation";
 import {
   Section,
   PersonalInfoData,
@@ -18,6 +20,7 @@ import {
 import { useToast } from "@/hooks/useToast";
 
 export default function RegistrationFormModule() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId") || "";
   const toast = useToast();
@@ -26,6 +29,8 @@ export default function RegistrationFormModule() {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Refs for debounce timeouts
   const lineTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -65,9 +70,21 @@ export default function RegistrationFormModule() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSection]);
 
+  const fetchApplicationStatus = async () => {
+    try {
+      const response = await registrationApi.getApplicationStatus(eventId);
+      if (response.success && response.data.hasApplication) {
+        setIsSubmitted(response.data.isSubmitted);
+      }
+    } catch (error) {
+      console.error("Failed to fetch application status:", error);
+    }
+  };
+
   const fetchSections = async () => {
     try {
       setLoading(true);
+      await fetchApplicationStatus();
       const sections = await registrationApi.getSections(eventId);
       setSections(sections);
     } catch (error) {
@@ -116,6 +133,8 @@ export default function RegistrationFormModule() {
 
   const handleLineChange = useCallback(
     (value: string) => {
+      if (isSubmitted) return;
+
       setLineId(value);
 
       // Clear previous timeout
@@ -136,11 +155,13 @@ export default function RegistrationFormModule() {
         }
       }, 1000);
     },
-    [eventId]
+    [eventId, isSubmitted]
   );
 
   const handleDivisionSelect = useCallback(
     (divisionId: string, priority: number) => {
+      if (isSubmitted) return;
+
       setSelectedDivisions((prev) => {
         // Remove any division with the same priority (replacement)
         const newDivisions = prev.filter((d) => d.priority !== priority);
@@ -179,7 +200,7 @@ export default function RegistrationFormModule() {
         return newDivisions;
       });
     },
-    [personalInfo, eventId]
+    [personalInfo, eventId, isSubmitted]
   );
 
   const handleAnswerChange = useCallback(
@@ -291,6 +312,16 @@ export default function RegistrationFormModule() {
   };
 
   const handleNext = async () => {
+    // Jika sudah submitted, hanya navigasi tanpa save
+    if (isSubmitted) {
+      if (!isLastSection) {
+        setCurrentSectionIndex((prev) => prev + 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+
+    // Jika belum submitted, validasi dan save
     try {
       await submitCurrentSection();
 
@@ -298,11 +329,30 @@ export default function RegistrationFormModule() {
         setCurrentSectionIndex((prev) => prev + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
-        toast.show("success", "Pendaftaran berhasil diselesaikan!");
-        // Redirect or show success page
+        // Tampilkan dialog konfirmasi di section terakhir
+        setShowSubmitDialog(true);
       }
     } catch {
       // Error already handled in submitCurrentSection
+    }
+  };
+
+  const handleFinalSubmit = async () => {
+    try {
+      setSubmitting(true);
+      // TODO: Call API endpoint POST /registration/submit
+      await registrationApi.submitRegistration(eventId);
+
+      setShowSubmitDialog(false);
+      toast.show("success", "Pendaftaran berhasil diselesaikan!");
+      router.push("/dashboard");
+    } catch (error) {
+      toast.show(
+        "error",
+        error instanceof Error ? error.message : "Gagal submit pendaftaran"
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -349,14 +399,23 @@ export default function RegistrationFormModule() {
         {/* Form Card */}
         <div className="bg-gradient-card-blur backdrop-blur-md rounded-2xl p-8 shadow-2xl">
           <div className="mb-6">
-            <h2 className="text-2xl font-jakarta font-bold text-neutral-100 mb-2">
-              {isPersonalInfo
-                ? "Staff Semarak Apresiasi 2026"
-                : questionSection?.title || currentSection?.name}
-            </h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-2xl font-jakarta font-bold text-neutral-100">
+                {isPersonalInfo
+                  ? "Staff Semarak Apresiasi 2026"
+                  : questionSection?.title || currentSection?.name}
+              </h2>
+              {isSubmitted && (
+                <span className="px-3 py-1 bg-green-500/20 border-2 border-green-500 rounded-lg text-green-500 text-sm font-jakarta font-semibold">
+                  ✓ Submitted
+                </span>
+              )}
+            </div>
             <p className="text-neutral-200 text-sm">
               {isPersonalInfo
-                ? "Lengkapi form registrasi berikut"
+                ? isSubmitted
+                  ? "Formulir Anda telah di-submit. Data tidak dapat diubah."
+                  : "Lengkapi form registrasi berikut"
                 : questionSection?.description}
             </p>
           </div>
@@ -367,6 +426,7 @@ export default function RegistrationFormModule() {
                 data={{ ...personalInfo, line: lineId, selectedDivisions }}
                 onLineChange={handleLineChange}
                 onDivisionSelect={handleDivisionSelect}
+                isReadOnly={isSubmitted}
               />
             ) : questionSection ? (
               questionSection.questions.map((question) => (
@@ -375,6 +435,7 @@ export default function RegistrationFormModule() {
                   question={question}
                   value={answers.get(question.id) || ""}
                   onAnswerChange={handleAnswerChange}
+                  isReadOnly={isSubmitted}
                 />
               ))
             ) : null}
@@ -391,17 +452,32 @@ export default function RegistrationFormModule() {
               Previous
             </Button>
 
-            <Button
-              variant="secondary"
-              onClick={handleNext}
-              disabled={submitting}
-            >
-              {submitting ? "Menyimpan..." : isLastSection ? "Submit" : "Next"}
-              {!isLastSection && <ChevronRight className="w-4 h-4 ml-1" />}
-            </Button>
+            {/* Hide Next/Submit button only on last section when already submitted */}
+            {!(isSubmitted && isLastSection) && (
+              <Button
+                variant="secondary"
+                onClick={handleNext}
+                disabled={submitting}
+              >
+                {submitting
+                  ? "Menyimpan..."
+                  : isLastSection
+                  ? "Submit"
+                  : "Next"}
+                {!isLastSection && <ChevronRight className="w-4 h-4 ml-1" />}
+              </Button>
+            )}
           </div>
         </div>
       </main>
+
+      {/* Submit Confirmation Dialog */}
+      <SubmitConfirmationDialog
+        open={showSubmitDialog}
+        onOpenChange={setShowSubmitDialog}
+        onConfirm={handleFinalSubmit}
+        loading={submitting}
+      />
     </div>
   );
 }

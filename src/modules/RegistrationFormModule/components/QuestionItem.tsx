@@ -15,12 +15,14 @@ interface QuestionItemProps {
   question: Question;
   value: string;
   onAnswerChange: (questionId: string, value: string) => void;
+  isReadOnly?: boolean;
 }
 
 export const QuestionItem: React.FC<QuestionItemProps> = ({
   question,
   value,
   onAnswerChange,
+  isReadOnly = false,
 }) => {
   // Use value from parent, parse for multiple choice
   const multipleChoiceAnswers = React.useMemo(() => {
@@ -73,6 +75,7 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="Masukkan jawaban Anda"
             required={question.isRequired}
+            disabled={isReadOnly}
           />
         );
 
@@ -84,13 +87,15 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
             placeholder="Masukkan jawaban Anda"
             required={question.isRequired}
             rows={5}
+            disabled={isReadOnly}
             className={cn(
               "px-3 py-2 text-primary-300 focus:ring-2 focus:ring-offset-0 focus:ring-primary-100",
               "flex w-full font-jakarta rounded-xl border-2 font-normal bg-neutral-50",
               "hover:bg-neutral-100 focus:bg-neutral-200 text-p5",
               "placeholder:text-primary-300 focus-visible:outline-none",
               "border-primary-300 hover:border-primary-400 transition-all duration-500",
-              "resize-none"
+              "resize-none",
+              isReadOnly && "cursor-not-allowed opacity-60"
             )}
           />
         );
@@ -103,6 +108,7 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="Masukkan angka"
             required={question.isRequired}
+            disabled={isReadOnly}
           />
         );
 
@@ -113,6 +119,7 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
             value={value}
             onChange={(e) => handleInputChange(e.target.value)}
             required={question.isRequired}
+            disabled={isReadOnly}
           />
         );
 
@@ -123,9 +130,12 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
               <label
                 key={option.id}
                 className={cn(
-                  "flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all",
+                  "flex items-center gap-3 py-2 px-3 rounded-xl border-2 transition-all",
+                  isReadOnly
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer",
                   value === option.value
-                      ? "border-3 border-secondary-400 bg-neutral-50 text-neutral-50"
+                    ? "border-3 border-primary-400 bg-neutral-50 text-neutral-50"
                     : "border-primary-300 bg-neutral-50"
                 )}
               >
@@ -136,6 +146,7 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
                   checked={value === option.value}
                   onChange={(e) => handleInputChange(e.target.value)}
                   required={question.isRequired}
+                  disabled={isReadOnly}
                   className="w-4 h-4 text-secondary-300 focus:ring-secondary-300"
                 />
                 <span className="text-primary-500 font-jakarta">
@@ -155,7 +166,10 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
                 <label
                   key={option.id}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all",
+                    "flex items-center gap-3 py-2 px-3 rounded-xl border-2 transition-all",
+                    isReadOnly
+                      ? "cursor-not-allowed opacity-60"
+                      : "cursor-pointer",
                     isChecked
                       ? " border-3 border-primary-400 bg-neutral-50 text-neutral-50"
                       : "border-primary-300 bg-neutral-50"
@@ -171,6 +185,7 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
                         e.target.checked
                       )
                     }
+                    disabled={isReadOnly}
                     className="w-4 h-4 text-secondary-300 rounded focus:ring-secondary-300"
                   />
                   <span className="text-primary-500 font-jakarta">
@@ -184,7 +199,11 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
 
       case "DROPDOWN":
         return (
-          <Select value={value} onValueChange={handleInputChange}>
+          <Select
+            value={value}
+            onValueChange={handleInputChange}
+            disabled={isReadOnly}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Pilih opsi" />
             </SelectTrigger>

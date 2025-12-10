@@ -115,3 +115,19 @@ export interface QuestionSectionSubmit {
   section: string;
   answers: AnswerSubmit[];
 }
+
+export interface ApplicationStatusResponse {
+  success: boolean;
+  message: string;
+  data: {
+    hasApplication: boolean;
+    applicationId?: string;
+    isSubmitted: boolean;
+    submittedAt?: string;
+    lastEditedAt?: string;
+    stage?: string;
+    allRequiredFieldsFilled?: boolean;
+    canModify?: boolean;
+    selectedDivisions?: SelectedDivision[];
+  };
+}

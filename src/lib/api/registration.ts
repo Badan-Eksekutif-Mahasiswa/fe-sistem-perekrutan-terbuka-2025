@@ -5,6 +5,7 @@ import {
   PersonalInfoSubmit,
   QuestionSectionSubmit,
   Section,
+  ApplicationStatusResponse,
 } from "@/types/registration";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
@@ -116,6 +117,48 @@ export const registrationApi = {
       throw new Error(
         error.message || "Failed to partially update registration"
       );
+    }
+
+    return response.json();
+  },
+
+  // POST: Submit registration (final submit)
+  async submitRegistration(eventId: string): Promise<SubmitResponse> {
+    const response = await fetch(`${BASE_URL}/registration/submit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ eventId }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to submit registration");
+    }
+
+    return response.json();
+  },
+
+  // GET: Get application status
+  async getApplicationStatus(
+    eventId: string
+  ): Promise<ApplicationStatusResponse> {
+    const response = await fetch(
+      `${BASE_URL}/registration/status?eventId=${eventId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to get application status");
     }
 
     return response.json();
