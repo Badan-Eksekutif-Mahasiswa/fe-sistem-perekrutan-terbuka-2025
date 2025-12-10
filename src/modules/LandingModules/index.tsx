@@ -7,7 +7,6 @@ import HowTo from "./section/HowTo";
 import ContactPerson from "@/components/elements/ContactPerson";
 import Partners from "./section/Partners";
 import FrequentlyAsked from "./section/Frequently";
-import OnGoing from "./section/OnGoing";
 import { Event } from "@/types/event";
 
 const LandingModules = () => {
@@ -38,10 +37,9 @@ const LandingModules = () => {
 
   return (
     <main className="flex flex-col gap-20 pb-20">
-      <Hero />
+      <Hero events={events} loading={loading} />
       <About />
       <HowTo />
-      <OnGoing events={events} loading={loading} />
       <Partners />
       <div className="px-12 max-lg:px-10 max-md:px-8">
         <ContactPerson

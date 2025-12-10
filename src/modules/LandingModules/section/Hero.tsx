@@ -5,8 +5,14 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Info, UserPen } from "lucide-react";
 import OnGoing from "./OnGoing";
+import { Event } from "@/types/event";
 
-const Hero = () => {
+type HeroProps = {
+  events: Event[];
+  loading: boolean;
+};
+
+const Hero = ({ events, loading }: HeroProps) => {
   const parallaxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,9 +96,9 @@ const Hero = () => {
         </div>
         {/* End parallax Effect */}
 
-        {/* About Section */}
+        {/* OnGoing Section */}
         <div className="relative z-10">
-          <OnGoing />
+          <OnGoing events={events} loading={loading} />
         </div>
       </div>
     </section>

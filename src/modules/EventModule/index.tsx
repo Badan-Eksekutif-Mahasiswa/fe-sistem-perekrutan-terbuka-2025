@@ -12,7 +12,7 @@ type EventModuleProps = {
 
 const EventModule = ({ event }: EventModuleProps) => {
   return (
-    <main className="min-h-screen overflow-hidden">
+    <main className="min-h-screen flex flex-col gap-14 overflow-hidden">
       <Hero event={event} />
       <Timeline event={event} />
       <Divisi event={event} />

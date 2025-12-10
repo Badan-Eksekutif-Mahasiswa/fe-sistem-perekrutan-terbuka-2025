@@ -52,6 +52,7 @@ const OngoingSection = ({
   events: Event[];
   loading: boolean;
 }) => {
+  console.log(events);
   return (
     <div className="w-full flex flex-col gap-2 font-jakarta text-neutral-50">
       <h1 className="text-h1">Pendaftaran Ongoing</h1>
