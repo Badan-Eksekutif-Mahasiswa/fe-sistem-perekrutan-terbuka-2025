@@ -3,6 +3,7 @@ import { BookmarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DiamondIcon, ArrowRightIcon } from "lucide-react";
 import type { EventType } from "../type";
+import Link from "next/link";
 
 type EventCardProps = {
   event: EventType;
@@ -68,10 +69,12 @@ const EventCard = ({ event }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Button variant={"secondary"} className="h-fit">
-            <p className="text-primary-500 text-m3">Selengkapnya</p>
-            <ArrowRightIcon className="size-4 text-primary-500" />
-          </Button>
+          <Link href={`/${event.id}`}>
+            <Button variant={"secondary"} className="h-fit">
+              <p className="text-primary-500 text-m3">Selengkapnya</p>
+              <ArrowRightIcon className="size-4 text-primary-500" />
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -107,7 +110,7 @@ const EventCard = ({ event }: EventCardProps) => {
           </div>
           <p className="text-p5">{event.desc}</p>
         </div>
-        <div className="flex flex-col gap-3 justify-between">
+        <div className="flex flex-col w-full gap-3 justify-between">
           <div className="gap-2 flex items-start flex-wrap ">
             {event.categories.map((c, i) => (
               <Button
@@ -120,10 +123,12 @@ const EventCard = ({ event }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Button variant={"secondary"}>
-            <p className="text-primary-500 text-m3">Selengkapnya</p>
-            <ArrowRightIcon className="size-4 text-primary-500" />
-          </Button>
+          <Link className="w-full" href={`/${event.id}`}>
+            <Button variant={"secondary"} className="w-full">
+              <p className="text-primary-500 text-m3">Selengkapnya</p>
+              <ArrowRightIcon className="size-4 text-primary-500" />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

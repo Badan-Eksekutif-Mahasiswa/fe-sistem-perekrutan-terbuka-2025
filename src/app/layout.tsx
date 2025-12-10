@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import Navbar from "@/components/elements/Navbar";
 import Footer from "@/components/elements/Footer";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +34,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${jakartaSans.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${jakartaSans.variable} antialiased font-jakarta`}
       >
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
 
-        <Toaster position="top-right" expand={false} />
+          <Toaster position="top-right" expand={false} />
+        </AuthProvider>
       </body>
     </html>
   );

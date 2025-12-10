@@ -5,11 +5,27 @@ import Image from "next/image";
 import { Chip } from "@/components/ui/chip";
 import { ArrowRight, Diamond } from "lucide-react";
 import Link from "next/link";
+import { Event } from "@/types/event";
+import { getEventStatus } from "@/lib/utils/event-transformer";
 
-const OnGoing = () => {
+type OnGoingProps = {
+  events: Event[];
+  loading: boolean;
+};
+
+const OnGoing = ({ events = [], loading }: OnGoingProps) => {
+  // Filter only open events
+  const ongoingEvents = events.filter((event) => {
+    const status = getEventStatus(
+      event.openRegistration,
+      event.closeRegistration
+    );
+    return status === "Dibuka";
+  });
+
   return (
     <section className="grid grid-cols-[2fr_1fr] max-lg:grid-cols-1 gap-12 max-lg:gap-8 py-20 px-12 max-lg:px-10 max-md:px-8">
-      <OngoingSection />
+      <OngoingSection events={ongoingEvents} loading={loading} />
       <CalendarSection />
     </section>
   );
@@ -29,7 +45,14 @@ const CalendarSection = () => {
   );
 };
 
-const OngoingSection = () => {
+const OngoingSection = ({
+  events,
+  loading,
+}: {
+  events: Event[];
+  loading: boolean;
+}) => {
+  console.log(events);
   return (
     <div className="w-full flex flex-col gap-2 font-jakarta text-neutral-50">
       <h1 className="text-h1">Pendaftaran Ongoing</h1>
@@ -41,30 +64,34 @@ const OngoingSection = () => {
       <div className="rounded-3xl border border-primary-300 w-full p-6 max-lg:p-4 flex flex-col gap-2 bg-gradient-card-blur">
         <p className="text-h4">Ayo Daftar sebelum ketinggalan!</p>
         <div className="max-h-80 max-lg:max-h-80 overflow-y-auto flex flex-col gap-3">
-          <EventCard
-            id="event-1"
-            logo="/logo-clean.webp"
-            title="Rekrutmen Anggota BEM UI 2025"
-            startDate={new Date("2024-07-01")}
-            endDate={new Date("2024-07-31")}
-            restrictions={["Mahasiswa Aktif", "IPK Minimal 3.0"]}
-          />
-          <EventCard
-            id="event-1"
-            logo="/logo-clean.webp"
-            title="Rekrutmen Anggota BEM UI 2025"
-            startDate={new Date("2024-07-01")}
-            endDate={new Date("2024-07-31")}
-            restrictions={["Mahasiswa Aktif", "IPK Minimal 3.0"]}
-          />
-          <EventCard
-            id="event-1"
-            logo="/logo-clean.webp"
-            title="Rekrutmen Anggota BEM UI 2025"
-            startDate={new Date("2024-07-01")}
-            endDate={new Date("2024-07-31")}
-            restrictions={["Mahasiswa Aktif", "IPK Minimal 3.0"]}
-          />
+          {loading ? (
+            <div className="text-center py-8 text-neutral-400">
+              Memuat data...
+            </div>
+          ) : events.length > 0 ? (
+            events.map((event) => (
+              <EventCard
+                key={event.id}
+                id={event.id}
+                logo={event.logo || "/logo-clean.webp"}
+                title={event.title}
+                startDate={new Date(event.openRegistration)}
+                endDate={new Date(event.closeRegistration)}
+                restrictions={[
+                  event.eventLevel,
+                  event.typeOfEvent === "ORGANISASI"
+                    ? "Organisasi"
+                    : event.typeOfEvent === "KEPANITIAAN"
+                    ? "Kepanitiaan"
+                    : "UKM",
+                ]}
+              />
+            ))
+          ) : (
+            <div className="text-center py-8 text-neutral-400">
+              Tidak ada pendaftaran yang sedang dibuka saat ini
+            </div>
+          )}
         </div>
       </div>
     </div>

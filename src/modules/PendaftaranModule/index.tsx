@@ -1,11 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
-import FilterCard from "./components/FilterCard";
-import { filterCategory, eventsData } from "./const";
-import Image from "next/image";
-import { AirBalloon } from "../../../public/svgs";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+
 import {
   SearchIcon,
   ArrowUpDown,
@@ -13,7 +7,13 @@ import {
   XIcon,
   Check,
 } from "lucide-react";
-
+import FilterCard from "./components/FilterCard";
+import EventCard from "./components/EventCard";
+import { BackgroundDecoration } from "./components/BackgroundDecoration";
+import { useEventFiltering, TabType } from "./hooks/useEventFiltering";
+import { filterCategory } from "./const";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
@@ -21,8 +21,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import EventCard from "./components/EventCard";
-
 import {
   Pagination,
   PaginationContent,
@@ -32,88 +30,39 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { Event } from "@/types/event";
+import { transformEventsToEventTypes } from "@/lib/utils/event-transformer";
 
-import type { EventType } from "./type";
+type PendaftaranModuleProps = {
+  events: Event[];
+};
 
-const PendaftaranModule = () => {
-  const [selectedCategoties, setSelectedCategories] = useState<
-    Record<string, boolean>
-  >({});
-  const [inputValue, setInputValue] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredEvent, setFilteredEvent] =
-    useState<readonly EventType[]>(eventsData);
+const PendaftaranModule = ({ events }: PendaftaranModuleProps) => {
+  const transformedEvents = transformEventsToEventTypes(events);
 
-  const [activeTab, setActiveTab] = useState("semua");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 3;
-
-  const handleSearchQuery = () => {
-    setSearchQuery(inputValue);
-    setActiveTab("semua");
-    setCurrentPage(1);
-  };
+  const {
+    inputValue,
+    setInputValue,
+    activeTab,
+    setActiveTab,
+    sortOrder,
+    setSortOrder,
+    currentPage,
+    setCurrentPage,
+    selectedCategories,
+    setSelectedCategories,
+    handleSearch,
+    clearFilters,
+    removeCategory,
+    paginatedEvents,
+    totalPages,
+  } = useEventFiltering({ events: transformedEvents });
 
   const handleKeyEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      handleSearchQuery();
+      handleSearch();
     }
   };
-
-  useEffect(() => {
-    const activeCategories = Object.keys(selectedCategoties).filter(
-      (key) => selectedCategoties[key]
-    );
-
-    const results = eventsData.filter((e) => {
-      const isCategoryMatch =
-        activeCategories.length === 0 ||
-        e.categories.some((c) => activeCategories.includes(c));
-
-      const isSearchMatch = e.title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-
-      return isCategoryMatch && isSearchMatch;
-    });
-
-    const sortedResults = [...results].sort((a, b) => {
-      const dateA = new Date(a.startedAt).getTime();
-      const dateB = new Date(b.startedAt).getTime();
-
-      const validDateA = isNaN(dateA) ? 0 : dateA;
-      const validDateB = isNaN(dateB) ? 0 : dateB;
-
-      if (sortOrder === "newest") {
-        return validDateB - validDateA;
-      } else {
-        return validDateA - validDateB;
-      }
-    });
-
-    setFilteredEvent(sortedResults);
-    setCurrentPage(1);
-  }, [selectedCategoties, searchQuery, sortOrder]);
-
-  const getActiveTabList = () => {
-    switch (activeTab) {
-      case "dibuka":
-        return filteredEvent.filter((e) => e.status === "Dibuka");
-      case "akan datang":
-        return filteredEvent.filter((e) => e.status === "Akan Datang");
-      default:
-        return filteredEvent;
-    }
-  };
-
-  const activeList = getActiveTabList();
-  const totalPages = Math.ceil(activeList.length / ITEMS_PER_PAGE);
-
-  const displayEvents = activeList.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
 
   const renderPaginationItems = () => {
     const items = [];
@@ -166,85 +115,9 @@ const PendaftaranModule = () => {
 
   return (
     <main className="min-h-screen relative mt-32">
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-      `}</style>
+      <BackgroundDecoration />
 
-      {/* Desktop Mist */}
-      <div className="absolute max-md:hidden h-[800px] bottom-60 w-full  rounded-lg">
-        <div className="absolute inset-0 bg-white opacity-10 rounded-full blur-[120px] scale-y-50 translate-y-1/4"></div>
-      </div>
-
-      {/* Mobile Mist */}
-      <div className="absolute md:hidden h-[800px] bottom-96 w-full  rounded-lg">
-        <div className="absolute inset-0 bg-white opacity-10 rounded-full blur-[120px] scale-y-50 translate-y-1/4"></div>
-      </div>
-
-      <div className="absolute md:hidden h-[800px] bottom-[750px] w-full  rounded-lg">
-        <div className="absolute inset-0 bg-white opacity-10 rounded-full blur-[120px] scale-y-50 translate-y-1/4"></div>
-      </div>
-
-      {/* Balloon Desktop */}
-      <div
-        className=" w-60 max-md:hidden absolute -z-20 bottom-30 left-12 h-82"
-        style={{ animation: "float 4s ease-in-out infinite" }}
-      >
-        <AirBalloon />
-      </div>
-      <div
-        className="w-25 max-md:hidden absolute top-0 -z-20 left-80 "
-        style={{ animation: "float 4s ease-in-out infinite" }}
-      >
-        <AirBalloon />
-      </div>
-
-      <div
-        className="w-32 h-40 max-md:hidden absolute top-60 -z-20 right-20 "
-        style={{ animation: "float 4s ease-in-out infinite" }}
-      >
-        <AirBalloon />
-      </div>
-
-      {/* Balloon Mobile */}
-      <div
-        className="w-32 h-40 md:hidden absolute top-0 -z-20 right-0 "
-        style={{ animation: "float 4s ease-in-out infinite" }}
-      >
-        <AirBalloon />
-      </div>
-
-      <div
-        className="w-14 h-24 md:hidden absolute top-30 -z-20 left-4 "
-        style={{ animation: "float 4s ease-in-out infinite" }}
-      >
-        <AirBalloon />
-      </div>
-
-      <div
-        className="w-30 h-42 md:hidden absolute top-[750px] -z-20 right-0"
-        style={{ animation: "float 4s ease-in-out infinite" }}
-      >
-        <AirBalloon />
-      </div>
-
-      <div
-        className="w-30 h-42 md:hidden absolute top-[1200px] -z-20 left-0"
-        style={{ animation: "float 4s ease-in-out infinite" }}
-      >
-        <AirBalloon />
-      </div>
-
-      <div
-        className="w-30 h-42 md:hidden absolute top-[1550px] -z-20 right-10"
-        style={{ animation: "float 4s ease-in-out infinite" }}
-      >
-        <AirBalloon />
-      </div>
-
-      <div className=" px-5 py-10 md:px-20 text-center gap-5 justify-center text-white flex flex-col">
+      <div className="px-5 py-10 md:px-20 text-center gap-5 justify-center text-white flex flex-col">
         <h1 className="text-h3 md:text-h1">Cari Lowongan</h1>
         <p className="text-p4">
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aliquid
@@ -252,26 +125,28 @@ const PendaftaranModule = () => {
           exercitationem praesentium incidunt quia illo nisi, voluptates
           aspernatur fugiat culpa repellendus non.
         </p>
+
         <div className="flex flex-col relative max-md:justify-center max-md:items-center lg:flex-row gap-5 w-full">
           <FilterCard
             filterCategory={filterCategory}
-            selectedCategory={selectedCategoties}
+            selectedCategory={selectedCategories}
             setSelectedCategory={setSelectedCategories}
           />
+
           <div className="flex flex-col w-full">
             <Tabs
               value={activeTab}
               onValueChange={(val) => {
-                setActiveTab(val);
+                setActiveTab(val as TabType);
                 setCurrentPage(1);
               }}
               className="gap-5 w-full"
             >
-              <TabsList className="w-full max-md:h-12  h-14 ">
-                <TabsTrigger className="h-14 max-md:h-12 " value="semua">
+              <TabsList className="w-full max-md:h-12 h-14">
+                <TabsTrigger className="h-14 max-md:h-12" value="semua">
                   Semua
                 </TabsTrigger>
-                <TabsTrigger className="h-14 max-md:h-12 " value="dibuka">
+                <TabsTrigger className="h-14 max-md:h-12" value="dibuka">
                   Dibuka
                 </TabsTrigger>
                 <TabsTrigger className="h-14 max-md:h-12" value="akan datang">
@@ -279,6 +154,7 @@ const PendaftaranModule = () => {
                 </TabsTrigger>
               </TabsList>
 
+              {/* Search & Sort Bar */}
               <div className="flex w-full gap-2.5">
                 <Input
                   value={inputValue}
@@ -288,21 +164,21 @@ const PendaftaranModule = () => {
                   placeholder="Cari posisi..."
                 />
                 <Button
-                  onClick={handleSearchQuery}
+                  onClick={handleSearch}
                   variant="secondary"
                   className="rounded-xl w-16 font-bold text-primary-400 md:w-28"
                 >
-                  <p className={`max-md:hidden `}>Cari</p>
-
+                  <p className="max-md:hidden">Cari</p>
                   <SearchIcon className="size-6" />
                 </Button>
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className=" ">
+                    <Button variant="ghost">
                       <ArrowUpDown />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-40 " align="start">
+                  <DropdownMenuContent className="w-40" align="start">
                     <DropdownMenuItem onClick={() => setSortOrder("newest")}>
                       Sort by Newest
                       {sortOrder === "newest" && <Check size={16} />}
@@ -315,46 +191,37 @@ const PendaftaranModule = () => {
                 </DropdownMenu>
               </div>
 
+              {/* Active Filters */}
               <div className="flex text-center items-center flex-wrap gap-2.5">
                 <h4 className="text-h4">Filter Terpasang: </h4>
-                {Object.keys(selectedCategoties)
-                  .filter((k) => selectedCategoties[k])
+                {Object.keys(selectedCategories)
+                  .filter((k) => selectedCategories[k])
                   .map((k) => (
                     <Button
                       className="rounded-full"
                       key={k}
-                      size={"md"}
+                      size="md"
                       variant="ghost"
-                      onClick={() =>
-                        setSelectedCategories((prev) => ({
-                          ...prev,
-                          [k]: false,
-                        }))
-                      }
+                      onClick={() => removeCategory(k)}
                     >
                       <DiamondIcon /> {k}
                     </Button>
                   ))}
 
                 <XIcon
-                  onClick={() => {
-                    setSelectedCategories({});
-                    setSearchQuery("");
-                    setInputValue("");
-                  }}
+                  onClick={clearFilters}
                   className={`cursor-pointer ${
-                    Object.keys(selectedCategoties).filter(
-                      (k) => selectedCategoties[k]
+                    Object.keys(selectedCategories).filter(
+                      (k) => selectedCategories[k]
                     ).length === 0 && "hidden"
                   }`}
                 />
               </div>
 
+              {/* Event Cards */}
               <div className="space-y-5 mt-5">
-                {displayEvents.length > 0 ? (
-                  displayEvents.map((e) => (
-                    <EventCard event={e} key={e.title} />
-                  ))
+                {paginatedEvents.length > 0 ? (
+                  paginatedEvents.map((e) => <EventCard event={e} key={e.id} />)
                 ) : (
                   <p className="text-neutral-400 mt-10">
                     Tidak ada lowongan yang cocok.
@@ -362,6 +229,7 @@ const PendaftaranModule = () => {
                 )}
               </div>
 
+              {/* Pagination */}
               {totalPages > 1 && (
                 <Pagination className="mt-2">
                   <PaginationContent>

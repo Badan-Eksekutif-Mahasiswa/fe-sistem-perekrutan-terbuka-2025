@@ -33,7 +33,7 @@ const BlockTime: React.FC<ComponentPropsWithoutRef<"div"> & CountdownProps> = ({
         >
           <span
             className={cn(
-              "inline-block font-jakarta font-semibold text-4xl  text-white",
+              "inline-block font-jakarta font-semibold text-4xl text-white",
               classNameType
             )}
           >
@@ -188,7 +188,7 @@ const Countdown = ({
           />
           <span
             className={cn(
-              "inline-block text-xs md:text-body pt-[2px] md:pt-0 text-white ",
+              "inline-block text-p3 md:text-m3 pt-[2px] md:pt-0 text-white ",
               classNameType
             )}
           >{`${dateTime.date}, ${dateTime.time.split(" ")[0]} WIB`}</span>

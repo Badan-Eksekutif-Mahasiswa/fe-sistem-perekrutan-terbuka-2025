@@ -1,10 +1,11 @@
 "use client";
 import Image from "next/legacy/image";
 import { Button } from "../../ui/button";
-import { User, Diamond } from "lucide-react";
+import { User, Diamond, LogOut } from "lucide-react";
 import Link from "next/link";
 import { data } from "./const";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -131,6 +132,12 @@ const Navbar = () => {
 export default Navbar;
 
 const Menu = () => {
+  const { user, logout, isLoading } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <>
       {data.map((item) => (
@@ -143,10 +150,32 @@ const Menu = () => {
           {item.title}
         </Link>
       ))}
-      <Button variant="secondary" className="max-lg:w-full">
-        <User />
-        Sign in
-      </Button>
+
+      {/* Authentication Section */}
+      {isLoading ? (
+        <div className="w-20 h-8 bg-gray-300 animate-pulse rounded-md"></div>
+      ) : user ? (
+        <>
+          <Link
+            href="/dashboard"
+            className="flex group hover:underline items-center gap-2 text-m3 max-lg:text-m4 text-neutral-50"
+          >
+            <Diamond className="w-4 h-4 group-hover:fill-white" />
+            Dashboard
+          </Link>
+          <Button variant="secondary" onClick={handleLogout}>
+            <LogOut />
+            Logout
+          </Button>
+        </>
+      ) : (
+        <Link href="/login">
+          <Button variant="secondary">
+            <User />
+            Sign in
+          </Button>
+        </Link>
+      )}
     </>
   );
 };

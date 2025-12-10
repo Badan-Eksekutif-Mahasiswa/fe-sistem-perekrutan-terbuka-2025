@@ -5,8 +5,15 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Info, UserPen } from "lucide-react";
 import OnGoing from "./OnGoing";
+import { Event } from "@/types/event";
+import Link from "next/link";
 
-const Hero = () => {
+type HeroProps = {
+  events: Event[];
+  loading: boolean;
+};
+
+const Hero = ({ events, loading }: HeroProps) => {
   const parallaxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,13 +43,6 @@ const Hero = () => {
           className="object-cover"
           priority
         />
-        {/* <Image
-          src="/hero-mobile.webp"
-          alt="Hero Background"
-          fill
-          className="object-cover hidden max-lg:block"
-          priority
-        /> */}
       </div>
 
       {/* Konten di atas gambar */}
@@ -66,10 +66,12 @@ const Hero = () => {
           />
         </div>
         <div className="flex gap-2">
-          <Button>
-            <UserPen />
-            Mulai Daftar
-          </Button>
+          <Link href="/event">
+            <Button>
+              <UserPen />
+              Mulai Daftar
+            </Button>
+          </Link>
           <Button variant={"secondary"}>
             <Info />
             Tentang SPT
@@ -90,9 +92,9 @@ const Hero = () => {
         </div>
         {/* End parallax Effect */}
 
-        {/* About Section */}
+        {/* OnGoing Section */}
         <div className="relative z-10">
-          <OnGoing />
+          <OnGoing events={events} loading={loading} />
         </div>
       </div>
     </section>

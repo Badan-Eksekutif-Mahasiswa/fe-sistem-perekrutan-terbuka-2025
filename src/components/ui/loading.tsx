@@ -1,0 +1,40 @@
+"use client";
+
+interface LoadingSpinnerProps {
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}
+
+export const LoadingSpinner = ({
+  size = "md",
+  className = "",
+}: LoadingSpinnerProps) => {
+  const sizeClasses = {
+    sm: "h-4 w-4",
+    md: "h-8 w-8",
+    lg: "h-12 w-12",
+  };
+
+  return (
+    <div
+      className={`animate-spin rounded-full border-b-2 border-primary-500 ${sizeClasses[size]} ${className}`}
+    />
+  );
+};
+
+interface AuthLoadingProps {
+  message?: string;
+}
+
+export const AuthLoading = ({
+  message = "Checking authentication...",
+}: AuthLoadingProps) => {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="text-center">
+        <LoadingSpinner size="lg" className="mx-auto mb-4" />
+        <p className="text-gray-600">{message}</p>
+      </div>
+    </div>
+  );
+};
