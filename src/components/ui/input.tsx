@@ -13,6 +13,10 @@ export interface InputProps
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, icon, error, label, prefix, ...props }, ref) => {
+    // Ensure value is never null (convert to empty string or undefined)
+    const { value, ...restProps } = props;
+    const safeValue = value === null ? undefined : value;
+
     const clonedIcon = icon
       ? React.cloneElement(
           icon as React.ReactElement,
@@ -47,7 +51,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               className
             )}
             ref={ref}
-            {...props}
+            value={safeValue}
+            {...restProps}
           />
         </div>
         {error && (
