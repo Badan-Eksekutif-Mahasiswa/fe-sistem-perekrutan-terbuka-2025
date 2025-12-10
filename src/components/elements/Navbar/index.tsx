@@ -1,10 +1,18 @@
 "use client";
 import Image from "next/legacy/image";
 import { Button } from "../../ui/button";
-import { User, Diamond } from "lucide-react";
+import { User, Diamond, LogOut } from "lucide-react";
 import Link from "next/link";
 import { data } from "./const";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -131,6 +139,12 @@ const Navbar = () => {
 export default Navbar;
 
 const Menu = () => {
+  const { user, logout, isLoading } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <>
       {data.map((item) => (
@@ -143,10 +157,46 @@ const Menu = () => {
           {item.title}
         </Link>
       ))}
-      <Button variant="secondary" className="max-lg:w-full">
-        <User />
-        Sign in
-      </Button>
+
+      {/* Authentication Section */}
+      {isLoading ? (
+        <div className="w-20 h-8 bg-gray-300 animate-pulse rounded-md"></div>
+      ) : user ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary" className="max-lg:w-full">
+              <User />
+              {user.name}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <div className="px-2 py-1.5 text-sm font-semibold">{user.name}</div>
+            <div className="px-2 py-1.5 text-xs text-gray-500">
+              {user.email}
+            </div>
+            {user.npm && (
+              <div className="px-2 py-1.5 text-xs text-gray-500">
+                NPM: {user.npm}
+              </div>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-red-600 focus:text-red-600"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <Link href="/login">
+          <Button variant="secondary" className="max-lg:w-full">
+            <User />
+            Sign in
+          </Button>
+        </Link>
+      )}
     </>
   );
 };
