@@ -25,13 +25,12 @@ const Partners = () => {
       <div className="flex overflow-hidden">
         <div className="flex animate-infinite-scroll-1 flex-nowrap items-center">
           {firstRowData.map((item, idx) => (
-            <img
+            <Image
               key={idx}
               alt="Partner Logo"
               src={item.link}
-              width={0}
-              height={0}
-              loading="lazy"
+              width={160}
+              height={160}
               className="mr-8 h-auto w-24 max-w-none lg:mr-16 lg:w-40"
             />
           ))}
@@ -41,13 +40,12 @@ const Partners = () => {
           aria-hidden="true"
         >
           {firstRowData.map((item, idx) => (
-            <img
+            <Image
               key={`duplicate-${idx}`}
               alt="Partner Logo"
               src={item.link}
-              width={0}
-              height={0}
-              loading="lazy"
+              width={160}
+              height={160}
               className="mr-8 h-auto w-24 max-w-none lg:mr-16 lg:w-40"
             />
           ))}
@@ -57,13 +55,12 @@ const Partners = () => {
       <div className="flex flex-row-reverse overflow-hidden">
         <div className="flex animate-infinite-scroll-2 flex-nowrap items-center">
           {secondRowData.map((item, idx) => (
-            <img
+            <Image
               key={idx}
               alt="Partner Logo"
               src={item.link}
-              width={0}
-              height={0}
-              loading="lazy"
+              width={160}
+              height={160}
               className="mr-8 h-auto w-24 max-w-none lg:mr-16 lg:w-40"
             />
           ))}
@@ -73,13 +70,12 @@ const Partners = () => {
           aria-hidden="true"
         >
           {secondRowData.map((item, idx) => (
-            <img
+            <Image
               key={`duplicate-${idx}`}
               alt="Partner Logo"
               src={item.link}
-              width={0}
-              height={0}
-              loading="lazy"
+              width={160}
+              height={160}
               className="mr-8 h-auto w-24 max-w-none lg:mr-16 lg:w-40"
             />
           ))}

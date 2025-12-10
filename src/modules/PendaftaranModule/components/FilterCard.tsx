@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { SquareIcon, SquareCheckBigIcon } from "lucide-react";
 import AnimatedPuzzle from "@/components/elements/AnimatedPuzzle";
 import type { FilterCategoryType } from "../type";

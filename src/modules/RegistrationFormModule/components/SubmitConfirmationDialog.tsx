@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
 
 interface SubmitConfirmationDialogProps {
   open: boolean;
