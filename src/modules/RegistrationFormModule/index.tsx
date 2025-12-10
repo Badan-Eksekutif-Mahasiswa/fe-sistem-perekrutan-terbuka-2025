@@ -406,9 +406,9 @@ export default function RegistrationFormModule() {
                   : questionSection?.title || currentSection?.name}
               </h2>
               {isSubmitted && (
-                <span className="px-3 py-1 bg-green-500/20 border-2 border-green-500 rounded-lg text-green-500 text-sm font-jakarta font-semibold">
-                  ✓ Submitted
-                </span>
+                <Button className="cursor-default" variant={"ghost"}>
+                  Submitted
+                </Button>
               )}
             </div>
             <p className="text-neutral-200 text-sm">
