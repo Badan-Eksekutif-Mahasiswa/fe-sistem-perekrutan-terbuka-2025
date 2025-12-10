@@ -124,9 +124,8 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
                 key={option.id}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all",
-                  "hover:bg-neutral-100",
                   value === option.value
-                    ? "border-secondary-300 bg-secondary-100/20"
+                      ? "border-3 border-secondary-400 bg-neutral-50 text-neutral-50"
                     : "border-primary-300 bg-neutral-50"
                 )}
               >
@@ -157,9 +156,8 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
                   key={option.id}
                   className={cn(
                     "flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all",
-                    "hover:bg-neutral-100",
                     isChecked
-                      ? "border-secondary-300 bg-secondary-100/20"
+                      ? " border-3 border-primary-400 bg-neutral-50 text-neutral-50"
                       : "border-primary-300 bg-neutral-50"
                   )}
                 >

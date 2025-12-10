@@ -15,13 +15,12 @@ import {
   AnswerSubmit,
   SelectedDivision,
 } from "@/types/registration";
-import { toast } from "sonner";
-import Image from "next/image";
-import Logo from "@/../public/logo-warnai.webp";
+import { useToast } from "@/hooks/useToast";
 
 export default function RegistrationFormModule() {
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId") || "";
+  const toast = useToast();
 
   const [sections, setSections] = useState<Section[]>([]);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -72,7 +71,7 @@ export default function RegistrationFormModule() {
       const sections = await registrationApi.getSections(eventId);
       setSections(sections);
     } catch (error) {
-      toast.error("Gagal memuat daftar section");
+      toast.show("error", "Gagal memuat daftar section");
       console.error(error);
     } finally {
       setLoading(false);
@@ -108,7 +107,7 @@ export default function RegistrationFormModule() {
         }
       }
     } catch (error) {
-      toast.error("Gagal memuat data section");
+      toast.show("error", "Gagal memuat data section");
       console.error(error);
     } finally {
       setLoading(false);
@@ -143,7 +142,8 @@ export default function RegistrationFormModule() {
   const handleDivisionSelect = useCallback(
     (divisionId: string, priority: number) => {
       setSelectedDivisions((prev) => {
-        const newDivisions = prev.filter((d) => d.divisionId !== divisionId);
+        // Remove any division with the same priority (replacement)
+        const newDivisions = prev.filter((d) => d.priority !== priority);
 
         const division = personalInfo?.availableDivisions.find(
           (d) => d.id === divisionId
@@ -158,10 +158,28 @@ export default function RegistrationFormModule() {
         }
 
         newDivisions.sort((a, b) => a.priority - b.priority);
+
+        // Auto-save with debounce
+        if (lineTimeoutRef.current) {
+          clearTimeout(lineTimeoutRef.current);
+        }
+
+        lineTimeoutRef.current = setTimeout(async () => {
+          try {
+            await registrationApi.partialUpdateRegistration({
+              eventId,
+              section: "personal-info",
+              divisions: newDivisions.map((d) => d.divisionId),
+            });
+          } catch (error) {
+            console.error("Auto-save divisions failed:", error);
+          }
+        }, 1000);
+
         return newDivisions;
       });
     },
-    [personalInfo]
+    [personalInfo, eventId]
   );
 
   const handleAnswerChange = useCallback(
@@ -202,7 +220,7 @@ export default function RegistrationFormModule() {
   const validateCurrentSection = (): boolean => {
     if (isPersonalInfo) {
       if (!lineId.trim()) {
-        toast.error("ID Line harus diisi");
+        toast.show("error", "ID Line harus diisi");
         return false;
       }
       if (
@@ -210,7 +228,10 @@ export default function RegistrationFormModule() {
         (personalInfo &&
           selectedDivisions.length > personalInfo.maxChooseDivision)
       ) {
-        toast.error(`Pilih ${personalInfo?.maxChooseDivision || 1} divisi`);
+        toast.show(
+          "error",
+          `Pilih ${personalInfo?.maxChooseDivision || 1} divisi`
+        );
         return false;
       }
       return true;
@@ -222,7 +243,7 @@ export default function RegistrationFormModule() {
       for (const question of requiredQuestions) {
         const answer = answers.get(question.id);
         if (!answer || answer.trim() === "") {
-          toast.error(`Pertanyaan "${question.question}" harus diisi`);
+          toast.show("error", `Pertanyaan "${question.question}" harus diisi`);
           return false;
         }
       }
@@ -259,7 +280,8 @@ export default function RegistrationFormModule() {
         });
       }
     } catch (error) {
-      toast.error(
+      toast.show(
+        "error",
         error instanceof Error ? error.message : "Gagal menyimpan data"
       );
       throw error;
@@ -276,7 +298,7 @@ export default function RegistrationFormModule() {
         setCurrentSectionIndex((prev) => prev + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
-        toast.success("Pendaftaran berhasil diselesaikan!");
+        toast.show("success", "Pendaftaran berhasil diselesaikan!");
         // Redirect or show success page
       }
     } catch {
@@ -296,24 +318,23 @@ export default function RegistrationFormModule() {
   }
 
   return (
-    <div className="min-h-screen bg-primary-500 relative overflow-hidden">
-
+    <div className="min-h-screen relative overflow-hidden pt-20">
       {/* Main Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 py-8">
+      <main className="relative grid grid-cols-[1.3fr_4fr] max-lg:grid-cols-1 max-lg:gap-4 gap-10 z-10 max-w-7xl mx-auto px-4 py-8">
         {/* Progress Tabs */}
-        <div className="mb-8 bg-primary-400/30 backdrop-blur-sm rounded-xl p-1 flex gap-1 overflow-x-auto">
+        <div className="bg-gradient-card-blur rounded-xl flex flex-col gap-2 h-fit p-3 overflow-x-auto">
           {sections.map((section, index) => (
-            <button
+            <Button
               key={`${section.id}-${index}`}
               onClick={() => setCurrentSectionIndex(index)}
               disabled={index > currentSectionIndex}
+              variant={"secondary"}
               className={`
-                flex-shrink-0 px-4 py-2 rounded-lg font-jakarta text-sm font-medium transition-all
                 ${
                   index === currentSectionIndex
-                    ? "bg-secondary-300 text-primary-500"
+                    ? ""
                     : index < currentSectionIndex
-                    ? "bg-primary-300/50 text-neutral-100 hover:bg-primary-300/70"
+                    ? "bg-secondary-300/50 hover:bg-secondary-300/70"
                     : "bg-transparent text-neutral-300 cursor-not-allowed"
                 }
               `}
@@ -321,12 +342,12 @@ export default function RegistrationFormModule() {
               {section.name === "personal-info"
                 ? "Personal Info"
                 : section.name}
-            </button>
+            </Button>
           ))}
         </div>
 
         {/* Form Card */}
-        <div className="bg-primary-400/40 backdrop-blur-md rounded-2xl border-2 border-primary-300/50 p-8 shadow-2xl">
+        <div className="bg-gradient-card-blur backdrop-blur-md rounded-2xl p-8 shadow-2xl">
           <div className="mb-6">
             <h2 className="text-2xl font-jakarta font-bold text-neutral-100 mb-2">
               {isPersonalInfo
@@ -343,7 +364,7 @@ export default function RegistrationFormModule() {
           <div className="space-y-6">
             {isPersonalInfo && personalInfo ? (
               <PersonalInfoForm
-                data={personalInfo}
+                data={{ ...personalInfo, line: lineId, selectedDivisions }}
                 onLineChange={handleLineChange}
                 onDivisionSelect={handleDivisionSelect}
               />
@@ -381,18 +402,6 @@ export default function RegistrationFormModule() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="relative z-10 mt-16 border-t border-primary-400/30 bg-primary-500/80 backdrop-blur-sm py-6">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-neutral-300 text-sm font-jakarta">
-            © BEM Multimedia BEM UI 2025. All Rights Reserved
-          </p>
-          <p className="text-neutral-400 text-xs mt-1">
-            Badan Eksekutif Mahasiswa UI 2025
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
