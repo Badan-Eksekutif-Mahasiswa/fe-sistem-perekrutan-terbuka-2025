@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRedirectIfAuth } from "@/hooks/useAuth";
 import { AuthLoading, LoadingSpinner } from "@/components/ui/loading";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
-const LoginModules = () => {
+const LoginContent = () => {
   const { login, isLoading } = useAuth();
   const searchParams = useSearchParams();
   const [isLoginLoading, setIsLoginLoading] = useState(false);
@@ -58,6 +58,14 @@ const LoginModules = () => {
         )}
       </Button>
     </main>
+  );
+};
+
+const LoginModules = () => {
+  return (
+    <Suspense fallback={<AuthLoading />}>
+      <LoginContent />
+    </Suspense>
   );
 };
 
