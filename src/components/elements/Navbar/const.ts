@@ -4,15 +4,11 @@ export const data = [
     href: "/",
   },
   {
-    title: "About",
-    href: "/about",
+    title: "About Us",
+    href: "/#about",
   },
   {
-    title: "Services",
-    href: "/services",
-  },
-  {
-    title: "Contact",
-    href: "/contact",
+    title: "Recruitment",
+    href: "/event",
   },
 ];

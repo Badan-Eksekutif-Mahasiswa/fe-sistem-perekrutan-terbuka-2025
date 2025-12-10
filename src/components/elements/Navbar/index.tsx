@@ -6,13 +6,6 @@ import Link from "next/link";
 import { data } from "./const";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -162,36 +155,22 @@ const Menu = () => {
       {isLoading ? (
         <div className="w-20 h-8 bg-gray-300 animate-pulse rounded-md"></div>
       ) : user ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary" className="max-lg:w-full">
-              <User />
-              {user.name}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <div className="px-2 py-1.5 text-sm font-semibold">{user.name}</div>
-            <div className="px-2 py-1.5 text-xs text-gray-500">
-              {user.email}
-            </div>
-            {user.npm && (
-              <div className="px-2 py-1.5 text-xs text-gray-500">
-                NPM: {user.npm}
-              </div>
-            )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={handleLogout}
-              className="text-red-600 focus:text-red-600"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <Link
+            href="/dashboard"
+            className="flex group hover:underline items-center gap-2 text-m3 max-lg:text-m4 text-neutral-50"
+          >
+            <Diamond className="w-4 h-4 group-hover:fill-white" />
+            Dashboard
+          </Link>
+          <Button variant="secondary" onClick={handleLogout}>
+            <LogOut />
+            Logout
+          </Button>
+        </>
       ) : (
         <Link href="/login">
-          <Button variant="secondary" className="max-lg:w-full">
+          <Button variant="secondary">
             <User />
             Sign in
           </Button>

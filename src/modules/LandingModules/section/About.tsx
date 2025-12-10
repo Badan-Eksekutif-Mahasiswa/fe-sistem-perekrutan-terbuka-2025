@@ -4,7 +4,7 @@ import { UserRound } from "lucide-react";
 
 const About = () => {
   return (
-    <section className="flex flex-col text-white font-jakarta gap-4 px-12 max-lg:px-10 max-md:px-8">
+    <section id="about" className="flex flex-col text-white font-jakarta gap-4 px-12 max-lg:px-10 max-md:px-8">
       <h1 className="text-center text-h1">Tentang kami</h1>
       <div className="grid grid-cols-[2fr_1fr] max-lg:grid-cols-1 gap-4 max-lg:gap-8">
         <div className="flex max-lg:flex-col-reverse justify-between gap-8 items-center rounded-3xl border border-primary-300 w-full p-6 max-lg:p-4 bg-gradient-card">
