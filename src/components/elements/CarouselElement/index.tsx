@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { ChevronRightIcon, ChevronLeftIcon, Pause } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -81,7 +81,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
 
         <div className="w-full max-w-4xl  grid place-items-center perspective-1000">
           {testimonyData.map((item: TestimonyType, index) => {
-            const styles: any = getSlideStyles(index);
+            const styles = getSlideStyles(index);
 
             return (
               <div
@@ -92,7 +92,8 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                   zIndex: styles.zIndex,
                   opacity: styles.opacity,
                   filter: styles.filter,
-                  pointerEvents: styles.pointerEvents,
+                  pointerEvents:
+                    styles.pointerEvents as React.CSSProperties["pointerEvents"],
                 }}
               >
                 <div
