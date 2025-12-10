@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PersonalInfoForm } from "./components/PersonalInfoForm";
@@ -18,11 +17,17 @@ import {
   SelectedDivision,
 } from "@/types/registration";
 import { useToast } from "@/hooks/useToast";
+import { Event } from "@/types/event";
 
-export default function RegistrationFormModule() {
+type RegistrationFormModuleProps = {
+  event: Event;
+};
+
+export default function RegistrationFormModule({
+  event,
+}: RegistrationFormModuleProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const eventId = searchParams.get("eventId") || "";
+  const eventId = event.id;
   const toast = useToast();
 
   const [sections, setSections] = useState<Section[]>([]);

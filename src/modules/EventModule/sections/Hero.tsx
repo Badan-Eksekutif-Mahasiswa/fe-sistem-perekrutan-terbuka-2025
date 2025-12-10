@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -8,10 +9,18 @@ import {
 } from "@/components/ui/card";
 import Countdown from "@/components/elements/Countdown";
 import { Button } from "@/components/ui/button";
+import { Event } from "@/types/event";
 
-const Hero = () => {
+type HeroProps = {
+  event: Event;
+};
+
+const Hero = ({ event }: HeroProps) => {
   return (
-    <main id="hero-section" className="relative w-screen overflow-x-hidden bg-primary-500 bg-linear-to-b from-secondary-300 to-secondary-100">
+    <main
+      id="hero-section"
+      className="relative w-screen overflow-x-hidden bg-primary-500 bg-linear-to-b from-secondary-300 to-secondary-100"
+    >
       <div className="w-7xl max-md:hidden absolute top-16 right-20 h-[139px] z-10">
         <Image src={"/events/sky-assets.webp"} layout="fill" alt="Sky Assets" />
       </div>
@@ -73,21 +82,16 @@ const Hero = () => {
          lg:gap-15 text-white"
         >
           <h1 className="font-extrabold font-jakarta text-h2 lg:text-6xl tracking-wide leading-normal  text-shadow-lg text-shadow-black">
-            Staff Semarak Apresiasi <br /> 2025
+            {event.title}
           </h1>
           <div className="relative w-32 h-32 md:w-72 md:h-72">
             <Image
-              src={"/placeholders/logo-event.webp"}
+              src={event.logo || "/placeholders/logo-event.webp"}
               alt="Logo"
               layout="fill"
             />
           </div>
-          <p className="text-p4 lg:text-p3">
-            Lorem ipsum dolor, sit amet consectetur adipisipcing elit. Quaerat
-            laudantium alias obcaecati sequi. Pariatur eligendi laboriosam natus
-            vitae nihil, eius excepturi ut quia, ipsam, magnam expedita quisquam
-            repellendus! Laudantium, vero!
-          </p>
+          <p className="text-p4 lg:text-p3">{event.description}</p>
         </div>
         <Card className="text-center w-full z-20 justify-center flex flex-col p-6 gap-6">
           <CardHeader>
@@ -97,14 +101,16 @@ const Hero = () => {
           </CardHeader>
           <CardContent>
             <Countdown
-              targetDate={new Date("2025-12-31T23:59:59+07:00")}
+              targetDate={new Date(event.closeRegistration)}
               displayDate={true}
             />
           </CardContent>
           <CardFooter className="flex items-center z-20 justify-center">
-            <Button variant={"secondary"} className="w-full">
-              Daftar Sekarang!
-            </Button>
+            <Link href={`/${event.id}/form`} className="w-full">
+              <Button variant={"secondary"} className="w-full">
+                Daftar Sekarang!
+              </Button>
+            </Link>
           </CardFooter>
         </Card>
       </div>

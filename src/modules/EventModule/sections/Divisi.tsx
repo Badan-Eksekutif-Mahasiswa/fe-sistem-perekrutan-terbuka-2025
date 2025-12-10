@@ -1,11 +1,10 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { divisiData } from "../const";
-import type { DivisiDataType } from "../type";
 import { DiamondIcon, ClipboardListIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import Link from "next/link";
 
 import {
   Select,
@@ -16,16 +15,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Event } from "@/types/event";
 
-const Divisi = () => {
+type DivisiProps = {
+  event: Event;
+};
+
+const Divisi = ({ event }: DivisiProps) => {
   const [indexDivisi, setIndexDivisi] = useState(0);
+  const divisiData = event.divisions;
   const divisiDipilih = divisiData[indexDivisi];
+
+  // Get PIC names from PIC array/object
+  let picData: Array<{ name: string; contact: string }> = [];
+
+  if (Array.isArray(divisiDipilih?.PIC)) {
+    picData = divisiDipilih.PIC as Array<{ name: string; contact: string }>;
+  } else if (divisiDipilih?.PIC && typeof divisiDipilih.PIC === "object") {
+    // If PIC is an object, try to extract data
+    const picObj = divisiDipilih.PIC as Record<string, unknown>;
+    if (picObj.name && picObj.contact) {
+      picData = [
+        {
+          name: picObj.name as string,
+          contact: picObj.contact as string,
+        },
+      ];
+    }
+  }
+
   const bphNames =
-    divisiDipilih.bphName.length > 1
-      ? `${divisiDipilih.bphName.slice(0, -1).join(", ")} & ${
-          divisiDipilih.bphName[divisiDipilih.bphName.length - 1]
-        }`
-      : divisiDipilih.bphName[0];
+    picData.length > 0 ? picData.map((p) => p.name).join(" dan ") : "PIC Name";
 
   return (
     <main className=" min-h-screen justify-center flex px-5 py-2.5 gap-5 md:px-20 md:py-10 md:gap-10 flex-col items-center">
@@ -33,17 +53,17 @@ const Divisi = () => {
       {/*  Details Divisi Desktop */}
       <div className="flex max-md:hidden flex-col lg:flex-row gap-6">
         {/* List Divisi */}
-        <div className="flex w-fit max-lg:hidden flex-col  justify-center gap-5 ">
-          {divisiData.map((item: DivisiDataType, i) => (
+        <div className="flex w-fit max-lg:hidden flex-col  gap-5 ">
+          {divisiData.map((item, i) => (
             <Button
-              key={i}
-              className={`w-full md:w-55 hover:from-primary-200 active:to-primary-300 ${
+              key={item.id}
+              className={`w-full md:w-55 hover:from-primary-200 overflow-hidden active:to-primary-300 ${
                 indexDivisi === i ? "from-primary-200" : "from-primary-300"
               } cursor-pointer to-primary-400 justify-start items-center`}
               onClick={() => setIndexDivisi(i)}
             >
               <DiamondIcon className="size-4" />
-              <p className="text-p2">{item.nama}</p>
+              <p className="text-p4">{item.name}</p>
             </Button>
           ))}
         </div>
@@ -58,13 +78,13 @@ const Divisi = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                {divisiData.map((item: DivisiDataType, i) => (
+                {divisiData.map((item, i) => (
                   <SelectItem
                     onClick={() => setIndexDivisi(i)}
-                    key={i}
-                    value={item.nama.toLowerCase()}
+                    key={item.id}
+                    value={item.name.toLowerCase()}
                   >
-                    {item.nama}
+                    {item.name}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -86,41 +106,51 @@ const Divisi = () => {
                       className="object-cover"
                     />
                   </div>
-                  <h3 className="text-h3 ">
-                    PIC & VPIC <br /> {divisiDipilih.nama}
+                  <h3 className="text-h4 ">
+                    PIC <br /> {divisiDipilih.name}
                   </h3>
                   <p className="text-p3">{bphNames}</p>
                 </CardContent>
               </Card>
               <div className="flex flex-row gap-3 justify-between">
-                <Button variant={"stroke"} className="flex-1">
-                  <DiamondIcon className="size-6" />{" "}
-                  <p className="text-m2">PIC</p>
-                </Button>
-                <Button variant={"stroke"} className="flex-1">
-                  <DiamondIcon className="size-6" />{" "}
-                  <p className="text-m2">VPIC</p>
-                </Button>
+                {picData.map((pic, idx) => (
+                  <Button key={idx} variant={"stroke"} className="flex-1">
+                    <DiamondIcon className="size-6" />{" "}
+                    <p className="text-m2">{pic.contact}</p>
+                  </Button>
+                ))}
+                {picData.length === 0 && (
+                  <Button variant={"stroke"} className="flex-1">
+                    <DiamondIcon className="size-6" />{" "}
+                    <p className="text-m2">PIC</p>
+                  </Button>
+                )}
               </div>
             </div>
             <div className="flex flex-col h-full w-full justify-start text-white gap-5 ">
               <div className="bg-gradient-card border-1 rounded-3xl flex-1 border-primary-300 p-6 gap-4 flex flex-col ">
-                <h2 className="text-h2">Deskripsi Divisi</h2>
-                <p className="text-p3 ">{divisiDipilih.desc}</p>
+                <h2 className="text-h3">Deskripsi Divisi</h2>
+                <p className="text-p4 ">
+                  {divisiDipilih.description || "Tidak ada deskripsi"}
+                </p>
               </div>
               <div className="bg-gradient-card border-1 rounded-3xl flex-1 border-primary-300 p-6 gap-4 flex flex-col ">
-                <h2 className="text-h2">Jobdesk</h2>
-                <p className="text-p3 ">{divisiDipilih.jobdesc}</p>
+                <h2 className="text-h3">Jobdesk</h2>
+                <p className="text-p4 ">
+                  {divisiDipilih.jobdesc || "Tidak ada jobdesk"}
+                </p>
               </div>
             </div>
           </div>
-          <Button
-            variant={"secondary"}
-            className="text-primary-500 items-center text-center"
-          >
-            <ClipboardListIcon className="size-6" />
-            <p className="text-m2">Daftar</p>
-          </Button>
+          <Link href={`/${event.id}/form`}>
+            <Button
+              variant={"secondary"}
+              className="text-primary-500 items-center text-center w-full"
+            >
+              <ClipboardListIcon className="size-6" />
+              <p className="text-m2">Daftar</p>
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -132,13 +162,13 @@ const Divisi = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              {divisiData.map((item: DivisiDataType, i) => (
+              {divisiData.map((item, i) => (
                 <SelectItem
                   onClick={() => setIndexDivisi(i)}
-                  key={i}
-                  value={item.nama.toLowerCase()}
+                  key={item.id}
+                  value={item.name.toLowerCase()}
                 >
-                  {item.nama}
+                  {item.name}
                 </SelectItem>
               ))}
             </SelectGroup>
@@ -153,13 +183,17 @@ const Divisi = () => {
           <TabsContent value="deskripsi" className="mt-4 text-white">
             <div className="bg-gradient-card border-1 rounded-3xl flex-1 border-primary-300 p-6 gap-4 flex flex-col ">
               <h2 className="text-h2">Deskripsi Divisi</h2>
-              <p className="text-p4 ">{divisiDipilih.desc}</p>
+              <p className="text-p4 ">
+                {divisiDipilih.description || "Tidak ada deskripsi"}
+              </p>
             </div>
           </TabsContent>
           <TabsContent value="jobdesk" className="mt-4 text-white ">
             <div className="bg-gradient-card border-1 rounded-3xl flex-1 border-primary-300 p-6 gap-4 flex flex-col ">
               <h2 className="text-h2">Jobdesk</h2>
-              <p className="text-p4 ">{divisiDipilih.jobdesc}</p>
+              <p className="text-p4 ">
+                {divisiDipilih.jobdesc || "Tidak ada jobdesk"}
+              </p>
             </div>
           </TabsContent>
           <TabsContent value="kontak" className="mt-4 text-white">
@@ -175,31 +209,37 @@ const Divisi = () => {
                     />
                   </div>
                   <h3 className="text-h3 ">
-                    PIC & VPIC <br /> {divisiDipilih.nama}
+                    PIC <br /> {divisiDipilih.name}
                   </h3>
                   <p className="text-p3">{bphNames}</p>
                 </CardContent>
               </Card>
               <div className="flex w-full flex-row gap-3 justify-between">
-                <Button variant={"stroke"} className="flex-1">
-                  <DiamondIcon className="size-6" />{" "}
-                  <p className="text-m2">PIC</p>
-                </Button>
-                <Button variant={"stroke"} className="flex-1">
-                  <DiamondIcon className="size-6" />{" "}
-                  <p className="text-m2">VPIC</p>
-                </Button>
+                {picData.map((pic, idx) => (
+                  <Button key={idx} variant={"stroke"} className="flex-1">
+                    <DiamondIcon className="size-6" />{" "}
+                    <p className="text-m2">{pic.contact}</p>
+                  </Button>
+                ))}
+                {picData.length === 0 && (
+                  <Button variant={"stroke"} className="flex-1">
+                    <DiamondIcon className="size-6" />{" "}
+                    <p className="text-m2">PIC</p>
+                  </Button>
+                )}
               </div>
             </div>
           </TabsContent>
         </Tabs>
-        <Button
-          variant={"secondary"}
-          className="text-primary-500 items-center w-full text-center"
-        >
-          <ClipboardListIcon className="size-6" />
-          <p className="text-m2">Daftar</p>
-        </Button>
+        <Link href={`/${event.id}/form`} className="w-full">
+          <Button
+            variant={"secondary"}
+            className="text-primary-500 items-center w-full text-center"
+          >
+            <ClipboardListIcon className="size-6" />
+            <p className="text-m2">Daftar</p>
+          </Button>
+        </Link>
       </div>
     </main>
   );

@@ -1,7 +1,8 @@
+import { getAllEvents } from "@/lib/api/event";
 import PendaftaranModule from "@/modules/PendaftaranModule";
 
-const StaffRegistrationPage = () => {
-  return <PendaftaranModule />;
-};
+export default async function StaffRegistrationPage() {
+  const events = await getAllEvents();
 
-export default StaffRegistrationPage;
+  return <PendaftaranModule events={events} />;
+}

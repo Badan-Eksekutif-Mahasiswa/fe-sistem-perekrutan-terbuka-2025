@@ -1,8 +1,12 @@
 import React from "react";
 import type { EventTimelineType, TimelineMarkerProps } from "../type";
-import { timelineData } from "../const";
 import { Button } from "@/components/ui/button";
 import { NodeTimeline } from "../../../../public/svgs/NodeTimeline";
+import { Event } from "@/types/event";
+
+type TimelineProps = {
+  event: Event;
+};
 
 const TimelineCard = ({ date, title, desc }: EventTimelineType) => {
   const formattedDate = date.toLocaleDateString("id-ID", {
@@ -35,7 +39,39 @@ const TimelineMarker = ({ isEven, isLast }: TimelineMarkerProps) => {
   );
 };
 
-const Timeline = () => {
+const Timeline = ({ event }: TimelineProps) => {
+  // Convert event.timeline JSON to timeline array
+  const timelineData: EventTimelineType[] = [];
+
+  // Check if timeline is an array
+  if (Array.isArray(event.timeline)) {
+    event.timeline.forEach((item: unknown) => {
+      if (
+        item &&
+        typeof item === "object" &&
+        "date" in item &&
+        "title" in item
+      ) {
+        const timelineItem = item as {
+          date: string;
+          title: string;
+          description?: string;
+          desc?: string;
+        };
+        timelineData.push({
+          date: new Date(timelineItem.date),
+          title: timelineItem.title,
+          desc: timelineItem.description || timelineItem.desc || "",
+        });
+      }
+    });
+  }
+
+  // If no timeline data, don't render the section
+  if (timelineData.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <h1 className="text-center text-h1 text-white mb-5">Timeline</h1>

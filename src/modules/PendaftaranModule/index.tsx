@@ -30,8 +30,16 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { Event } from "@/types/event";
+import { transformEventsToEventTypes } from "@/lib/utils/event-transformer";
 
-const PendaftaranModule = () => {
+type PendaftaranModuleProps = {
+  events: Event[];
+};
+
+const PendaftaranModule = ({ events }: PendaftaranModuleProps) => {
+  const transformedEvents = transformEventsToEventTypes(events);
+
   const {
     inputValue,
     setInputValue,
@@ -48,7 +56,7 @@ const PendaftaranModule = () => {
     removeCategory,
     paginatedEvents,
     totalPages,
-  } = useEventFiltering();
+  } = useEventFiltering({ events: transformedEvents });
 
   const handleKeyEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -213,9 +221,7 @@ const PendaftaranModule = () => {
               {/* Event Cards */}
               <div className="space-y-5 mt-5">
                 {paginatedEvents.length > 0 ? (
-                  paginatedEvents.map((e, i) => (
-                    <EventCard event={e} index={i + 1} key={e.title} />
-                  ))
+                  paginatedEvents.map((e) => <EventCard event={e} key={e.id} />)
                 ) : (
                   <p className="text-neutral-400 mt-10">
                     Tidak ada lowongan yang cocok.

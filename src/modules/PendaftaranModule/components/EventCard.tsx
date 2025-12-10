@@ -7,10 +7,9 @@ import Link from "next/link";
 
 type EventCardProps = {
   event: EventType;
-  index: number;
 };
 
-const EventCard = ({ event, index }: EventCardProps) => {
+const EventCard = ({ event }: EventCardProps) => {
   const formattedDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-GB", {
       day: "2-digit",
@@ -70,7 +69,7 @@ const EventCard = ({ event, index }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Link href={`/event/${index}`}>
+          <Link href={`/${event.id}`}>
             <Button variant={"secondary"} className="h-fit">
               <p className="text-primary-500 text-m3">Selengkapnya</p>
               <ArrowRightIcon className="size-4 text-primary-500" />
@@ -124,7 +123,7 @@ const EventCard = ({ event, index }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Link className="w-full" href={`/event/${index}`}>
+          <Link className="w-full" href={`/${event.id}`}>
             <Button variant={"secondary"} className="w-full">
               <p className="text-primary-500 text-m3">Selengkapnya</p>
               <ArrowRightIcon className="size-4 text-primary-500" />

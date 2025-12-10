@@ -1,11 +1,14 @@
 import { useState, useMemo } from "react";
-import { eventsData } from "../const";
 import { EventType } from "../type";
 
 type SortOrder = "newest" | "oldest";
 export type TabType = "semua" | "dibuka" | "akan datang";
 
-export const useEventFiltering = () => {
+type UseEventFilteringProps = {
+  events: EventType[];
+};
+
+export const useEventFiltering = ({ events }: UseEventFilteringProps) => {
   const [selectedCategories, setSelectedCategories] = useState<
     Record<string, boolean>
   >({});
@@ -50,7 +53,7 @@ export const useEventFiltering = () => {
       (key) => selectedCategories[key]
     );
 
-    return eventsData
+    return events
       .filter((event) => {
         // Category Filter
         const isCategoryMatch =
@@ -80,7 +83,7 @@ export const useEventFiltering = () => {
           ? validDateB - validDateA
           : validDateA - validDateB;
       });
-  }, [selectedCategories, searchQuery, activeTab, sortOrder]);
+  }, [events, selectedCategories, searchQuery, activeTab, sortOrder]);
 
   const paginatedEvents = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
