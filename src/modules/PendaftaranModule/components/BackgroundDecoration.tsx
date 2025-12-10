@@ -1,18 +1,8 @@
-import { AirBalloon } from "../../../../public/svgs";
+import { AirBalloon } from "../../../../public/svgs/AirBaloon";
 
 export const BackgroundDecoration = () => {
   return (
     <>
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-      `}</style>
-
       {/* Desktop Mist */}
       <div className="absolute max-md:hidden h-[800px] bottom-60 w-full rounded-lg pointer-events-none">
         <div className="absolute inset-0 bg-white opacity-10 rounded-full blur-[120px] scale-y-50 translate-y-1/4"></div>
