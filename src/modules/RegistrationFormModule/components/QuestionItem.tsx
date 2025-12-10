@@ -69,14 +69,6 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
   }
   if (question.type === "INFORMATION" && question.inputType === "BUTTON") {
     return (
-      //   <div className="p-4 rounded-xl bg-blue-100 border-2 border-blue-300">
-      //     <h3 className="font-jakarta font-semibold text-primary-500 mb-2">
-      //       {question.question}
-      //     </h3>
-      //     {question.description && (
-      //       <p className="text-sm text-primary-400">{question.description}</p>
-      //     )}
-      //   </div>
       <div className="flex flex-col gap-3">
         <Link className="cursor-pointer" href={question.description || "#"}>
           <Button variant={"secondary"}>{question.question}</Button>
