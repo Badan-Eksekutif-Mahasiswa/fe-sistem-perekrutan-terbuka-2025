@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Info, UserPen } from "lucide-react";
 import OnGoing from "./OnGoing";
 import { Event } from "@/types/event";
+import Link from "next/link";
 
 type HeroProps = {
   events: Event[];
@@ -42,13 +43,6 @@ const Hero = ({ events, loading }: HeroProps) => {
           className="object-cover"
           priority
         />
-        {/* <Image
-          src="/hero-mobile.webp"
-          alt="Hero Background"
-          fill
-          className="object-cover hidden max-lg:block"
-          priority
-        /> */}
       </div>
 
       {/* Konten di atas gambar */}
@@ -72,10 +66,12 @@ const Hero = ({ events, loading }: HeroProps) => {
           />
         </div>
         <div className="flex gap-2">
-          <Button>
-            <UserPen />
-            Mulai Daftar
-          </Button>
+          <Link href="/event">
+            <Button>
+              <UserPen />
+              Mulai Daftar
+            </Button>
+          </Link>
           <Button variant={"secondary"}>
             <Info />
             Tentang SPT

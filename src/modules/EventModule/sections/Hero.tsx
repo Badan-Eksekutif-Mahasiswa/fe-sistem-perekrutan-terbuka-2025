@@ -76,12 +76,12 @@ const Hero = ({ event }: HeroProps) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex px-5 py-10 max-lg:mt-20 md:px-20 lg:px-36 lg:py-0 lg:gap-40 z-50 w-full min-h-screen max-lg:flex-col flex-row gap-12 lg:justify-between items-center">
+      <div className="flex px-5 mt-10 py-14 max-lg:mt-20 md:px-20 lg:px-36 lg:py-0 lg:gap-40 z-50 w-full min-h-screen max-lg:flex-col flex-row gap-12 lg:justify-between items-center">
         <div
           className="flex flex-col text-center z-50 items-center gap-5
          lg:gap-15 text-white"
         >
-          <h1 className="font-extrabold font-jakarta text-h2 lg:text-6xl tracking-wide leading-normal  text-shadow-lg text-shadow-black">
+          <h1 className="font-extrabold font-jakarta text-h1 tracking-wide leading-normal  text-shadow-lg text-shadow-black">
             {event.title}
           </h1>
           <div className="relative w-32 h-32 md:w-72 md:h-72">
@@ -91,7 +91,7 @@ const Hero = ({ event }: HeroProps) => {
               layout="fill"
             />
           </div>
-          <p className="text-p4 lg:text-p3">{event.description}</p>
+          <p className="text-p5 lg:text-p4">{event.description}</p>
         </div>
         <Card className="text-center w-full z-20 justify-center flex flex-col p-6 gap-6">
           <CardHeader>
