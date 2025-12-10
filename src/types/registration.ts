@@ -7,7 +7,8 @@ export type QuestionInputType =
   | "MULTIPLE_CHOICE"
   | "DROPDOWN"
   | "NUMBER"
-  | "DATE";
+  | "DATE"
+  | "BUTTON";
 
 export interface Option {
   id: string;
