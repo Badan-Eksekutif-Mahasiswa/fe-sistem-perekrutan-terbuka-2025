@@ -155,7 +155,7 @@ const DashboardPage = () => {
 
         {/* Applications List */}
         <div className="mb-8">
-          <h2 className="text-h3 text-white mb-4">List aplikasi</h2>
+          <h2 className="text-h3 text-white mb-4">Pendaftaran saya</h2>
 
           {loadingApplications ? (
             <div className="bg-gradient-card-glass backdrop-blur-sm border border-primary-300 rounded-xl p-8 text-center">
