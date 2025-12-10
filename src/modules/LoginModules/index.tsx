@@ -6,6 +6,7 @@ import { useRedirectIfAuth } from "@/hooks/useAuth";
 import { AuthLoading, LoadingSpinner } from "@/components/ui/loading";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 const LoginModules = () => {
   const { login, isLoading } = useAuth();
@@ -37,50 +38,25 @@ const LoginModules = () => {
   }
 
   return (
-    <main className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Sistem Perekrutan Terbuka
-          </h1>
-          <p className="text-gray-600">
-            Masuk menggunakan akun Universitas Indonesia
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <Button
-            onClick={handleLogin}
-            disabled={isLoginLoading}
-            className="w-full h-12 text-lg"
-          >
-            {isLoginLoading ? (
-              <>
-                <LoadingSpinner size="sm" className="border-white mr-2" />
-                Mengarahkan ke UI SSO...
-              </>
-            ) : (
-              "Login dengan UI SSO"
-            )}
-          </Button>
-
-          <div className="text-sm text-gray-500 text-center">
-            <p>
-              Dengan masuk, Anda akan diarahkan ke sistem Single Sign-On (SSO)
-              Universitas Indonesia untuk verifikasi identitas.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <div className="text-xs text-gray-400 text-center">
-            <p>
-              Hanya mahasiswa Universitas Indonesia yang dapat mengakses sistem
-              ini.
-            </p>
-          </div>
-        </div>
-      </div>
+    <main className="min-h-screen flex justify-center items-center">
+      <Button onClick={handleLogin} disabled={isLoginLoading}>
+        {isLoginLoading ? (
+          <>
+            <LoadingSpinner size="sm" className="border-white mr-2" />
+            Mengarahkan ke UI SSO...
+          </>
+        ) : (
+          <>
+            <Image
+              src="/logo-UI.png"
+              alt="Login with SSO"
+              width={20}
+              height={20}
+            />
+            <span>Login with SSO UI</span>
+          </>
+        )}
+      </Button>
     </main>
   );
 };

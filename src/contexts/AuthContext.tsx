@@ -3,11 +3,14 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, AuthContextType } from "@/types/auth";
 import { authApi } from "@/lib/auth";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/useToast";
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const { show } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,15 +43,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.success) {
         setUser(null);
-        toast.success("Logged out successfully");
+        show("success", "Successfully logged out");
         // Redirect to home page after logout
-        window.location.href = "/";
+        // window.location.href = "/";
+        router.push("/");
       } else {
-        toast.error(response.message || "Logout failed");
+        show("error", response.message || "Logout failed");
       }
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("An error occurred during logout");
+      show("error", "An error occurred during logout");
     } finally {
       setIsLoading(false);
     }
