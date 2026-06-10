@@ -23,8 +23,17 @@ type DivisiProps = {
 
 const Divisi = ({ event }: DivisiProps) => {
   const [indexDivisi, setIndexDivisi] = useState(0);
-  const divisiData = event.divisions;
+  const divisiData = event.divisions || [];
   const divisiDipilih = divisiData[indexDivisi];
+
+  if (!divisiData || divisiData.length === 0 || !divisiDipilih) {
+    return (
+      <main className="min-h-screen justify-center flex px-5 py-2.5 gap-5 md:px-20 md:py-10 md:gap-10 flex-col items-center text-center text-white">
+        <h1 className="text-h3 md:text-h1">Divisi-Divisi Kami</h1>
+        <p className="text-p4 text-neutral-300">Event ini belum memiliki divisi yang terdaftar.</p>
+      </main>
+    );
+  }
 
   // Get PIC names from PIC array/object
   let picData: Array<{ name: string; contact: string }> = [];
