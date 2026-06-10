@@ -21,18 +21,31 @@ export interface Division {
   };
   eventId: string;
   interviewLink: string | null;
+  maxQuota: number | null;
+  hasDivisionTask: boolean;
+  taskDescription: string | null;
+  sortOrder: number;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
+export type EventStatus = "DRAFT" | "ACTIVE" | "CLOSED" | "ARCHIVED";
+
 // Event Type
 export interface Event {
   id: string;
+  eventCode: string;
   title: string;
   description: string;
   logo: string | null;
+  status: EventStatus;
   openRegistration: string;
   closeRegistration: string;
+  closedAt: string | null;
+  maxRegistrants: number | null;
+  requiresGeneralTask: boolean;
+  generalTaskUrl: string | null;
   timeline: {
     [key: string]: unknown;
   };
