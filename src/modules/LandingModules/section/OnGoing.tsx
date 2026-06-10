@@ -16,10 +16,7 @@ type OnGoingProps = {
 const OnGoing = ({ events = [], loading }: OnGoingProps) => {
   // Filter only open events
   const ongoingEvents = events.filter((event) => {
-    const status = getEventStatus(
-      event.openRegistration,
-      event.closeRegistration
-    );
+    const status = getEventStatus(event);
     return status === "Dibuka";
   });
 

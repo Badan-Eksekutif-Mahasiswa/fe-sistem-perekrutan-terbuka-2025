@@ -142,15 +142,26 @@ const Divisi = ({ event }: DivisiProps) => {
               </div>
             </div>
           </div>
-          <Link href={`/${event.id}/form`}>
+          {event.status === "CLOSED" ? (
             <Button
               variant={"secondary"}
               className="text-primary-500 items-center text-center w-full"
+              disabled
             >
               <ClipboardListIcon className="size-6" />
-              <p className="text-m2">Daftar</p>
+              <p className="text-m2">Pendaftaran Ditutup</p>
             </Button>
-          </Link>
+          ) : (
+            <Link href={`/${event.id}/form`}>
+              <Button
+                variant={"secondary"}
+                className="text-primary-500 items-center text-center w-full"
+              >
+                <ClipboardListIcon className="size-6" />
+                <p className="text-m2">Daftar</p>
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -231,15 +242,26 @@ const Divisi = ({ event }: DivisiProps) => {
             </div>
           </TabsContent>
         </Tabs>
-        <Link href={`/${event.id}/form`} className="w-full">
+        {event.status === "CLOSED" ? (
           <Button
             variant={"secondary"}
             className="text-primary-500 items-center w-full text-center"
+            disabled
           >
             <ClipboardListIcon className="size-6" />
-            <p className="text-m2">Daftar</p>
+            <p className="text-m2">Pendaftaran Ditutup</p>
           </Button>
-        </Link>
+        ) : (
+          <Link href={`/${event.id}/form`} className="w-full">
+            <Button
+              variant={"secondary"}
+              className="text-primary-500 items-center w-full text-center"
+            >
+              <ClipboardListIcon className="size-6" />
+              <p className="text-m2">Daftar</p>
+            </Button>
+          </Link>
+        )}
       </div>
     </main>
   );

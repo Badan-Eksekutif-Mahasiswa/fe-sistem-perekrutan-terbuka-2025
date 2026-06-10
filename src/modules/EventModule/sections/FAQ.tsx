@@ -9,8 +9,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowUpIcon, ClipboardListIcon } from "lucide-react";
 import { AirBalloon } from "../../../../public/svgs/AirBaloon";
+import { Event } from "@/types/event";
+import Link from "next/link";
 
-const FAQ = () => {
+type FAQProps = {
+  event: Event;
+};
+
+const FAQ = ({ event }: FAQProps) => {
   return (
     <section className="flex relative mb-11 min-h-screen justify-center flex-col gap-4 px-12 max-lg:px-10 max-md:px-8">
       <AirBalloon className="absolute max-lg:hidden size-32 left-80 top-0  animate-float" />
@@ -65,10 +71,19 @@ const FAQ = () => {
             <p className="text-m2">Scroll to Top</p>
           </Button>
 
-          <Button className="flex-1 flex" variant={"primary"}>
-            <ClipboardListIcon className="size-6 mr-2" />
-            <p className="text-m2">Daftar</p>
-          </Button>
+          {event.status === "CLOSED" ? (
+            <Button className="flex-1 flex" variant={"primary"} disabled>
+              <ClipboardListIcon className="size-6 mr-2" />
+              <p className="text-m2">Pendaftaran Ditutup</p>
+            </Button>
+          ) : (
+            <Link href={`/${event.id}/form`} className="flex-1 flex w-full">
+              <Button className="w-full flex" variant={"primary"}>
+                <ClipboardListIcon className="size-6 mr-2" />
+                <p className="text-m2">Daftar</p>
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </section>

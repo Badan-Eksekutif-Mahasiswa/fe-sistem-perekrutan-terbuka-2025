@@ -106,11 +106,17 @@ const Hero = ({ event }: HeroProps) => {
             />
           </CardContent>
           <CardFooter className="flex items-center z-20 justify-center">
-            <Link href={`/${event.id}/form`} className="w-full">
-              <Button variant={"secondary"} className="w-full">
-                Daftar Sekarang!
+            {event.status === "CLOSED" ? (
+              <Button variant={"secondary"} className="w-full" disabled>
+                Pendaftaran Ditutup
               </Button>
-            </Link>
+            ) : (
+              <Link href={`/${event.id}/form`} className="w-full">
+                <Button variant={"secondary"} className="w-full">
+                  Daftar Sekarang!
+                </Button>
+              </Link>
+            )}
           </CardFooter>
         </Card>
       </div>

@@ -18,7 +18,7 @@ const EventModule = ({ event }: EventModuleProps) => {
       <Divisi event={event} />
       <Testimoni />
       <Dokumentasi />
-      <FAQ />
+      <FAQ event={event} />
     </main>
   );
 };
