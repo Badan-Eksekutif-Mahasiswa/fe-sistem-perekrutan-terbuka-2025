@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Event } from "@/types/event";
 import { Button } from "@/components/ui/button";
+import { Plus, Trash2 } from "lucide-react";
 
 type EventFormProps = {
   initialData?: Partial<Event>;
@@ -22,7 +23,22 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     maxChooseDivision: initialData?.maxChooseDivision || 1,
     openRegistration: initialData?.openRegistration ? new Date(initialData.openRegistration).toISOString().slice(0, 16) : "",
     closeRegistration: initialData?.closeRegistration ? new Date(initialData.closeRegistration).toISOString().slice(0, 16) : "",
+    logo: initialData?.logo || "",
   });
+
+  const [socialMedia, setSocialMedia] = useState({
+    instagram: (initialData?.socialMedia as any)?.instagram || "",
+    tiktok: (initialData?.socialMedia as any)?.tiktok || "",
+    twitter: (initialData?.socialMedia as any)?.twitter || "",
+    website: (initialData?.socialMedia as any)?.website || "",
+    line: (initialData?.socialMedia as any)?.line || "",
+  });
+
+  const parsedTimeline = Array.isArray(initialData?.timeline) && initialData.timeline.length > 0
+    ? initialData.timeline as any
+    : [{ date: "", title: "", description: "" }];
+
+  const [timeline, setTimeline] = useState<Array<{ date: string, title: string, description: string }>>(parsedTimeline);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -32,13 +48,44 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     }));
   };
 
+  const handleSocialMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const cleanValue = name !== 'website' && value.startsWith('@') ? value.substring(1) : value;
+    setSocialMedia((prev) => ({ ...prev, [name]: cleanValue }));
+  };
+
+  const handleTimelineChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const newTimeline = [...timeline];
+    newTimeline[index] = { ...newTimeline[index], [name]: value };
+    setTimeline(newTimeline);
+  };
+
+  const addTimeline = () => {
+    setTimeline([...timeline, { date: "", title: "", description: "" }]);
+  };
+
+  const removeTimeline = (index: number) => {
+    const newTimeline = timeline.filter((_, i) => i !== index);
+    setTimeline(newTimeline);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Convert local datetime to ISO string
-    const submitData = { ...formData };
+    const submitData: any = { ...formData };
     if (submitData.openRegistration) submitData.openRegistration = new Date(submitData.openRegistration).toISOString();
     if (submitData.closeRegistration) submitData.closeRegistration = new Date(submitData.closeRegistration).toISOString();
     
+    // Clean up empty social media fields
+    const cleanedSocialMedia: any = {};
+    Object.entries(socialMedia).forEach(([key, val]) => {
+      if (val.trim() !== "") cleanedSocialMedia[key] = val.trim();
+    });
+
+    submitData.socialMedia = cleanedSocialMedia;
+    submitData.timeline = timeline.filter(t => t.title.trim() !== "" || t.date.trim() !== "");
+
     onSubmit(submitData);
   };
 
@@ -93,6 +140,81 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           className="border p-2 rounded-md h-32"
           required
         />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="font-bold text-m4">URL Logo</label>
+        <input
+          type="url"
+          name="logo"
+          value={formData.logo || ""}
+          onChange={handleChange}
+          className="border p-2 rounded-md"
+          placeholder="https://example.com/logo.png"
+        />
+      </div>
+
+      {/* SOSIAL MEDIA */}
+      <div className="flex flex-col gap-2 p-4 border border-neutral-200 rounded-md">
+        <label className="font-bold text-m4">Sosial Media</label>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm">Instagram</label>
+            <input type="text" name="instagram" value={socialMedia.instagram} onChange={handleSocialMediaChange} className="border p-2 rounded-md" placeholder="bemui_official" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm">Tiktok</label>
+            <input type="text" name="tiktok" value={socialMedia.tiktok} onChange={handleSocialMediaChange} className="border p-2 rounded-md" placeholder="bemui_official" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm">Twitter</label>
+            <input type="text" name="twitter" value={socialMedia.twitter} onChange={handleSocialMediaChange} className="border p-2 rounded-md" placeholder="BEMUI_Official" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm">Line</label>
+            <input type="text" name="line" value={socialMedia.line} onChange={handleSocialMediaChange} className="border p-2 rounded-md" placeholder="bemui" />
+          </div>
+          <div className="flex flex-col gap-1 col-span-2">
+            <label className="text-sm">Website</label>
+            <input type="url" name="website" value={socialMedia.website} onChange={handleSocialMediaChange} className="border p-2 rounded-md" placeholder="https://bemui.id" />
+          </div>
+        </div>
+      </div>
+
+      {/* TIMELINE */}
+      <div className="flex flex-col gap-2 p-4 border border-neutral-200 rounded-md">
+        <div className="flex justify-between items-center mb-2">
+          <label className="font-bold text-m4">Timeline</label>
+          <Button variant="secondary" size="sm" type="button" onClick={addTimeline}>
+            <Plus className="size-4 mr-1" /> Tambah Timeline
+          </Button>
+        </div>
+        
+        {timeline.map((item, index) => (
+          <div key={index} className="flex gap-4 items-start p-3 bg-neutral-50 rounded-md border border-neutral-100">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="flex gap-4">
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Tanggal</label>
+                  <input type="date" name="date" value={item.date} onChange={(e) => handleTimelineChange(index, e)} className="border p-2 rounded-md" required />
+                </div>
+                <div className="flex-[2] flex flex-col gap-1">
+                  <label className="text-sm">Judul</label>
+                  <input type="text" name="title" value={item.title} onChange={(e) => handleTimelineChange(index, e)} className="border p-2 rounded-md" placeholder="Contoh: Pembukaan Pendaftaran" required />
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm">Deskripsi</label>
+                <textarea name="description" value={item.description} onChange={(e) => handleTimelineChange(index, e)} className="border p-2 rounded-md h-20" placeholder="Opsional" />
+              </div>
+            </div>
+            {timeline.length > 1 && (
+              <Button variant="destructive" size="icon" type="button" onClick={() => removeTimeline(index)} className="mt-7">
+                <Trash2 className="size-4" />
+              </Button>
+            )}
+          </div>
+        ))}
       </div>
 
       <div className="flex gap-4">

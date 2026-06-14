@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState, use } from "react";
 import EventForm from "../../components/EventForm";
-import { getEventById, updateEvent, deleteEvent } from "@/lib/api/event";
+import DivisionFormModal from "../../components/DivisionFormModal";
+import { getEventById, updateEvent, deleteEvent, createDivision, updateDivision } from "@/lib/api/event";
 import { useRouter } from "next/navigation";
-import { Event } from "@/types/event";
+import { Event, Division } from "@/types/event";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, Plus } from "lucide-react";
 import Loader from "@/components/elements/Loader";
 
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -18,6 +19,9 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [isDivisionModalOpen, setIsDivisionModalOpen] = useState(false);
+  const [selectedDivision, setSelectedDivision] = useState<Partial<Division> | null>(null);
+  const [divisionSaving, setDivisionSaving] = useState(false);
 
   useEffect(() => {
     fetchEvent();
@@ -59,6 +63,34 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
         setSaving(false);
       }
     }
+  };
+
+  const handleDivisionSubmit = async (data: Partial<Division>) => {
+    try {
+      setDivisionSaving(true);
+      setError("");
+      if (data.id) {
+        await updateDivision(data.id, data);
+      } else {
+        await createDivision(data);
+      }
+      setIsDivisionModalOpen(false);
+      fetchEvent();
+    } catch (err: any) {
+      setError(err.message || "Gagal menyimpan divisi");
+    } finally {
+      setDivisionSaving(false);
+    }
+  };
+
+  const openAddDivision = () => {
+    setSelectedDivision(null);
+    setIsDivisionModalOpen(true);
+  };
+
+  const openEditDivision = (division: Division) => {
+    setSelectedDivision(division);
+    setIsDivisionModalOpen(true);
   };
 
   if (loading) return <Loader />;
@@ -108,7 +140,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                       </span>
                     </td>
                     <td className="p-4">
-                      <Button variant="ghost" size="sm">Edit Divisi (Coming Soon)</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openEditDivision(div)}>Edit Divisi</Button>
                     </td>
                   </tr>
                 ))
@@ -119,11 +151,23 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
               )}
             </tbody>
           </table>
-          <div className="p-4 border-t border-neutral-200 bg-neutral-50 text-center">
-            <Button variant="secondary" size="sm">Tambah Divisi (Coming Soon)</Button>
+          <div className="p-4 border-t border-neutral-200 bg-neutral-50 text-center flex justify-center">
+            <Button variant="secondary" size="sm" onClick={openAddDivision}>
+              <Plus className="size-4 mr-2" />
+              Tambah Divisi
+            </Button>
           </div>
         </div>
       </div>
+
+      <DivisionFormModal
+        isOpen={isDivisionModalOpen}
+        onClose={() => setIsDivisionModalOpen(false)}
+        initialData={selectedDivision}
+        eventId={id}
+        onSubmit={handleDivisionSubmit}
+        loading={divisionSaving}
+      />
     </div>
   );
 }
