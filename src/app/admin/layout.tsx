@@ -25,8 +25,15 @@ export default function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-neutral-50 p-8 overflow-y-auto text-black">
-        {children}
+      <main 
+        className="flex-1 p-8 overflow-y-auto text-black relative bg-cover bg-center bg-fixed"
+        style={{ backgroundImage: "url('/hero.webp')" }}
+      >
+        {/* Overlay putih transparan agar teks/konten tetap terbaca */}
+        <div className="absolute inset-0 bg-white/80 z-0" />
+        <div className="relative z-10">
+          {children}
+        </div>
       </main>
     </div>
   );

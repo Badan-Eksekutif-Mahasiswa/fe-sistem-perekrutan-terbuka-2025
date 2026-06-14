@@ -34,11 +34,21 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     line: (initialData?.socialMedia as any)?.line || "",
   });
 
-  const parsedTimeline = Array.isArray(initialData?.timeline) && initialData.timeline.length > 0
-    ? initialData.timeline as any
-    : [{ date: "", title: "", description: "" }];
+  const [timeline, setTimeline] = useState<Array<{ date: string, title: string, description: string }>>(
+    Array.isArray(initialData?.timeline) && initialData.timeline.length > 0 ? initialData.timeline as any : [{ date: "", title: "", description: "" }]
+  );
 
-  const [timeline, setTimeline] = useState<Array<{ date: string, title: string, description: string }>>(parsedTimeline);
+  const [faqs, setFaqs] = useState<Array<{ question: string, answer: string }>>(
+    Array.isArray(initialData?.faqs) && initialData.faqs.length > 0 ? initialData.faqs as any : [{ question: "", answer: "" }]
+  );
+
+  const [testimonials, setTestimonials] = useState<Array<{ name: string, role: string, message: string, photoUrl: string }>>(
+    Array.isArray(initialData?.testimonials) && initialData.testimonials.length > 0 ? initialData.testimonials as any : [{ name: "", role: "", message: "", photoUrl: "" }]
+  );
+
+  const [documentations, setDocumentations] = useState<Array<{ title: string, imageUrl: string }>>(
+    Array.isArray(initialData?.documentations) && initialData.documentations.length > 0 ? initialData.documentations as any : [{ title: "", imageUrl: "" }]
+  );
 
   // Divisions State
   const parsedDivisions = Array.isArray(initialData?.divisions) && initialData.divisions.length > 0
@@ -87,15 +97,36 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     newTimeline[index] = { ...newTimeline[index], [name]: value };
     setTimeline(newTimeline);
   };
+  const addTimeline = () => setTimeline([...timeline, { date: "", title: "", description: "" }]);
+  const removeTimeline = (index: number) => setTimeline(timeline.filter((_, i) => i !== index));
 
-  const addTimeline = () => {
-    setTimeline([...timeline, { date: "", title: "", description: "" }]);
+  const handleFaqChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const newFaqs = [...faqs];
+    newFaqs[index] = { ...newFaqs[index], [name]: value };
+    setFaqs(newFaqs);
   };
+  const addFaq = () => setFaqs([...faqs, { question: "", answer: "" }]);
+  const removeFaq = (index: number) => setFaqs(faqs.filter((_, i) => i !== index));
 
-  const removeTimeline = (index: number) => {
-    const newTimeline = timeline.filter((_, i) => i !== index);
-    setTimeline(newTimeline);
+  const handleTestimonialChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const newTestimonials = [...testimonials];
+    newTestimonials[index] = { ...newTestimonials[index], [name]: value };
+    setTestimonials(newTestimonials);
   };
+  const addTestimonial = () => setTestimonials([...testimonials, { name: "", role: "", message: "", photoUrl: "" }]);
+  const removeTestimonial = (index: number) => setTestimonials(testimonials.filter((_, i) => i !== index));
+
+  const handleDocumentationChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const newDocs = [...documentations];
+    newDocs[index] = { ...newDocs[index], [name]: value };
+    setDocumentations(newDocs);
+  };
+  const addDocumentation = () => setDocumentations([...documentations, { title: "", imageUrl: "" }]);
+  const removeDocumentation = (index: number) => setDocumentations(documentations.filter((_, i) => i !== index));
+
 
   const handleDivisionChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -135,6 +166,9 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
     submitData.socialMedia = cleanedSocialMedia;
     submitData.timeline = timeline.filter(t => t.title.trim() !== "" || t.date.trim() !== "");
+    submitData.faqs = faqs.filter(f => f.question.trim() !== "");
+    submitData.testimonials = testimonials.filter(t => t.name.trim() !== "");
+    submitData.documentations = documentations.filter(d => d.title.trim() !== "" || d.imageUrl.trim() !== "");
 
     // Prepare divisions payload
     const finalDivisions = divisions.filter(d => d.name.trim() !== "").map(d => ({
@@ -312,7 +346,111 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         ))}
       </div>
 
-      <div className="flex gap-4">
+      {/* FAQ */}
+      <div className="flex flex-col gap-2 p-4 border border-neutral-200 rounded-md">
+        <div className="flex justify-between items-center mb-2">
+          <label className="font-bold text-m4">FAQ</label>
+          <Button variant="secondary" size="sm" type="button" onClick={addFaq}>
+            <Plus className="size-4 mr-1" /> Tambah FAQ
+          </Button>
+        </div>
+        
+        {faqs.map((item, index) => (
+          <div key={index} className="flex gap-4 items-start p-3 bg-neutral-50 rounded-md border border-neutral-100">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
+                <label className="text-sm">Pertanyaan</label>
+                <input type="text" name="question" value={item.question} onChange={(e) => handleFaqChange(index, e)} className="border p-2 rounded-md" placeholder="Contoh: Apakah event ini berbayar?" required />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm">Jawaban</label>
+                <textarea name="answer" value={item.answer} onChange={(e) => handleFaqChange(index, e)} className="border p-2 rounded-md h-20" placeholder="Contoh: Tidak, event ini 100% gratis." required />
+              </div>
+            </div>
+            {faqs.length > 1 && (
+              <Button variant="destructive" size="icon" type="button" onClick={() => removeFaq(index)} className="mt-7">
+                <Trash2 className="size-4" />
+              </Button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* TESTIMONIAL */}
+      <div className="flex flex-col gap-2 p-4 border border-neutral-200 rounded-md">
+        <div className="flex justify-between items-center mb-2">
+          <label className="font-bold text-m4">Testimoni</label>
+          <Button variant="secondary" size="sm" type="button" onClick={addTestimonial}>
+            <Plus className="size-4 mr-1" /> Tambah Testimoni
+          </Button>
+        </div>
+        
+        {testimonials.map((item, index) => (
+          <div key={index} className="flex gap-4 items-start p-3 bg-neutral-50 rounded-md border border-neutral-100">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="flex gap-4">
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Nama</label>
+                  <input type="text" name="name" value={item.name} onChange={(e) => handleTestimonialChange(index, e)} className="border p-2 rounded-md" placeholder="Contoh: Budi" required />
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Peran/Posisi</label>
+                  <input type="text" name="role" value={item.role} onChange={(e) => handleTestimonialChange(index, e)} className="border p-2 rounded-md" placeholder="Contoh: Peserta 2024" required />
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">URL Foto</label>
+                  <input type="url" name="photoUrl" value={item.photoUrl} onChange={(e) => handleTestimonialChange(index, e)} className="border p-2 rounded-md" placeholder="https://example.com/photo.jpg" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm">Pesan Testimoni</label>
+                <textarea name="message" value={item.message} onChange={(e) => handleTestimonialChange(index, e)} className="border p-2 rounded-md h-20" placeholder="Pesan singkat..." required />
+              </div>
+            </div>
+            {testimonials.length > 1 && (
+              <Button variant="destructive" size="icon" type="button" onClick={() => removeTestimonial(index)} className="mt-7">
+                <Trash2 className="size-4" />
+              </Button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* DOKUMENTASI */}
+      <div className="flex flex-col gap-2 p-4 border border-neutral-200 rounded-md">
+        <div className="flex justify-between items-center mb-2">
+          <label className="font-bold text-m4">Dokumentasi</label>
+          <Button variant="secondary" size="sm" type="button" onClick={addDocumentation}>
+            <Plus className="size-4 mr-1" /> Tambah Dokumentasi
+          </Button>
+        </div>
+        
+        {documentations.map((item, index) => (
+          <div key={index} className="flex gap-4 items-start p-3 bg-neutral-50 rounded-md border border-neutral-100">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="flex gap-4">
+                <div className="flex-[2] flex flex-col gap-1">
+                  <label className="text-sm">Judul Foto/Kegiatan</label>
+                  <input type="text" name="title" value={item.title} onChange={(e) => handleDocumentationChange(index, e)} className="border p-2 rounded-md" placeholder="Contoh: Pembukaan Acara" required />
+                </div>
+                <div className="flex-[3] flex flex-col gap-1">
+                  <label className="text-sm">URL Gambar</label>
+                  <input type="url" name="imageUrl" value={item.imageUrl} onChange={(e) => handleDocumentationChange(index, e)} className="border p-2 rounded-md" placeholder="https://example.com/foto.jpg" required />
+                </div>
+              </div>
+            </div>
+            {documentations.length > 1 && (
+              <Button variant="destructive" size="icon" type="button" onClick={() => removeDocumentation(index)} className="mt-7">
+                <Trash2 className="size-4" />
+              </Button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="flex gap-4 mt-6">
         <div className="flex-1 flex flex-col gap-1">
           <label className="font-bold text-m4">Status</label>
           <select name="status" value={formData.status} onChange={handleChange} className="border p-2 rounded-md">
@@ -381,8 +519,8 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         </div>
       </div>
 
-      <div className="mt-4 flex justify-end gap-2">
-        <Button variant="primary" type="submit" disabled={loading}>
+      <div className="mt-4 flex justify-end gap-2 border-t pt-4 border-neutral-200">
+        <Button variant="primary" type="submit" disabled={loading} className="w-48 text-lg font-bold py-6">
           {loading ? "Menyimpan..." : "Simpan Event"}
         </Button>
       </div>

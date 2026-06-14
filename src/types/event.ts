@@ -53,6 +53,9 @@ export interface Event {
   socialMedia: {
     [key: string]: unknown;
   };
+  faqs?: Array<{ question: string; answer: string }>;
+  testimonials?: Array<{ name: string; role: string; message: string; photoUrl?: string }>;
+  documentations?: Array<{ title: string; imageUrl: string }>;
   maxChooseDivision: number;
   typeOfEvent: "ORGANISASI" | "KEPANITIAAN" | "UKM";
   eventLevel: "Universitas" | "Fakultas" | "ProgramStudi";
