@@ -5,6 +5,7 @@ import { Event } from "@/types/event";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import FileUpload from "@/components/elements/FileUpload";
 
 function DeleteConfirmModal({ onConfirm, itemName }: { onConfirm: () => void, itemName: string }) {
   return (
@@ -340,14 +341,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="font-bold text-m4">URL Logo</label>
-        <input
-          type="url"
-          name="logo"
+        <FileUpload
+          label="Logo Event"
           value={formData.logo || ""}
-          onChange={handleChange}
-          className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
-          placeholder="https://example.com/logo.png"
+          onChange={(url) => setFormData(prev => ({ ...prev, logo: url }))}
+          placeholder="Upload Logo Event"
         />
       </div>
 
@@ -358,8 +356,16 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         {divisions.map((item, index) => (
           <div key={index} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-sm">Upload Foto Cover Divisi</label>
-              <input type="url" name="coverUrl" value={item.coverUrl} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="https://example.com/cover.jpg" />
+              <FileUpload
+                label="Upload Foto Cover Divisi"
+                value={item.coverUrl}
+                onChange={(url) => {
+                  const newDivisions = [...divisions];
+                  newDivisions[index] = { ...newDivisions[index], coverUrl: url };
+                  setDivisions(newDivisions);
+                }}
+                placeholder="Upload Cover Divisi"
+              />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Nama/Judul Divisi</label>
@@ -495,8 +501,16 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         {testimonials.map((item, index) => (
           <div key={index} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-sm">Upload Foto Responden</label>
-              <input type="url" name="photoUrl" value={item.photoUrl} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="https://example.com/photo.jpg" />
+              <FileUpload
+                label="Upload Foto Responden"
+                value={item.photoUrl}
+                onChange={(url) => {
+                  const newTestimonials = [...testimonials];
+                  newTestimonials[index] = { ...newTestimonials[index], photoUrl: url };
+                  setTestimonials(newTestimonials);
+                }}
+                placeholder="Upload Foto Responden"
+              />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Nama Responden</label>
@@ -528,8 +542,16 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         {documentations.map((item, index) => (
           <div key={index} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-sm">Upload Foto Dokumentasi</label>
-              <input type="url" name="imageUrl" value={item.imageUrl} onChange={(e) => handleDocumentationChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="https://example.com/foto.jpg" required />
+              <FileUpload
+                label="Upload Foto Dokumentasi"
+                value={item.imageUrl}
+                onChange={(url) => {
+                  const newDocs = [...documentations];
+                  newDocs[index] = { ...newDocs[index], imageUrl: url };
+                  setDocumentations(newDocs);
+                }}
+                placeholder="Upload Foto Dokumentasi"
+              />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Judul Foto/Kegiatan</label>
