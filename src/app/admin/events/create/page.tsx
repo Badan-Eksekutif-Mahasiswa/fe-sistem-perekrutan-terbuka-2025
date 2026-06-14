@@ -26,10 +26,12 @@ export default function CreateEventPage() {
           await createDivision({
             eventId: newEvent.id,
             name: div.name,
+            cover: div.cover,
             maxQuota: div.maxQuota,
             isActive: div.isActive,
             description: div.description,
             jobdesc: div.jobdesc,
+            taskUrl: div.taskUrl,
             PIC: div.PIC
           });
         }
@@ -51,7 +53,7 @@ export default function CreateEventPage() {
             <ArrowLeft className="size-5" />
           </Button>
         </Link>
-        <h1 className="text-h2 font-bold font-jakarta">Buat Event Baru</h1>
+        <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Buat Event Baru</h1>
       </div>
 
       {error && <div className="p-4 bg-red-100 text-red-700 rounded-lg">{error}</div>}

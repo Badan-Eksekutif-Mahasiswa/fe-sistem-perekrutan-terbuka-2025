@@ -30,7 +30,7 @@ export default function AdminLayout({
         style={{ backgroundImage: "url('/hero.webp')" }}
       >
         {/* Overlay putih transparan agar teks/konten tetap terbaca */}
-        <div className="absolute inset-0 bg-white/80 z-0" />
+        <div className="absolute inset-0 bg-white/40 z-0" />
         <div className="relative z-10">
           {children}
         </div>

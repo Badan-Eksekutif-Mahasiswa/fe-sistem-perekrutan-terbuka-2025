@@ -53,10 +53,12 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
           const divPayload = {
             eventId: id,
             name: div.name,
+            cover: div.cover,
             maxQuota: div.maxQuota,
             isActive: div.isActive,
             description: div.description,
             jobdesc: div.jobdesc,
+            taskUrl: div.taskUrl,
             PIC: div.PIC
           };
           if (div.id) {
@@ -100,7 +102,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
               <ArrowLeft className="size-5" />
             </Button>
           </Link>
-          <h1 className="text-h2 font-bold font-jakarta">Edit Event</h1>
+          <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Edit Event</h1>
         </div>
         <Button variant="destructive" onClick={handleDelete} disabled={saving}>
           <Trash2 className="size-4 mr-2" /> Hapus Event

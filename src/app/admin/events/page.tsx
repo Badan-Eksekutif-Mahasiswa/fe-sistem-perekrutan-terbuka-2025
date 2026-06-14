@@ -32,7 +32,7 @@ export default function AdminEventsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-h2 font-bold font-jakarta">Daftar Event</h1>
+        <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Daftar Event</h1>
         <Link href="/admin/events/create">
           <Button variant="primary">Tambah Event Baru</Button>
         </Link>
