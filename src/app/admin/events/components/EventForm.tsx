@@ -40,6 +40,15 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const [timeline, setTimeline] = useState<Array<{ date: string, title: string, description: string }>>(parsedTimeline);
 
+  React.useEffect(() => {
+    if (!initialData?.id && formData.title) {
+      setFormData((prev) => ({
+        ...prev,
+        id: prev.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || "",
+      }));
+    }
+  }, [formData.title, initialData?.id]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -91,34 +100,6 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded-xl border border-neutral-200 shadow-sm">
-      <div className="flex gap-4">
-        <div className="flex-1 flex flex-col gap-1">
-          <label className="font-bold text-m4">ID Event (URL Safe)</label>
-          <input
-            type="text"
-            name="id"
-            value={formData.id}
-            onChange={handleChange}
-            className="border p-2 rounded-md"
-            placeholder="contoh: bem-ui-2025"
-            required
-            disabled={!!initialData?.id} // cannot edit ID if editing
-          />
-        </div>
-        <div className="flex-1 flex flex-col gap-1">
-          <label className="font-bold text-m4">Kode Event</label>
-          <input
-            type="text"
-            name="eventCode"
-            value={formData.eventCode}
-            onChange={handleChange}
-            className="border p-2 rounded-md"
-            placeholder="BEM2025"
-            required
-          />
-        </div>
-      </div>
-
       <div className="flex flex-col gap-1">
         <label className="font-bold text-m4">Judul Event</label>
         <input
