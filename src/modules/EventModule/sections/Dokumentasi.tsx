@@ -14,8 +14,13 @@ import {
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { AirBalloon } from "../../../../public/svgs/AirBaloon";
+import { Event } from "@/types/event";
 
-const Dokumentasi = () => {
+type DokumentasiProps = {
+  event: Event;
+};
+
+const Dokumentasi = ({ event }: DokumentasiProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
@@ -51,6 +56,18 @@ const Dokumentasi = () => {
     api.reInit();
   }, [api, slidesToScroll]);
 
+  let docs = event.documentations || [];
+
+  if (docs.length === 0) return null;
+
+  // Duplicate docs to ensure infinite scroll works smoothly even with few photos
+  if (docs.length > 0 && docs.length < 6) {
+    const originalDocs = [...docs];
+    while (docs.length < 6) {
+      docs = [...docs, ...originalDocs];
+    }
+  }
+
   return (
     <section className=" flex flex-col justify-center relative items-center gap-10 px-6 md:px-20 py-10 w-full">
       <img
@@ -79,15 +96,15 @@ const Dokumentasi = () => {
           className="w-full"
         >
           <CarouselContent className="-ml-4">
-            {Array.from({ length: 15 }).map((_, index) => (
+            {docs.map((doc, index) => (
               <CarouselItem
                 key={index}
                 className="pl-4 basis-full md:basis-1/2 lg:basis-1/3"
               >
                 <div className="w-full aspect-[16/10] relative border-[8px] md:border-[10px] border-primary-300 rounded-3xl overflow-hidden bg-white/5">
                   <Image
-                    src={`/placeholder-1.webp`}
-                    alt={`Dokumentasi ${index + 1}`}
+                    src={doc.imageUrl || `/placeholder-1.webp`}
+                    alt={doc.title || `Dokumentasi ${index + 1}`}
                     fill
                     className="object-cover hover:scale-105 transition-transform duration-500"
                   />

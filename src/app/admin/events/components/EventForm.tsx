@@ -89,7 +89,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   const [divisions, setDivisions] = useState<Array<any>>(parsedDivisions.map((d: any) => ({
     id: d.id || "",
     name: d.name || "",
-    coverUrl: d.coverUrl || "",
+    coverUrl: d.cover || d.coverUrl || "",
     maxQuota: d.maxQuota || "",
     description: d.description || "",
     jobdesc: d.jobdesc || "",

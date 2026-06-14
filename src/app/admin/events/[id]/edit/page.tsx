@@ -53,7 +53,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
           const divPayload = {
             eventId: id,
             name: div.name,
-            cover: div.cover,
+            cover: div.coverUrl,
             maxQuota: div.maxQuota,
             isActive: div.isActive,
             description: div.description,

@@ -11,7 +11,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { TestimonyType } from "@/modules/EventModule/type";
-import { testimoniData } from "@/modules/EventModule/const";
 
 type CarouselElementProps = {
   testimonyData: TestimonyType[];
@@ -42,7 +41,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
   }, [isPaused, testimonyData.length]);
 
   const getSlideStyles = (index: number) => {
-    const total = testimoniData.length;
+    const total = testimonyData.length;
 
     let distance = (index - activeIndex) % total;
 
@@ -107,7 +106,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                 >
                   <div className="w-36 h-36 rounded-full absolute -top-24 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
                     <img
-                      src={`https://picsum.photos/seed/${index + 1}/200/200`}
+                      src={item.profilePicture}
                       alt="profile picture"
                       className="w-full h-full object-cover"
                     />
@@ -139,7 +138,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
           className="max-md:w-11/16 max-w-xl  mx-auto"
         >
           <CarouselContent className="items-stretch pt-20">
-            {testimoniData.map((item: TestimonyType, index) => {
+            {testimonyData.map((item: TestimonyType, index) => {
               return (
                 <CarouselItem
                   key={index}
@@ -150,9 +149,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                       <CardContent className="flex items-center justify-center p-1">
                         <div className="w-30 h-30 rounded-full absolute -top-18 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
                           <img
-                            src={`https://picsum.photos/seed/${
-                              index + 1
-                            }/200/200`}
+                            src={item.profilePicture}
                             alt="profile picture"
                             className="w-full h-full object-cover"
                           />

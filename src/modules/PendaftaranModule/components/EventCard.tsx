@@ -29,7 +29,7 @@ const EventCard = ({ event }: EventCardProps) => {
         <div className="flex w-full flex-row gap-6">
           <div className="relative w-40 h-34">
             <Image
-              src={"/placeholders/logo-event.webp"}
+              src={event.logo || "/placeholders/logo-event.webp"}
               alt="Logo"
               layout="fill"
             />
@@ -103,7 +103,7 @@ const EventCard = ({ event }: EventCardProps) => {
         <div className="flex text-start flex-row gap-6">
           <div className="relative max-sm:w-72 w-32 h-34">
             <Image
-              src={"/placeholders/logo-event.webp"}
+              src={event.logo || "/placeholders/logo-event.webp"}
               alt="Logo"
               layout="fill"
             />

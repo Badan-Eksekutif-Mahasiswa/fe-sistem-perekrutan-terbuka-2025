@@ -16,8 +16,8 @@ const EventModule = ({ event }: EventModuleProps) => {
       <Hero event={event} />
       <Timeline event={event} />
       <Divisi event={event} />
-      <Testimoni />
-      <Dokumentasi />
+      <Testimoni event={event} />
+      <Dokumentasi event={event} />
       <FAQ event={event} />
     </main>
   );

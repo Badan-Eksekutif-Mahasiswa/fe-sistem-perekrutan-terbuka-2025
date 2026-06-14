@@ -20,6 +20,7 @@ export interface Division {
     [key: string]: unknown;
   };
   eventId: string;
+  cover: string | null;
   interviewLink: string | null;
   maxQuota: number | null;
   hasDivisionTask: boolean;

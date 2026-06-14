@@ -109,7 +109,7 @@ const Divisi = ({ event }: DivisiProps) => {
                 <CardContent className="gap-2 px-3 py-3">
                   <div className="max-lg:w-[72vw] w-96 h-72 relative rounded-lg overflow-hidden">
                     <Image
-                      src={"/placeholder-1.webp"}
+                      src={divisiDipilih.cover || "/placeholder-1.webp"}
                       alt="Gambar PIC"
                       layout="fill"
                       className="object-cover"
@@ -222,7 +222,7 @@ const Divisi = ({ event }: DivisiProps) => {
                 <CardContent className="gap-2 px-3 py-3">
                   <div className="w-64 h-42 relative rounded-lg overflow-hidden">
                     <Image
-                      src={"/placeholder-1.webp"}
+                      src={divisiDipilih.cover || "/placeholder-1.webp"}
                       alt="Gambar PIC"
                       layout="fill"
                       className="object-cover"
