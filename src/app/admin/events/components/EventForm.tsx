@@ -7,7 +7,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 type EventFormProps = {
   initialData?: Partial<Event>;
-  onSubmit: (data: Partial<Event>) => Promise<void>;
+  onSubmit: (data: Partial<Event>, divisionsData?: any[], deletedDivisionIds?: string[]) => Promise<void>;
   loading?: boolean;
 };
 
@@ -39,6 +39,24 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     : [{ date: "", title: "", description: "" }];
 
   const [timeline, setTimeline] = useState<Array<{ date: string, title: string, description: string }>>(parsedTimeline);
+
+  // Divisions State
+  const parsedDivisions = Array.isArray(initialData?.divisions) && initialData.divisions.length > 0
+    ? initialData.divisions as any
+    : [{ id: "", name: "", maxQuota: "", description: "", jobdesc: "", picName: "", picContact: "", isActive: true }];
+
+  const [divisions, setDivisions] = useState<Array<any>>(parsedDivisions.map((d: any) => ({
+    id: d.id || "",
+    name: d.name || "",
+    maxQuota: d.maxQuota || "",
+    description: d.description || "",
+    jobdesc: d.jobdesc || "",
+    picName: d.PIC?.name || "",
+    picContact: d.PIC?.contact || "",
+    isActive: d.isActive !== undefined ? d.isActive : true,
+  })));
+
+  const [deletedDivisions, setDeletedDivisions] = useState<string[]>([]);
 
   React.useEffect(() => {
     if (!initialData?.id && formData.title) {
@@ -79,6 +97,29 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     setTimeline(newTimeline);
   };
 
+  const handleDivisionChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const newDivisions = [...divisions];
+    newDivisions[index] = { 
+      ...newDivisions[index], 
+      [name]: name === "isActive" ? value === "true" : name === "maxQuota" ? (value === "" ? "" : Number(value)) : value 
+    };
+    setDivisions(newDivisions);
+  };
+
+  const addDivision = () => {
+    setDivisions([...divisions, { id: "", name: "", maxQuota: "", description: "", jobdesc: "", picName: "", picContact: "", isActive: true }]);
+  };
+
+  const removeDivision = (index: number) => {
+    const divToRemove = divisions[index];
+    if (divToRemove.id) {
+      setDeletedDivisions([...deletedDivisions, divToRemove.id]);
+    }
+    const newDivisions = divisions.filter((_, i) => i !== index);
+    setDivisions(newDivisions);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Convert local datetime to ISO string
@@ -95,7 +136,21 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     submitData.socialMedia = cleanedSocialMedia;
     submitData.timeline = timeline.filter(t => t.title.trim() !== "" || t.date.trim() !== "");
 
-    onSubmit(submitData);
+    // Prepare divisions payload
+    const finalDivisions = divisions.filter(d => d.name.trim() !== "").map(d => ({
+      id: d.id,
+      name: d.name,
+      maxQuota: d.maxQuota === "" ? null : Number(d.maxQuota),
+      isActive: d.isActive,
+      description: d.description,
+      jobdesc: d.jobdesc,
+      PIC: {
+        name: d.picName,
+        contact: d.picContact
+      }
+    }));
+
+    onSubmit(submitData, finalDivisions, deletedDivisions);
   };
 
   return (
@@ -133,6 +188,65 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           className="border p-2 rounded-md"
           placeholder="https://example.com/logo.png"
         />
+      </div>
+
+      {/* DIVISI */}
+      <div className="flex flex-col gap-2 p-4 border border-neutral-200 rounded-md">
+        <div className="flex justify-between items-center mb-2">
+          <label className="font-bold text-m4">Divisi</label>
+          <Button variant="secondary" size="sm" type="button" onClick={addDivision}>
+            <Plus className="size-4 mr-1" /> Tambah Divisi
+          </Button>
+        </div>
+        
+        {divisions.map((item, index) => (
+          <div key={index} className="flex gap-4 items-start p-3 bg-neutral-50 rounded-md border border-neutral-100">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="flex gap-4">
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Nama Divisi</label>
+                  <input type="text" name="name" value={item.name} onChange={(e) => handleDivisionChange(index, e)} className="border p-2 rounded-md" placeholder="Contoh: Humas" required />
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Kuota Maksimal</label>
+                  <input type="number" name="maxQuota" value={item.maxQuota} onChange={(e) => handleDivisionChange(index, e)} className="border p-2 rounded-md" placeholder="Opsional" min={1} />
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Status</label>
+                  <select name="isActive" value={item.isActive?.toString()} onChange={(e) => handleDivisionChange(index, e)} className="border p-2 rounded-md">
+                    <option value="true">Aktif</option>
+                    <option value="false">Nonaktif</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Deskripsi Divisi</label>
+                  <textarea name="description" value={item.description} onChange={(e) => handleDivisionChange(index, e)} className="border p-2 rounded-md h-20" placeholder="Opsional" />
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Jobdesc</label>
+                  <textarea name="jobdesc" value={item.jobdesc} onChange={(e) => handleDivisionChange(index, e)} className="border p-2 rounded-md h-20" placeholder="Opsional" />
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Nama PIC</label>
+                  <input type="text" name="picName" value={item.picName} onChange={(e) => handleDivisionChange(index, e)} className="border p-2 rounded-md" placeholder="Opsional" />
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-sm">Kontak PIC</label>
+                  <input type="text" name="picContact" value={item.picContact} onChange={(e) => handleDivisionChange(index, e)} className="border p-2 rounded-md" placeholder="Contoh: Line/WA" />
+                </div>
+              </div>
+            </div>
+            {divisions.length > 1 && (
+              <Button variant="destructive" size="icon" type="button" onClick={() => removeDivision(index)} className="mt-7">
+                <Trash2 className="size-4" />
+              </Button>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* SOSIAL MEDIA */}

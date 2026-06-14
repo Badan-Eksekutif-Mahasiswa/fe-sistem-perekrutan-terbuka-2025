@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import EventForm from "../components/EventForm";
-import { createEvent } from "@/lib/api/event";
+import { createEvent, createDivision } from "@/lib/api/event";
 import { useRouter } from "next/navigation";
 import { Event } from "@/types/event";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,27 @@ export default function CreateEventPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (data: Partial<Event>) => {
+  const handleSubmit = async (data: Partial<Event>, divisionsData?: any[], deletedDivisionIds?: string[]) => {
     try {
       setLoading(true);
       setError("");
-      await createEvent(data);
+      
+      const newEvent = await createEvent(data);
+      
+      if (divisionsData && divisionsData.length > 0 && newEvent.id) {
+        for (const div of divisionsData) {
+          await createDivision({
+            eventId: newEvent.id,
+            name: div.name,
+            maxQuota: div.maxQuota,
+            isActive: div.isActive,
+            description: div.description,
+            jobdesc: div.jobdesc,
+            PIC: div.PIC
+          });
+        }
+      }
+      
       router.push("/admin/events");
     } catch (err: any) {
       setError(err.message || "Gagal membuat event");
