@@ -1,6 +1,9 @@
 export interface User {
   id: string;
-  email: string;
+  role?: "APPLICANT" | "ADMIN" | "SUPERADMIN";
+  authProvider?: "SSO" | "INTERNAL";
+  ssoId?: string | null;
+  email: string | null;
   name: string;
   npm: string | null;
   organizationalCode: string | null;
@@ -8,14 +11,22 @@ export interface User {
   faculty: string | null;
   year: string | null;
   emailVerified: boolean;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface AuthResponse {
   success: boolean;
+  status?: "success" | "error";
   user?: User;
+  data?: {
+    user?: User;
+    ssoLogoutUrl?: string | null;
+  } | null;
   message?: string;
+  errors?: unknown[] | null;
+  meta?: Record<string, unknown> | null;
 }
 
 export interface AuthContextType {

@@ -18,9 +18,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       const response = await authApi.getSession();
+      const sessionUser = response.data?.user ?? response.user;
 
-      if (response.success && response.user) {
-        setUser(response.user);
+      if (response.success && sessionUser) {
+        setUser(sessionUser);
       } else {
         setUser(null);
       }
@@ -44,8 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.success) {
         setUser(null);
         show("success", "Successfully logged out");
-        // Redirect to home page after logout
-        // window.location.href = "/";
         router.push("/");
       } else {
         show("error", response.message || "Logout failed");
