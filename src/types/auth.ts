@@ -23,6 +23,7 @@ export interface AuthResponse {
   data?: {
     user?: User;
     ssoLogoutUrl?: string | null;
+    resetUrl?: string;
   } | null;
   message?: string;
   errors?: unknown[] | null;
@@ -33,6 +34,7 @@ export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (redirectPath?: string) => void;
+  internalLogin: (email: string, password: string) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }

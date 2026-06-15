@@ -37,6 +37,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authApi.login(redirectPath);
   };
 
+  const internalLogin = async (email: string, password: string) => {
+    const response = await authApi.internalLogin(email, password);
+    if (response.success) {
+      await checkAuth();
+    }
+
+    return response;
+  };
+
   const logout = async () => {
     try {
       setIsLoading(true);
@@ -65,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     isLoading,
     login,
+    internalLogin,
     logout,
     checkAuth,
   };
