@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
+import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -105,10 +106,15 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                 `}
                 >
                   <div className="w-36 h-36 rounded-full absolute -top-24 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
-                    <img
+                    <Image
                       src={item.profilePicture}
                       alt="profile picture"
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      onError={(e) => {
+                        e.currentTarget.srcset = "";
+                        e.currentTarget.src = "/placeholder-1.webp";
+                      }}
                     />
                   </div>
 
@@ -148,10 +154,15 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                     <Card className="w-full h-full flex-1 flex flex-col  ">
                       <CardContent className="flex items-center justify-center p-1">
                         <div className="w-30 h-30 rounded-full absolute -top-18 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
-                          <img
+                          <Image
                             src={item.profilePicture}
                             alt="profile picture"
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              e.currentTarget.srcset = "";
+                              e.currentTarget.src = "/placeholder-1.webp";
+                            }}
                           />
                         </div>
 

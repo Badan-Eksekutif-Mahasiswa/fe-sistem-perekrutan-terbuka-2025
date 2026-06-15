@@ -107,6 +107,10 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
                     alt={doc.title || `Dokumentasi ${index + 1}`}
                     fill
                     className="object-cover hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      e.currentTarget.srcset = "";
+                      e.currentTarget.src = "/placeholder-1.webp";
+                    }}
                   />
                 </div>
               </CarouselItem>

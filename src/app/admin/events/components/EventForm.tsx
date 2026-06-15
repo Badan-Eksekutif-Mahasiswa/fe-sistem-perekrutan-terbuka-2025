@@ -66,19 +66,43 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   });
 
   const [timeline, setTimeline] = useState<Array<{ startDate: string, endDate: string, title: string, description: string }>>(
-    Array.isArray(initialData?.timeline) && initialData.timeline.length > 0 ? initialData.timeline as any : [{ startDate: "", endDate: "", title: "", description: "" }]
+    Array.isArray(initialData?.timeline) && initialData.timeline.length > 0 
+      ? initialData.timeline.map((t: any) => ({
+          startDate: t.startDate || "",
+          endDate: t.endDate || "",
+          title: t.title || "",
+          description: t.description || ""
+        }))
+      : [{ startDate: "", endDate: "", title: "", description: "" }]
   );
 
   const [faqs, setFaqs] = useState<Array<{ question: string, answer: string }>>(
-    Array.isArray(initialData?.faqs) && initialData.faqs.length > 0 ? initialData.faqs as any : [{ question: "", answer: "" }]
+    Array.isArray(initialData?.faqs) && initialData.faqs.length > 0 
+      ? initialData.faqs.map((f: any) => ({
+          question: f.question || "",
+          answer: f.answer || ""
+        }))
+      : [{ question: "", answer: "" }]
   );
 
   const [testimonials, setTestimonials] = useState<Array<{ name: string, role: string, message: string, photoUrl: string }>>(
-    Array.isArray(initialData?.testimonials) && initialData.testimonials.length > 0 ? initialData.testimonials as any : [{ name: "", role: "", message: "", photoUrl: "" }]
+    Array.isArray(initialData?.testimonials) && initialData.testimonials.length > 0 
+      ? initialData.testimonials.map((t: any) => ({
+          name: t.name || "",
+          role: t.role || "",
+          message: t.message || "",
+          photoUrl: t.photoUrl || ""
+        }))
+      : [{ name: "", role: "", message: "", photoUrl: "" }]
   );
 
   const [documentations, setDocumentations] = useState<Array<{ title: string, imageUrl: string }>>(
-    Array.isArray(initialData?.documentations) && initialData.documentations.length > 0 ? initialData.documentations as any : [{ title: "", imageUrl: "" }]
+    Array.isArray(initialData?.documentations) && initialData.documentations.length > 0 
+      ? initialData.documentations.map((d: any) => ({
+          title: d.title || "",
+          imageUrl: d.imageUrl || ""
+        }))
+      : [{ title: "", imageUrl: "" }]
   );
 
   // Divisions State
