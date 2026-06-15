@@ -132,6 +132,27 @@ export default function FileUpload({
         </label>
       )}
 
+      {!value && (
+        <div className="flex gap-2 items-center mt-1">
+          <input
+            type="url"
+            placeholder="Atau masukkan URL gambar..."
+            className="border border-[#475CA3] bg-white p-2 rounded-md text-sm text-neutral-900 placeholder:text-neutral-400 flex-1"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const url = e.currentTarget.value.trim();
+                if (url) onChange(url);
+              }
+            }}
+            onBlur={(e) => {
+              const url = e.target.value.trim();
+              if (url) onChange(url);
+            }}
+          />
+        </div>
+      )}
+
       {error && <span className="text-xs text-red-500">{error}</span>}
     </div>
   );

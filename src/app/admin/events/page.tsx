@@ -37,12 +37,12 @@ export default function AdminEventsPage() {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Link href="/">
-            <Button variant="outline" size="icon" className="rounded-full bg-white/50 border-[#475CA3] hover:bg-white text-[#475CA3]">
+            <Button variant="stroke" size="icon" className="rounded-full bg-white/50 border-[#475CA3] hover:bg-white text-[#475CA3]">
               <ArrowLeft className="size-5" />
             </Button>
           </Link>
           <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">
-            Hello {user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || "Admin"} 👋🏼
+            Hello {(user as any)?.user_metadata?.name || (user as any)?.user_metadata?.full_name || user?.email?.split('@')[0] || "Admin"} 👋🏼
           </h1>
         </div>
         <Link href="/admin/events/create">
@@ -96,7 +96,7 @@ export default function AdminEventsPage() {
                   </td>
                   <td className="p-4 text-center">{event.divisions?.length || 0}</td>
                   <td className="p-4 flex gap-2">
-                    <Link href={`/admin/events/${event.id}/edit`}>
+                    <Link href={`/admin/events/${event.eventCode}/edit`}>
                       <Button variant="ghost" size="sm">
                         Edit
                       </Button>

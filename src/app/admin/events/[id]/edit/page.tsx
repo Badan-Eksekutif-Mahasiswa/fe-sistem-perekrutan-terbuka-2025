@@ -51,7 +51,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
       if (divisionsData && divisionsData.length > 0) {
         for (const div of divisionsData) {
           const divPayload = {
-            eventId: id,
+            eventId: event?.id || id,
             name: div.name,
             cover: div.coverUrl,
             maxQuota: div.maxQuota,
