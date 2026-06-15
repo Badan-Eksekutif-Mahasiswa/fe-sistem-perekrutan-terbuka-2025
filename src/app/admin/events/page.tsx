@@ -6,10 +6,13 @@ import { getAllEvents } from "@/lib/api/event";
 import { Event } from "@/types/event";
 import Link from "next/link";
 import Loader from "@/components/elements/Loader";
+import { ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchEvents();
@@ -32,9 +35,18 @@ export default function AdminEventsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Daftar Event</h1>
+        <div className="flex items-center gap-4">
+          <Link href="/">
+            <Button variant="outline" size="icon" className="rounded-full bg-white/50 border-[#475CA3] hover:bg-white text-[#475CA3]">
+              <ArrowLeft className="size-5" />
+            </Button>
+          </Link>
+          <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">
+            Hello {user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || "Admin"} 👋🏼
+          </h1>
+        </div>
         <Link href="/admin/events/create">
-          <Button variant="primary">Tambah Event Baru</Button>
+          <Button variant="primary">Buat Event +</Button>
         </Link>
       </div>
 
