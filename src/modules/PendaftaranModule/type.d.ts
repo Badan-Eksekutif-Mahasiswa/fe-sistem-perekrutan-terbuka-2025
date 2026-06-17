@@ -1,5 +1,6 @@
 export type EventType = {
   id: string;
+  eventCode?: string;
   title: string;
   logo: string;
   desc: string;

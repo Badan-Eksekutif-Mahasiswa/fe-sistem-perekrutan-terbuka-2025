@@ -10,8 +10,8 @@ export function getEventStatus(
   if (event.status === "CLOSED") return "Ditutup";
 
   const now = new Date();
-  const openDate = new Date(event.openRegistration);
-  const closeDate = new Date(event.closeRegistration);
+  const openDate = new Date(event.registrationOpen);
+  const closeDate = new Date(event.registrationClose);
 
   if (now < openDate) {
     return "Akan Datang";
@@ -56,12 +56,13 @@ export function transformEventToEventType(event: Event): EventType {
 
   return {
     id: event.id,
+    eventCode: event.eventCode,
     title: event.title,
     logo: event.logo || "/placeholders/logo-event.webp",
     desc: event.description,
     status: getEventStatus(event),
-    startedAt: new Date(event.openRegistration),
-    closedAt: new Date(event.closeRegistration),
+    startedAt: new Date(event.registrationOpen),
+    closedAt: new Date(event.registrationClose),
     categories: categories as readonly string[],
     isSaved: false,
   };

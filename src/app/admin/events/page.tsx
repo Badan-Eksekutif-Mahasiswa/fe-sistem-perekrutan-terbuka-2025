@@ -91,8 +91,8 @@ export default function AdminEventsPage() {
                     </span>
                   </td>
                   <td className="p-4 text-p5 text-neutral-500">
-                    {new Date(event.openRegistration).toLocaleDateString("id-ID")} -{" "}
-                    {new Date(event.closeRegistration).toLocaleDateString("id-ID")}
+                    {new Date(event.registrationOpen).toLocaleDateString("id-ID")} -{" "}
+                    {new Date(event.registrationClose).toLocaleDateString("id-ID")}
                   </td>
                   <td className="p-4 text-center">{event.divisions?.length || 0}</td>
                   <td className="p-4 flex gap-2">

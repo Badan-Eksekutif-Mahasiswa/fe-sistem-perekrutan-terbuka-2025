@@ -69,11 +69,11 @@ const OngoingSection = ({
             events.map((event) => (
               <EventCard
                 key={event.id}
-                id={event.id}
+                eventCode={event.eventCode || event.id}
                 logo={event.logo || "/logo-clean.webp"}
                 title={event.title}
-                startDate={new Date(event.openRegistration)}
-                endDate={new Date(event.closeRegistration)}
+                startDate={new Date(event.registrationOpen)}
+                endDate={new Date(event.registrationClose)}
                 restrictions={[
                   event.eventLevel,
                   event.typeOfEvent === "ORGANISASI"
@@ -96,14 +96,14 @@ const OngoingSection = ({
 };
 
 const EventCard = ({
-  id,
+  eventCode,
   logo,
   title,
   startDate,
   endDate,
   restrictions,
 }: {
-  id: string;
+  eventCode: string;
   logo: string;
   title: string;
   startDate: Date;
@@ -142,7 +142,7 @@ const EventCard = ({
           </div>
         </div>
       </div>
-      <Link className="max-lg:w-full" href={`/${id}`}>
+      <Link className="max-lg:w-full" href={`/${eventCode}`}>
         <Button className="max-lg:w-full" variant={"secondary"}>
           Lihat Selengkapnya <ArrowRight />
         </Button>

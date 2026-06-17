@@ -41,8 +41,8 @@ export interface Event {
   description: string;
   logo: string | null;
   status: EventStatus;
-  openRegistration: string;
-  closeRegistration: string;
+  registrationOpen: string;
+  registrationClose: string;
   closedAt: string | null;
   maxRegistrants: number | null;
   requiresGeneralTask: boolean;
@@ -57,7 +57,15 @@ export interface Event {
   faqs?: Array<{ question: string; answer: string }>;
   testimonials?: Array<{ name: string; role: string; message: string; photoUrl?: string }>;
   documentations?: Array<{ title: string; imageUrl: string }>;
-  maxChooseDivision: number;
+  maxDivisionChoices: number;
+  organizer: string;
+  contactLineId: string;
+  contactName?: string;
+  contactWhatsapp?: string;
+  contactEmail?: string;
+  bannerUrl?: string;
+  publishedAt?: string;
+  archivedAt?: string;
   typeOfEvent: "ORGANISASI" | "KEPANITIAAN" | "UKM";
   eventLevel: "Universitas" | "Fakultas" | "ProgramStudi";
   createdAt: string;

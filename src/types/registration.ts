@@ -49,7 +49,7 @@ export interface PersonalInfoData {
   studyProgram: string;
   line: string;
   availableDivisions: Division[];
-  maxChooseDivision: number;
+  maxDivisionChoices: number;
   selectedDivisions: SelectedDivision[];
 }
 
@@ -153,8 +153,8 @@ export interface MyApplication {
   eventLogo: string | null;
   typeOfEvent: string;
   eventLevel: string;
-  openRegistration: string;
-  closeRegistration: string;
+  registrationOpen: string;
+  registrationClose: string;
   isSubmitted: boolean;
   submittedAt: string | null;
   lastEditedAt: string;

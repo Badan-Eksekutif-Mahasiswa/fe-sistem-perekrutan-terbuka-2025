@@ -7,6 +7,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import FileUpload from "@/components/elements/FileUpload";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 function DeleteConfirmModal({ onConfirm, itemName }: { onConfirm: () => void, itemName: string }) {
   return (
@@ -43,6 +44,7 @@ type EventFormProps = {
 };
 
 export default function EventForm({ initialData, onSubmit, loading }: EventFormProps) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState<Partial<Event>>({
     id: initialData?.id || "",
     title: initialData?.title || "",
@@ -52,10 +54,15 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     status: initialData?.status || "DRAFT",
     typeOfEvent: initialData?.typeOfEvent || "ORGANISASI",
     eventLevel: initialData?.eventLevel || "Universitas",
-    maxChooseDivision: initialData?.maxChooseDivision || 1,
-    openRegistration: initialData?.openRegistration ? new Date(initialData.openRegistration).toISOString().slice(0, 16) : "",
-    closeRegistration: initialData?.closeRegistration ? new Date(initialData.closeRegistration).toISOString().slice(0, 16) : "",
+    maxDivisionChoices: initialData?.maxDivisionChoices || 1,
+    registrationOpen: initialData?.registrationOpen ? new Date(initialData.registrationOpen).toISOString().slice(0, 16) : "",
+    registrationClose: initialData?.registrationClose ? new Date(initialData.registrationClose).toISOString().slice(0, 16) : "",
     logo: initialData?.logo || "",
+    organizer: initialData?.organizer || "",
+    contactLineId: initialData?.contactLineId || "",
+    contactName: initialData?.contactName || "",
+    contactWhatsapp: initialData?.contactWhatsapp || "",
+    contactEmail: initialData?.contactEmail || "",
   });
 
   const [socialMedia, setSocialMedia] = useState({
@@ -132,7 +139,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       ...prev,
       [name]: name === "eventCode" || name === "id" 
         ? value.toLowerCase().replace(/\s+/g, '-') 
-        : name === "maxChooseDivision" 
+        : name === "maxDivisionChoices" 
           ? Number(value) 
           : value,
     }));
@@ -207,8 +214,8 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.openRegistration && formData.closeRegistration) {
-      if (new Date(formData.closeRegistration as string) <= new Date(formData.openRegistration as string)) {
+    if (formData.registrationOpen && formData.registrationClose) {
+      if (new Date(formData.registrationClose as string) <= new Date(formData.registrationOpen as string)) {
         toast.error("Waktu Tutup Pendaftaran harus setelah Waktu Buka Pendaftaran!");
         return;
       }
@@ -216,23 +223,26 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
     // Convert local datetime to ISO string
     const submitData: any = { ...formData };
+    submitData.ownerId = submitData.ownerId || user?.id;
     
     // Inject placeholders if status is DRAFT to satisfy backend constraints
     if (submitData.status === "DRAFT") {
       if (!submitData.title) submitData.title = "Draft Event";
       if (!submitData.eventCode) submitData.eventCode = "draft-" + Date.now();
       if (!submitData.description) submitData.description = "-";
-      if (!submitData.maxChooseDivision) submitData.maxChooseDivision = 1;
+      if (!submitData.maxDivisionChoices) submitData.maxDivisionChoices = 1;
+      if (!submitData.organizer) submitData.organizer = "Draft Organizer";
+      if (!submitData.contactLineId) submitData.contactLineId = "draftline";
       
-      submitData.openRegistration = submitData.openRegistration 
-        ? new Date(submitData.openRegistration).toISOString() 
+      submitData.registrationOpen = submitData.registrationOpen 
+        ? new Date(submitData.registrationOpen).toISOString() 
         : new Date().toISOString();
-      submitData.closeRegistration = submitData.closeRegistration 
-        ? new Date(submitData.closeRegistration).toISOString() 
+      submitData.registrationClose = submitData.registrationClose 
+        ? new Date(submitData.registrationClose).toISOString() 
         : new Date().toISOString();
     } else {
-      if (submitData.openRegistration) submitData.openRegistration = new Date(submitData.openRegistration).toISOString();
-      if (submitData.closeRegistration) submitData.closeRegistration = new Date(submitData.closeRegistration).toISOString();
+      if (submitData.registrationOpen) submitData.registrationOpen = new Date(submitData.registrationOpen).toISOString();
+      if (submitData.registrationClose) submitData.registrationClose = new Date(submitData.registrationClose).toISOString();
     }
     
     // Clean up empty social media fields
@@ -263,10 +273,8 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       description: d.description,
       jobdesc: d.jobdesc,
       taskUrl: d.taskUrl,
-      PIC: {
-        name: d.picName,
-        contact: d.picContact
-      }
+      picName: d.picName,
+      picContact: d.picContact
     }));
 
     onSubmit(submitData, finalDivisions, deletedDivisions);
@@ -337,6 +345,70 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         />
       </div>
 
+      <div className="flex flex-col gap-1">
+        <label className="font-bold text-m4">Penyelenggara (Organizer)</label>
+        <input
+          type="text"
+          name="organizer"
+          value={formData.organizer || ""}
+          onChange={handleChange}
+          className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+          placeholder="Contoh: BEM UI 2026"
+          required={formData.status !== "DRAFT"}
+        />
+      </div>
+
+      <div className="flex gap-4 mt-2">
+        <div className="flex-1 flex flex-col gap-1">
+          <label className="font-bold text-m4">Nama Kontak Utama</label>
+          <input
+            type="text"
+            name="contactName"
+            value={formData.contactName || ""}
+            onChange={handleChange}
+            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            placeholder="Contoh: Budi"
+          />
+        </div>
+        <div className="flex-1 flex flex-col gap-1">
+          <label className="font-bold text-m4">ID Line Kontak</label>
+          <input
+            type="text"
+            name="contactLineId"
+            value={formData.contactLineId || ""}
+            onChange={handleChange}
+            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            placeholder="Contoh: budi_line"
+            required={formData.status !== "DRAFT"}
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-4 mt-2">
+        <div className="flex-1 flex flex-col gap-1">
+          <label className="font-bold text-m4">Email Kontak</label>
+          <input
+            type="email"
+            name="contactEmail"
+            value={formData.contactEmail || ""}
+            onChange={handleChange}
+            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            placeholder="Contoh: info@bem.ui.ac.id"
+          />
+        </div>
+        <div className="flex-1 flex flex-col gap-1">
+          <label className="font-bold text-m4">WhatsApp Kontak</label>
+          <input
+            type="text"
+            name="contactWhatsapp"
+            value={formData.contactWhatsapp || ""}
+            onChange={handleChange}
+            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            placeholder="Contoh: 08123456789"
+          />
+        </div>
+      </div>
+
       <div className="flex flex-col gap-4 mt-2">
         <div className="flex flex-col gap-1">
           <label className="font-bold text-m4">Status</label>
@@ -372,8 +444,8 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           <label className="font-bold text-m4">Maks Pilih Divisi</label>
           <input
             type="number"
-            name="maxChooseDivision"
-            value={formData.maxChooseDivision}
+            name="maxDivisionChoices"
+            value={formData.maxDivisionChoices}
             onChange={handleChange}
             className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
             min={1}
@@ -387,8 +459,8 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           <label className="font-bold text-m4">Waktu Buka Pendaftaran</label>
           <input
             type="datetime-local"
-            name="openRegistration"
-            value={formData.openRegistration as string}
+            name="registrationOpen"
+            value={formData.registrationOpen as string}
             onChange={handleChange}
             className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
             required={formData.status !== "DRAFT"}
@@ -398,10 +470,10 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           <label className="font-bold text-m4">Waktu Tutup Pendaftaran</label>
           <input
             type="datetime-local"
-            name="closeRegistration"
-            value={formData.closeRegistration as string}
+            name="registrationClose"
+            value={formData.registrationClose as string}
             onChange={handleChange}
-            min={formData.openRegistration as string}
+            min={formData.registrationOpen as string}
             className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
             required={formData.status !== "DRAFT"}
           />

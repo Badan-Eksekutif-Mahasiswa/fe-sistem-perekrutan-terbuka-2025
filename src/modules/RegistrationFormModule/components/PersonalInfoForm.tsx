@@ -93,7 +93,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
       {/* Division Selection */}
       <div className="space-y-2">
         <div className="grid grid-cols-2 gap-4">
-          {Array.from({ length: data.maxChooseDivision }).map((_, index) => {
+          {Array.from({ length: data.maxDivisionChoices }).map((_, index) => {
             const priority = index + 1;
             const selectedDivisionId = selectedDivisions[index] || "";
 

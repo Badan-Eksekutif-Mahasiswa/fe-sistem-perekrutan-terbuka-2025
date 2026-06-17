@@ -69,7 +69,7 @@ const EventCard = ({ event }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Link href={`/${event.id}`}>
+          <Link href={`/${event.eventCode || event.id}`}>
             <Button variant={"secondary"} className="h-fit">
               <p className="text-primary-500 text-m3">Selengkapnya</p>
               <ArrowRightIcon className="size-4 text-primary-500" />
@@ -123,7 +123,7 @@ const EventCard = ({ event }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Link className="w-full" href={`/${event.id}`}>
+          <Link className="w-full" href={`/${event.eventCode || event.id}`}>
             <Button variant={"secondary"} className="w-full">
               <p className="text-primary-500 text-m3">Selengkapnya</p>
               <ArrowRightIcon className="size-4 text-primary-500" />

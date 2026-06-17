@@ -101,7 +101,7 @@ const Hero = ({ event }: HeroProps) => {
           </CardHeader>
           <CardContent>
             <Countdown
-              targetDate={new Date(event.closeRegistration)}
+              targetDate={new Date(event.registrationClose)}
               displayDate={true}
             />
           </CardContent>
