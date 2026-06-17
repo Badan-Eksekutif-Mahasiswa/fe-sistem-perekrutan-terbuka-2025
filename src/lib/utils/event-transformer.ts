@@ -5,12 +5,13 @@ import { EventType } from "@/modules/PendaftaranModule/type";
  * Get event status based on registration dates
  */
 export function getEventStatus(
-  openRegistration: string,
-  closeRegistration: string
+  event: Event
 ): "Dibuka" | "Akan Datang" | "Ditutup" {
+  if (event.status === "CLOSED") return "Ditutup";
+
   const now = new Date();
-  const openDate = new Date(openRegistration);
-  const closeDate = new Date(closeRegistration);
+  const openDate = new Date(event.registrationOpen);
+  const closeDate = new Date(event.registrationClose);
 
   if (now < openDate) {
     return "Akan Datang";
@@ -55,12 +56,13 @@ export function transformEventToEventType(event: Event): EventType {
 
   return {
     id: event.id,
+    eventCode: event.eventCode,
     title: event.title,
     logo: event.logo || "/placeholders/logo-event.webp",
     desc: event.description,
-    status: getEventStatus(event.openRegistration, event.closeRegistration),
-    startedAt: new Date(event.openRegistration),
-    closedAt: new Date(event.closeRegistration),
+    status: getEventStatus(event),
+    startedAt: new Date(event.registrationOpen),
+    closedAt: new Date(event.registrationClose),
     categories: categories as readonly string[],
     isSaved: false,
   };
@@ -70,5 +72,7 @@ export function transformEventToEventType(event: Event): EventType {
  * Transform multiple API Events to EventType array
  */
 export function transformEventsToEventTypes(events: Event[]): EventType[] {
-  return events.map(transformEventToEventType);
+  return events
+    .filter((event) => event.status !== "DRAFT" && event.status !== "ARCHIVED")
+    .map(transformEventToEventType);
 }

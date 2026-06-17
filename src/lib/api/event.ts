@@ -68,3 +68,126 @@ export async function getEventById(id: string): Promise<Event> {
     throw error;
   }
 }
+
+/**
+ * Create a new event
+ */
+export async function createEvent(data: Partial<Event>): Promise<Event> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/event`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error("Failed to create event");
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+    return result.data;
+  } catch (error) {
+    console.error("Error creating event:", error);
+    throw error;
+  }
+}
+
+/**
+ * Update an event
+ */
+export async function updateEvent(id: string, data: Partial<Event>): Promise<Event> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/event/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error("Failed to update event");
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+    return result.data;
+  } catch (error) {
+    console.error("Error updating event:", error);
+    throw error;
+  }
+}
+
+/**
+ * Delete an event
+ */
+export async function deleteEvent(id: string): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/event/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) throw new Error("Failed to delete event");
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new division
+ */
+export async function createDivision(data: any): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/division`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error("Failed to create division");
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+    return result.data;
+  } catch (error) {
+    console.error("Error creating division:", error);
+    throw error;
+  }
+}
+
+/**
+ * Update a division
+ */
+export async function updateDivision(id: string, data: any): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/division/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error("Failed to update division");
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+    return result.data;
+  } catch (error) {
+    console.error("Error updating division:", error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a division
+ */
+export async function deleteDivision(id: string): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/division/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) throw new Error("Failed to delete division");
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message);
+  } catch (error) {
+    console.error("Error deleting division:", error);
+    throw error;
+  }
+}
+

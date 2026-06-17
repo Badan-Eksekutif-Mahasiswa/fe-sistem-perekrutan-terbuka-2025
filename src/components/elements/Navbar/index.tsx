@@ -6,8 +6,10 @@ import Link from "next/link";
 import { data } from "./const";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -63,6 +65,8 @@ const Navbar = () => {
       }
     };
   }, [lastScrollY, scrollTimeout]);
+
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <>

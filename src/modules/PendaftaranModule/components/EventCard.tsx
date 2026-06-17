@@ -29,7 +29,7 @@ const EventCard = ({ event }: EventCardProps) => {
         <div className="flex w-full flex-row gap-6">
           <div className="relative w-40 h-34">
             <Image
-              src={"/placeholders/logo-event.webp"}
+              src={event.logo || "/placeholders/logo-event.webp"}
               alt="Logo"
               layout="fill"
             />
@@ -69,7 +69,7 @@ const EventCard = ({ event }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Link href={`/${event.id}`}>
+          <Link href={`/${event.eventCode || event.id}`}>
             <Button variant={"secondary"} className="h-fit">
               <p className="text-primary-500 text-m3">Selengkapnya</p>
               <ArrowRightIcon className="size-4 text-primary-500" />
@@ -103,7 +103,7 @@ const EventCard = ({ event }: EventCardProps) => {
         <div className="flex text-start flex-row gap-6">
           <div className="relative max-sm:w-72 w-32 h-34">
             <Image
-              src={"/placeholders/logo-event.webp"}
+              src={event.logo || "/placeholders/logo-event.webp"}
               alt="Logo"
               layout="fill"
             />
@@ -123,7 +123,7 @@ const EventCard = ({ event }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Link className="w-full" href={`/${event.id}`}>
+          <Link className="w-full" href={`/${event.eventCode || event.id}`}>
             <Button variant={"secondary"} className="w-full">
               <p className="text-primary-500 text-m3">Selengkapnya</p>
               <ArrowRightIcon className="size-4 text-primary-500" />

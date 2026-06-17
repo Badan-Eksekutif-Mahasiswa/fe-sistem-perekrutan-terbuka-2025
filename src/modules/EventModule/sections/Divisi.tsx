@@ -23,8 +23,17 @@ type DivisiProps = {
 
 const Divisi = ({ event }: DivisiProps) => {
   const [indexDivisi, setIndexDivisi] = useState(0);
-  const divisiData = event.divisions;
+  const divisiData = event.divisions || [];
   const divisiDipilih = divisiData[indexDivisi];
+
+  if (!divisiData || divisiData.length === 0 || !divisiDipilih) {
+    return (
+      <main className="min-h-screen justify-center flex px-5 py-2.5 gap-5 md:px-20 md:py-10 md:gap-10 flex-col items-center text-center text-white">
+        <h1 className="text-h3 md:text-h1">Divisi-Divisi Kami</h1>
+        <p className="text-p4 text-neutral-300">Event ini belum memiliki divisi yang terdaftar.</p>
+      </main>
+    );
+  }
 
   // Get PIC names from PIC array/object
   let picData: Array<{ name: string; contact: string }> = [];
@@ -100,7 +109,7 @@ const Divisi = ({ event }: DivisiProps) => {
                 <CardContent className="gap-2 px-3 py-3">
                   <div className="max-lg:w-[72vw] w-96 h-72 relative rounded-lg overflow-hidden">
                     <Image
-                      src={"/placeholder-1.webp"}
+                      src={divisiDipilih.cover || "/placeholder-1.webp"}
                       alt="Gambar PIC"
                       layout="fill"
                       className="object-cover"
@@ -142,15 +151,26 @@ const Divisi = ({ event }: DivisiProps) => {
               </div>
             </div>
           </div>
-          <Link href={`/${event.id}/form`}>
+          {event.status === "CLOSED" ? (
             <Button
               variant={"secondary"}
               className="text-primary-500 items-center text-center w-full"
+              disabled
             >
               <ClipboardListIcon className="size-6" />
-              <p className="text-m2">Daftar</p>
+              <p className="text-m2">Pendaftaran Ditutup</p>
             </Button>
-          </Link>
+          ) : (
+            <Link href={`/${event.id}/form`}>
+              <Button
+                variant={"secondary"}
+                className="text-primary-500 items-center text-center w-full"
+              >
+                <ClipboardListIcon className="size-6" />
+                <p className="text-m2">Daftar</p>
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -202,7 +222,7 @@ const Divisi = ({ event }: DivisiProps) => {
                 <CardContent className="gap-2 px-3 py-3">
                   <div className="w-64 h-42 relative rounded-lg overflow-hidden">
                     <Image
-                      src={"/placeholder-1.webp"}
+                      src={divisiDipilih.cover || "/placeholder-1.webp"}
                       alt="Gambar PIC"
                       layout="fill"
                       className="object-cover"
@@ -231,15 +251,26 @@ const Divisi = ({ event }: DivisiProps) => {
             </div>
           </TabsContent>
         </Tabs>
-        <Link href={`/${event.id}/form`} className="w-full">
+        {event.status === "CLOSED" ? (
           <Button
             variant={"secondary"}
             className="text-primary-500 items-center w-full text-center"
+            disabled
           >
             <ClipboardListIcon className="size-6" />
-            <p className="text-m2">Daftar</p>
+            <p className="text-m2">Pendaftaran Ditutup</p>
           </Button>
-        </Link>
+        ) : (
+          <Link href={`/${event.id}/form`} className="w-full">
+            <Button
+              variant={"secondary"}
+              className="text-primary-500 items-center w-full text-center"
+            >
+              <ClipboardListIcon className="size-6" />
+              <p className="text-m2">Daftar</p>
+            </Button>
+          </Link>
+        )}
       </div>
     </main>
   );

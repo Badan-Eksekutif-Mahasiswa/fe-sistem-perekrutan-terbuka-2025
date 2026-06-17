@@ -85,10 +85,10 @@ const Hero = ({ event }: HeroProps) => {
             {event.title}
           </h1>
           <div className="relative w-32 h-32 md:w-72 md:h-72">
-            <Image
+            <img
               src={event.logo || "/placeholders/logo-event.webp"}
               alt="Logo"
-              layout="fill"
+              className="w-full h-full object-contain"
             />
           </div>
           <p className="text-p5 lg:text-p4">{event.description}</p>
@@ -101,16 +101,22 @@ const Hero = ({ event }: HeroProps) => {
           </CardHeader>
           <CardContent>
             <Countdown
-              targetDate={new Date(event.closeRegistration)}
+              targetDate={new Date(event.registrationClose)}
               displayDate={true}
             />
           </CardContent>
           <CardFooter className="flex items-center z-20 justify-center">
-            <Link href={`/${event.id}/form`} className="w-full">
-              <Button variant={"secondary"} className="w-full">
-                Daftar Sekarang!
+            {event.status === "CLOSED" ? (
+              <Button variant={"secondary"} className="w-full" disabled>
+                Pendaftaran Ditutup
               </Button>
-            </Link>
+            ) : (
+              <Link href={`/${event.id}/form`} className="w-full">
+                <Button variant={"secondary"} className="w-full">
+                  Daftar Sekarang!
+                </Button>
+              </Link>
+            )}
           </CardFooter>
         </Card>
       </div>

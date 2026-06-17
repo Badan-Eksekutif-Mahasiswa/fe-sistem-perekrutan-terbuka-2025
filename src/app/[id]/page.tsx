@@ -12,8 +12,8 @@ export default async function EventPage({ params }: EventPageProps) {
   const { id } = await params;
 
   try {
-    const event = await getEventById(id);
-    console.log(event.timeline);
+    const decodedId = decodeURIComponent(id);
+    const event = await getEventById(decodedId);
 
     return <EventModule event={event} />;
   } catch (error) {

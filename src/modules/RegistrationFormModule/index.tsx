@@ -252,11 +252,11 @@ export default function RegistrationFormModule({
       if (
         selectedDivisions.length === 0 ||
         (personalInfo &&
-          selectedDivisions.length > personalInfo.maxChooseDivision)
+          selectedDivisions.length > personalInfo.maxDivisionChoices)
       ) {
         toast.show(
           "error",
-          `Pilih ${personalInfo?.maxChooseDivision || 1} divisi`
+          `Pilih ${personalInfo?.maxDivisionChoices || 1} divisi`
         );
         return false;
       }
