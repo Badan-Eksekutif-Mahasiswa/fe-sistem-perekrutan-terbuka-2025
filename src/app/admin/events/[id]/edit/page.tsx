@@ -59,7 +59,10 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
             description: div.description,
             jobdesc: div.jobdesc,
             taskUrl: div.taskUrl,
-            PIC: div.PIC
+            PIC: {
+              name: div.picName,
+              contact: div.picContact
+            }
           };
           if (div.id) {
             await updateDivision(div.id, divPayload);
