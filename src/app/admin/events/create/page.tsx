@@ -26,14 +26,16 @@ export default function CreateEventPage() {
           await createDivision({
             eventId: newEvent.id,
             name: div.name,
-            coverUrl: div.coverUrl,
+            cover: div.coverUrl,
             maxQuota: div.maxQuota,
             isActive: div.isActive,
             description: div.description,
             jobdesc: div.jobdesc,
             taskUrl: div.taskUrl,
-            picName: div.picName,
-            picContact: div.picContact
+            PIC: {
+              name: div.picName,
+              contact: div.picContact
+            }
           });
         }
       }
