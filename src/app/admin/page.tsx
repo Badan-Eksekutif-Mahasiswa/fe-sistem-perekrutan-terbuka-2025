@@ -297,7 +297,7 @@ function MetricCard({
 
 function StatusBadge({ status }: { status: string }) {
   const className =
-    status === "PUBLISHED" || status === "PASSED_ADMINISTRATION"
+    status === "ACTIVE" || status === "PASSED_ADMINISTRATION"
       ? "border-green-200/30 bg-green-300/15 text-green-100"
       : status === "DRAFT" || status === "SUBMITTED"
         ? "border-yellow-200/30 bg-yellow-300/15 text-yellow-100"

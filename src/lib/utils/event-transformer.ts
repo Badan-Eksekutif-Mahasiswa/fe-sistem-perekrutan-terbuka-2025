@@ -28,7 +28,7 @@ export function getEventStatus(
 export function mapEventLevelToCategory(
   eventLevel: Event["eventLevel"]
 ): string {
-  return eventLevel;
+  return eventLevel || "Umum";
 }
 
 /**
@@ -37,7 +37,9 @@ export function mapEventLevelToCategory(
 export function mapTypeOfEventToCategory(
   typeOfEvent: Event["typeOfEvent"]
 ): string {
-  const typeMapping: Record<Event["typeOfEvent"], string> = {
+  if (!typeOfEvent) return "Event";
+
+  const typeMapping: Record<NonNullable<Event["typeOfEvent"]>, string> = {
     ORGANISASI: "Organisasi",
     KEPANITIAAN: "Kepanitiaan",
     UKM: "UKM",
@@ -56,7 +58,7 @@ export function transformEventToEventType(event: Event): EventType {
 
   return {
     id: event.id,
-    eventCode: event.eventCode,
+    eventCode: event.eventCode || event.id,
     title: event.title,
     logo: event.logo || "/placeholders/logo-event.webp",
     desc: event.description,

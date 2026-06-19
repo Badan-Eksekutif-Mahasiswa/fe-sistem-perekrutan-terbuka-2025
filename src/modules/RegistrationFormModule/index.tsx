@@ -78,8 +78,8 @@ export default function RegistrationFormModule({
   const fetchApplicationStatus = async () => {
     try {
       const response = await registrationApi.getApplicationStatus(eventId);
-      if (response.success && response.data.hasApplication) {
-        setIsSubmitted(response.data.isSubmitted);
+      if (response.success && response.data.hasRegistration) {
+        setIsSubmitted(response.data.registration?.status !== "DRAFT");
       }
     } catch (error) {
       console.error("Failed to fetch application status:", error);

@@ -5,7 +5,7 @@ import {
   PersonalInfoSubmit,
   QuestionSectionSubmit,
   Section,
-  ApplicationStatusResponse,
+  RegistrationStatusResponse,
   MyApplicationsResponse,
 } from "@/types/registration";
 
@@ -145,7 +145,7 @@ export const registrationApi = {
   // GET: Get application status
   async getApplicationStatus(
     eventId: string
-  ): Promise<ApplicationStatusResponse> {
+  ): Promise<RegistrationStatusResponse> {
     const response = await fetch(
       `${BASE_URL}/registration/status?eventId=${eventId}`,
       {

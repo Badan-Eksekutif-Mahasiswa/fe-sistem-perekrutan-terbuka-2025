@@ -311,7 +311,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           <input
             type="text"
             name="eventCode"
-            value={formData.eventCode}
+            value={formData.eventCode || ""}
             onChange={handleChange}
             className="border border-[#475CA3] bg-white p-2 rounded-r-md text-neutral-900 placeholder:text-neutral-400 flex-1 font-mono text-sm"
             placeholder="open-recruitment"
@@ -412,7 +412,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       <div className="flex flex-col gap-4 mt-2">
         <div className="flex flex-col gap-1">
           <label className="font-bold text-m4">Status</label>
-          <select name="status" value={formData.status} onChange={handleChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
+          <select name="status" value={formData.status || "DRAFT"} onChange={handleChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
             <option value="DRAFT">DRAFT</option>
             <option value="ACTIVE">ACTIVE</option>
             <option value="CLOSED">CLOSED</option>
@@ -421,7 +421,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         </div>
         <div className="flex flex-col gap-1">
           <label className="font-bold text-m4">Tipe Event</label>
-          <select name="typeOfEvent" value={formData.typeOfEvent} onChange={handleChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
+          <select name="typeOfEvent" value={formData.typeOfEvent || "ORGANISASI"} onChange={handleChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
             <option value="ORGANISASI">Organisasi</option>
             <option value="KEPANITIAAN">Kepanitiaan</option>
             <option value="UKM">UKM</option>
@@ -431,7 +431,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           <label className="font-bold text-m4">Level Event</label>
           <select 
             name="eventLevel" 
-            value={formData.eventLevel} 
+            value={formData.eventLevel || "Universitas"} 
             onChange={handleChange} 
             className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
           >

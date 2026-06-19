@@ -2,10 +2,10 @@
 export interface ApiResponse<T> {
   success: boolean;
   status: "success" | "error";
-  message: string;
+  message: string | null;
   data: T;
-  errors: null;
-  meta: null;
+  errors: unknown[] | null;
+  meta: Record<string, unknown> | null;
 }
 
 // Division Type
@@ -36,7 +36,7 @@ export type EventStatus = "DRAFT" | "ACTIVE" | "CLOSED" | "ARCHIVED";
 // Event Type
 export interface Event {
   id: string;
-  eventCode: string;
+  eventCode: string | null;
   title: string;
   description: string;
   logo: string | null;
@@ -49,25 +49,25 @@ export interface Event {
   generalTaskUrl: string | null;
   timeline: {
     [key: string]: unknown;
-  };
+  } | null;
   booklet: string | null;
   socialMedia: {
     [key: string]: unknown;
-  };
-  faqs?: Array<{ question: string; answer: string }>;
-  testimonials?: Array<{ name: string; role: string; message: string; photoUrl?: string }>;
-  documentations?: Array<{ title: string; imageUrl: string }>;
+  } | null;
+  faqs?: Array<{ question: string; answer: string }> | null;
+  testimonials?: Array<{ name: string; role: string; message: string; photoUrl?: string }> | null;
+  documentations?: Array<{ title: string; imageUrl: string }> | null;
   maxDivisionChoices: number;
   organizer: string;
   contactLineId: string;
-  contactName?: string;
-  contactWhatsapp?: string;
-  contactEmail?: string;
+  contactName?: string | null;
+  contactWhatsapp?: string | null;
+  contactEmail?: string | null;
   bannerUrl?: string;
-  publishedAt?: string;
-  archivedAt?: string;
-  typeOfEvent: "ORGANISASI" | "KEPANITIAAN" | "UKM";
-  eventLevel: "Universitas" | "Fakultas" | "ProgramStudi";
+  publishedAt?: string | null;
+  archivedAt?: string | null;
+  typeOfEvent: "ORGANISASI" | "KEPANITIAAN" | "UKM" | null;
+  eventLevel: "Universitas" | "Fakultas" | "ProgramStudi" | null;
   createdAt: string;
   updatedAt: string;
   divisions: Division[];
