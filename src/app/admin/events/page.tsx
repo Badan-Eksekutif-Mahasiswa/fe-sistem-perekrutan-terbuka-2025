@@ -2,15 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getAllEvents } from "@/lib/api/event";
-import { Event } from "@/types/event";
+import { AdminEvent, adminApi } from "@/lib/api/admin";
 import Link from "next/link";
 import Loader from "@/components/elements/Loader";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminEventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<AdminEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -21,8 +20,8 @@ export default function AdminEventsPage() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const data = await getAllEvents();
-      setEvents(data);
+      const data = await adminApi.getEvents();
+      setEvents(data.events);
     } catch (error) {
       console.error("Failed to fetch events", error);
     } finally {
@@ -96,7 +95,7 @@ export default function AdminEventsPage() {
                   </td>
                   <td className="p-4 text-center">{event.divisions?.length || 0}</td>
                   <td className="p-4 flex gap-2">
-                    <Link href={`/admin/events/${event.eventCode}/edit`}>
+                    <Link href={`/admin/events/${event.eventCode || event.id}/edit`}>
                       <Button variant="ghost" size="sm">
                         Edit
                       </Button>

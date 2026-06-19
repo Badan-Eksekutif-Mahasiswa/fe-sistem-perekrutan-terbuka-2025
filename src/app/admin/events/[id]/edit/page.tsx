@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, use } from "react";
 import EventForm from "../../components/EventForm";
-import { getEventById, updateEvent, deleteEvent, createDivision, updateDivision, deleteDivision } from "@/lib/api/event";
+import { getAdminEventById, updateEvent, deleteEvent, createDivision, updateDivision, deleteDivision } from "@/lib/api/event";
 import { useRouter } from "next/navigation";
 import { Event } from "@/types/event";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   const fetchEvent = async () => {
     try {
       setLoading(true);
-      const data = await getEventById(id);
+      const data = await getAdminEventById(id);
       setEvent(data);
     } catch (err: any) {
       setError(err.message || "Gagal memuat event");
