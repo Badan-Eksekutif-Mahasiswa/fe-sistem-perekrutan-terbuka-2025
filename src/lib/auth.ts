@@ -149,6 +149,36 @@ export const authApi = {
     }
   },
 
+  getAdmins: async (): Promise<AuthResponse> => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/auth/admins`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to fetch admin users",
+          errors: data.errors,
+        };
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Fetch admin users failed:", error);
+      return {
+        success: false,
+        message: "Network error or server unavailable",
+      };
+    }
+  },
+
   forgotPassword: async (email: string): Promise<AuthResponse> => {
     try {
       const response = await fetch(`${BACKEND_URL}/auth/forgot-password`, {

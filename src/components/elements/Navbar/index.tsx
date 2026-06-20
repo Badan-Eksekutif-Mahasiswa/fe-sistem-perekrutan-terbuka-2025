@@ -8,6 +8,12 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 
+const hiddenNavbarPaths = new Set([
+  "/admin/login",
+  "/admin/forgot-password",
+  "/admin/reset-password",
+]);
+
 const Navbar = () => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -66,7 +72,7 @@ const Navbar = () => {
     };
   }, [lastScrollY, scrollTimeout]);
 
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname && hiddenNavbarPaths.has(pathname)) return null;
 
   return (
     <>
@@ -142,9 +148,30 @@ const Menu = () => {
     await logout();
   };
 
+  const navigationLinks =
+    user?.role === "SUPERADMIN"
+      ? [
+          { title: "Home", href: "/" },
+          { title: "Kelola Event", href: "/admin/events" },
+        ]
+      : user?.role === "ADMIN"
+      ? [
+          { title: "Home", href: "/" },
+          { title: "Buat Event", href: "/admin/events/create" },
+          { title: "Password", href: "/admin/change-password" },
+        ]
+      : data;
+
+  const dashboardLink =
+    user?.role === "SUPERADMIN"
+      ? { href: "/superadmin", label: "Kelola Akun" }
+      : user?.role === "ADMIN"
+      ? { href: "/admin/events", label: "Kelola Event" }
+      : { href: "/dashboard", label: "Dashboard" };
+
   return (
     <>
-      {data.map((item) => (
+      {navigationLinks.map((item) => (
         <Link
           key={item.title}
           href={item.href}
@@ -161,11 +188,11 @@ const Menu = () => {
       ) : user ? (
         <>
           <Link
-            href="/dashboard"
+            href={dashboardLink.href}
             className="flex group hover:underline items-center gap-2 text-m3 max-lg:text-m4 text-neutral-50"
           >
             <Diamond className="w-4 h-4 group-hover:fill-white" />
-            Dashboard
+            {dashboardLink.label}
           </Link>
           <Button variant="secondary" onClick={handleLogout}>
             <LogOut />

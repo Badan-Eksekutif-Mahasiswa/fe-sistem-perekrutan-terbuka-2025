@@ -1,11 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Loader from "@/components/elements/Loader";
 import { authApi } from "@/lib/auth";
 import { useRequireRole } from "@/hooks/useAuth";
+import type { User } from "@/types/auth";
 import {
   BadgeCheck,
   KeyRound,
@@ -15,20 +16,14 @@ import {
   Users,
 } from "lucide-react";
 
-type CreatedAdmin = {
-  id: string;
-  name: string;
-  email: string | null;
-  role?: "ADMIN" | "SUPERADMIN";
-};
-
 export default function SuperadminPage() {
   const { user, isLoading, isAuthorized } = useRequireRole(
     ["SUPERADMIN"],
     "/admin/login",
     "/admin"
   );
-  const [createdAdmins, setCreatedAdmins] = useState<CreatedAdmin[]>([]);
+  const [admins, setAdmins] = useState<User[]>([]);
+  const [isFetchingAdmins, setIsFetchingAdmins] = useState(true);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -39,6 +34,27 @@ export default function SuperadminPage() {
     type: "success" | "error";
     message: string;
   } | null>(null);
+
+  const fetchAdmins = useCallback(async () => {
+    setIsFetchingAdmins(true);
+    const response = await authApi.getAdmins();
+
+    if (response.success && response.data?.users) {
+      setAdmins(response.data.users);
+    } else {
+      setFeedback({
+        type: "error",
+        message: response.message || "Gagal memuat daftar akun internal.",
+      });
+    }
+
+    setIsFetchingAdmins(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthorized) return;
+    fetchAdmins();
+  }, [fetchAdmins, isAuthorized]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -53,22 +69,12 @@ export default function SuperadminPage() {
     });
 
     if (response.success && response.data?.user) {
-      const createdUser = response.data.user;
-      setCreatedAdmins((current) => [
-        {
-          id: createdUser.id,
-          name: createdUser.name,
-          email: createdUser.email,
-          role:
-            createdUser.role === "SUPERADMIN" ? "SUPERADMIN" : "ADMIN",
-        },
-        ...current,
-      ]);
       setForm({ name: "", email: "", password: "" });
       setFeedback({
         type: "success",
         message: "Akun panitia berhasil dibuat.",
       });
+      await fetchAdmins();
     } else {
       setFeedback({
         type: "error",
@@ -88,9 +94,9 @@ export default function SuperadminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[var(--bg-main)] px-5 py-8 text-white md:px-8 lg:px-12">
+    <main className="min-h-screen bg-[var(--bg-main)] px-5 pb-8 pt-32 text-white md:px-8 lg:px-12">
       <div className="mx-auto flex max-w-7xl flex-col gap-8">
-        <header className="flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between">
+        <header className="flex flex-col gap-5 border-b border-white/10 pb-6 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-p5 uppercase tracking-normal text-secondary-100">
               Panel Superadmin
@@ -109,8 +115,8 @@ export default function SuperadminPage() {
         <section className="grid gap-4 md:grid-cols-3">
           <MetricCard
             icon={Users}
-            label="Akun Dibuat Sesi Ini"
-            value={createdAdmins.length}
+            label="Akun Internal"
+            value={admins.length}
           />
           <MetricCard icon={BadgeCheck} label="Role Baru" value="ADMIN" />
           <MetricCard icon={KeyRound} label="Provider" value="Internal" />
@@ -200,7 +206,7 @@ export default function SuperadminPage() {
           </form>
 
           <div className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
-            <h2 className="text-h4">Akun Baru Sesi Ini</h2>
+            <h2 className="text-h4">Akun Internal</h2>
             <div className="mt-5 overflow-hidden rounded-md border border-white/10">
               <table className="w-full min-w-[520px] border-collapse text-left">
                 <thead className="bg-white/[0.08] text-p6 uppercase text-white/60">
@@ -211,14 +217,20 @@ export default function SuperadminPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
-                  {createdAdmins.length === 0 ? (
+                  {isFetchingAdmins ? (
                     <tr className="text-p5">
                       <td className="px-4 py-4 text-white/70" colSpan={3}>
-                        Belum ada akun panitia yang dibuat pada sesi ini.
+                        Memuat akun internal...
+                      </td>
+                    </tr>
+                  ) : admins.length === 0 ? (
+                    <tr className="text-p5">
+                      <td className="px-4 py-4 text-white/70" colSpan={3}>
+                        Belum ada akun internal di database.
                       </td>
                     </tr>
                   ) : (
-                    createdAdmins.map((account) => (
+                    admins.map((account) => (
                       <tr key={account.id} className="text-p5">
                         <td className="px-4 py-4 font-semibold">
                           {account.name}

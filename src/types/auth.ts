@@ -22,6 +22,7 @@ export interface AuthResponse {
   user?: User;
   data?: {
     user?: User;
+    users?: User[];
     ssoLogoutUrl?: string | null;
     resetUrl?: string;
   } | null;

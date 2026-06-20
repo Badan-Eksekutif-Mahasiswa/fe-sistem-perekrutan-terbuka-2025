@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { AdminEvent, adminApi } from "@/lib/api/admin";
 import Link from "next/link";
 import Loader from "@/components/elements/Loader";
-import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminEventsPage() {
@@ -33,14 +32,9 @@ export default function AdminEventsPage() {
   if (loading) return <Loader />;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 pb-20 pt-8 md:px-8 lg:px-12">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <Link href="/">
-            <Button variant="stroke" size="icon" className="rounded-full bg-white/50 border-[#475CA3] hover:bg-white text-[#475CA3]">
-              <ArrowLeft className="size-5" />
-            </Button>
-          </Link>
           <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">
             Hello {displayName}
           </h1>
