@@ -2,6 +2,14 @@
 
 import React, { useState } from "react";
 import { Event } from "@/types/event";
+import {
+  EventDocumentationItem,
+  EventFaqItem,
+  EventFormDivision,
+  EventPayload,
+  EventTestimonialItem,
+  EventTimelineItem,
+} from "@/lib/api/event";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
@@ -39,13 +47,35 @@ function DeleteConfirmModal({ onConfirm, itemName }: { onConfirm: () => void, it
 
 type EventFormProps = {
   initialData?: Partial<Event>;
-  onSubmit: (data: Partial<Event>, divisionsData?: any[], deletedDivisionIds?: string[]) => Promise<void>;
+  onSubmit: (data: EventPayload, divisionsData?: EventFormDivision[], deletedDivisionIds?: string[]) => Promise<void>;
   loading?: boolean;
 };
 
+type SocialMediaLinks = {
+  instagram: string;
+  tiktok: string;
+  twitter: string;
+  website: string;
+  line: string;
+};
+
+function toRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function toStringValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function getStringField(value: unknown, key: string): string {
+  return toStringValue(toRecord(value)[key]);
+}
+
 export default function EventForm({ initialData, onSubmit, loading }: EventFormProps) {
   const { user } = useAuth();
-  const [formData, setFormData] = useState<Partial<Event>>({
+  const [formData, setFormData] = useState<EventPayload>({
     id: initialData?.id || "",
     title: initialData?.title || "",
     eventCode: initialData?.eventCode || "",
@@ -65,71 +95,89 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     contactEmail: initialData?.contactEmail || "",
   });
 
-  const [socialMedia, setSocialMedia] = useState({
-    instagram: (initialData?.socialMedia as any)?.instagram || "",
-    tiktok: (initialData?.socialMedia as any)?.tiktok || "",
-    twitter: (initialData?.socialMedia as any)?.twitter || "",
-    website: (initialData?.socialMedia as any)?.website || "",
-    line: (initialData?.socialMedia as any)?.line || "",
+  const socialMediaData = toRecord(initialData?.socialMedia);
+  const [socialMedia, setSocialMedia] = useState<SocialMediaLinks>({
+    instagram: toStringValue(socialMediaData.instagram),
+    tiktok: toStringValue(socialMediaData.tiktok),
+    twitter: toStringValue(socialMediaData.twitter),
+    website: toStringValue(socialMediaData.website),
+    line: toStringValue(socialMediaData.line),
   });
 
-  const [timeline, setTimeline] = useState<Array<{ startDate: string, endDate: string, title: string, description: string }>>(
+  const [timeline, setTimeline] = useState<EventTimelineItem[]>(
     Array.isArray(initialData?.timeline) && initialData.timeline.length > 0 
-      ? initialData.timeline.map((t: any) => ({
-          startDate: t.startDate || "",
-          endDate: t.endDate || "",
-          title: t.title || "",
-          description: t.description || ""
+      ? initialData.timeline.map((item: unknown) => ({
+          startDate: getStringField(item, "startDate"),
+          endDate: getStringField(item, "endDate"),
+          title: getStringField(item, "title"),
+          description: getStringField(item, "description")
         }))
       : [{ startDate: "", endDate: "", title: "", description: "" }]
   );
 
-  const [faqs, setFaqs] = useState<Array<{ question: string, answer: string }>>(
+  const [faqs, setFaqs] = useState<EventFaqItem[]>(
     Array.isArray(initialData?.faqs) && initialData.faqs.length > 0 
-      ? initialData.faqs.map((f: any) => ({
-          question: f.question || "",
-          answer: f.answer || ""
+      ? initialData.faqs.map((item: unknown) => ({
+          question: getStringField(item, "question"),
+          answer: getStringField(item, "answer")
         }))
       : [{ question: "", answer: "" }]
   );
 
-  const [testimonials, setTestimonials] = useState<Array<{ name: string, role: string, message: string, photoUrl: string }>>(
+  const [testimonials, setTestimonials] = useState<EventTestimonialItem[]>(
     Array.isArray(initialData?.testimonials) && initialData.testimonials.length > 0 
-      ? initialData.testimonials.map((t: any) => ({
-          name: t.name || "",
-          role: t.role || "",
-          message: t.message || "",
-          photoUrl: t.photoUrl || ""
+      ? initialData.testimonials.map((item: unknown) => ({
+          name: getStringField(item, "name"),
+          role: getStringField(item, "role"),
+          message: getStringField(item, "message"),
+          photoUrl: getStringField(item, "photoUrl")
         }))
       : [{ name: "", role: "", message: "", photoUrl: "" }]
   );
 
-  const [documentations, setDocumentations] = useState<Array<{ title: string, imageUrl: string }>>(
+  const [documentations, setDocumentations] = useState<EventDocumentationItem[]>(
     Array.isArray(initialData?.documentations) && initialData.documentations.length > 0 
-      ? initialData.documentations.map((d: any) => ({
-          title: d.title || "",
-          imageUrl: d.imageUrl || ""
+      ? initialData.documentations.map((item: unknown) => ({
+          title: getStringField(item, "title"),
+          imageUrl: getStringField(item, "imageUrl")
         }))
       : [{ title: "", imageUrl: "" }]
   );
 
   // Divisions State
-  const parsedDivisions = Array.isArray(initialData?.divisions) && initialData.divisions.length > 0
-    ? initialData.divisions as any
-    : [{ id: "", name: "", coverUrl: "", maxQuota: "", description: "", jobdesc: "", picName: "", picContact: "", taskUrl: "", isActive: true }];
+  const blankDivision: EventFormDivision = {
+    id: "",
+    name: "",
+    coverUrl: "",
+    maxQuota: "",
+    description: "",
+    jobdesc: "",
+    picName: "",
+    picContact: "",
+    taskUrl: "",
+    isActive: true,
+  };
 
-  const [divisions, setDivisions] = useState<Array<any>>(parsedDivisions.map((d: any) => ({
-    id: d.id || "",
-    name: d.name || "",
-    coverUrl: d.cover || d.coverUrl || "",
-    maxQuota: d.maxQuota || "",
-    description: d.description || "",
-    jobdesc: d.jobdesc || "",
-    picName: d.PIC?.name || d.picName || "",
-    picContact: d.PIC?.contact || d.picContact || "",
-    taskUrl: d.taskUrl || "",
-    isActive: d.isActive !== undefined ? d.isActive : true,
-  })));
+  const [divisions, setDivisions] = useState<EventFormDivision[]>(
+    Array.isArray(initialData?.divisions) && initialData.divisions.length > 0
+      ? initialData.divisions.map((division) => {
+          const pic = toRecord(division.PIC);
+
+          return {
+            id: division.id || "",
+            name: division.name || "",
+            coverUrl: division.cover || "",
+            maxQuota: division.maxQuota || "",
+            description: division.description || "",
+            jobdesc: division.jobdesc || "",
+            picName: toStringValue(pic.name),
+            picContact: toStringValue(pic.contact),
+            taskUrl: division.taskUrl || "",
+            isActive: division.isActive !== undefined ? division.isActive : true,
+          };
+        })
+      : [blankDivision]
+  );
 
   const [deletedDivisions, setDeletedDivisions] = useState<string[]>([]);
 
@@ -222,7 +270,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     }
 
     // Convert local datetime to ISO string
-    const submitData: any = { ...formData };
+    const submitData: EventPayload = { ...formData };
     submitData.ownerId = submitData.ownerId || user?.id;
     
     // Inject placeholders if status is DRAFT to satisfy backend constraints
@@ -246,7 +294,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     }
     
     // Clean up empty social media fields
-    const cleanedSocialMedia: any = {};
+    const cleanedSocialMedia: Record<string, string> = {};
     Object.entries(socialMedia).forEach(([key, val]) => {
       let cleanVal = val.trim();
       if (cleanVal !== "") {
@@ -264,11 +312,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     submitData.documentations = documentations.filter(d => d.title.trim() !== "" || d.imageUrl.trim() !== "");
 
     // Prepare divisions payload
-    const finalDivisions = divisions.filter(d => d.name.trim() !== "").map(d => ({
+    const finalDivisions: EventFormDivision[] = divisions.filter(d => d.name.trim() !== "").map(d => ({
       id: d.id,
       name: d.name,
       coverUrl: d.coverUrl,
-      maxQuota: d.maxQuota === "" ? null : Number(d.maxQuota),
+      maxQuota: d.maxQuota === "" ? "" : Number(d.maxQuota),
       isActive: d.isActive,
       description: d.description,
       jobdesc: d.jobdesc,

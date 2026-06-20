@@ -22,6 +22,7 @@ export interface Division {
   eventId: string;
   cover: string | null;
   interviewLink: string | null;
+  taskUrl: string | null;
   maxQuota: number | null;
   hasDivisionTask: boolean;
   taskDescription: string | null;

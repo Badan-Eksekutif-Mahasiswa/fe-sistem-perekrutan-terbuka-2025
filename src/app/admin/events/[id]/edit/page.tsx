@@ -1,14 +1,45 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react";
+import React, { useCallback, useEffect, useState, use } from "react";
 import EventForm from "../../components/EventForm";
-import { getAdminEventById, updateEvent, deleteEvent, createDivision, updateDivision, deleteDivision } from "@/lib/api/event";
+import {
+  getAdminEventById,
+  updateEvent,
+  deleteEvent,
+  createDivision,
+  updateDivision,
+  deleteDivision,
+  DivisionPayload,
+  EventFormDivision,
+  EventPayload,
+} from "@/lib/api/event";
 import { useRouter } from "next/navigation";
 import { Event } from "@/types/event";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import Loader from "@/components/elements/Loader";
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function toDivisionPayload(eventId: string, division: EventFormDivision): DivisionPayload {
+  return {
+    eventId,
+    name: division.name,
+    cover: division.coverUrl,
+    maxQuota: division.maxQuota === "" ? null : division.maxQuota,
+    isActive: division.isActive,
+    description: division.description,
+    jobdesc: division.jobdesc,
+    taskUrl: division.taskUrl,
+    PIC: {
+      name: division.picName,
+      contact: division.picContact,
+    },
+  };
+}
 
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
@@ -19,23 +50,23 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchEvent();
-  }, [id]);
-
-  const fetchEvent = async () => {
+  const fetchEvent = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getAdminEventById(id);
       setEvent(data);
-    } catch (err: any) {
-      setError(err.message || "Gagal memuat event");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Gagal memuat event"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const handleSubmit = async (data: Partial<Event>, divisionsData?: any[], deletedDivisionIds?: string[]) => {
+  useEffect(() => {
+    fetchEvent();
+  }, [fetchEvent]);
+
+  const handleSubmit = async (data: EventPayload, divisionsData?: EventFormDivision[], deletedDivisionIds?: string[]) => {
     try {
       setSaving(true);
       setError("");
@@ -50,20 +81,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
 
       if (divisionsData && divisionsData.length > 0) {
         for (const div of divisionsData) {
-          const divPayload = {
-            eventId: event?.id || id,
-            name: div.name,
-            cover: div.coverUrl,
-            maxQuota: div.maxQuota,
-            isActive: div.isActive,
-            description: div.description,
-            jobdesc: div.jobdesc,
-            taskUrl: div.taskUrl,
-            PIC: {
-              name: div.picName,
-              contact: div.picContact
-            }
-          };
+          const divPayload = toDivisionPayload(event?.id || id, div);
           if (div.id) {
             await updateDivision(div.id, divPayload);
           } else {
@@ -73,8 +91,8 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
       }
       
       router.push("/admin/events");
-    } catch (err: any) {
-      setError(err.message || "Gagal menyimpan event");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Gagal menyimpan event"));
     } finally {
       setSaving(false);
     }
@@ -86,8 +104,8 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
         setSaving(true);
         await deleteEvent(id);
         router.push("/admin/events");
-      } catch (err: any) {
-        setError(err.message || "Gagal menghapus event");
+      } catch (err: unknown) {
+        setError(getErrorMessage(err, "Gagal menghapus event"));
         setSaving(false);
       }
     }

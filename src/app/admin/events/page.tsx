@@ -12,6 +12,7 @@ export default function AdminEventsPage() {
   const [events, setEvents] = useState<AdminEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const displayName = user?.name || user?.email?.split("@")[0] || "Admin";
 
   useEffect(() => {
     fetchEvents();
@@ -41,7 +42,7 @@ export default function AdminEventsPage() {
             </Button>
           </Link>
           <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">
-            Hello {(user as any)?.user_metadata?.name || (user as any)?.user_metadata?.full_name || user?.email?.split('@')[0] || "Admin"} 👋🏼
+            Hello {displayName}
           </h1>
         </div>
         <Link href="/admin/events/create">

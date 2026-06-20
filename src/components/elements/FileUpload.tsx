@@ -61,9 +61,13 @@ export default function FileUpload({
       if (data?.publicUrl) {
         onChange(data.publicUrl);
       }
-    } catch (err: any) {
-      console.error("Upload error:", err.message);
-      setError(err.message || "Terjadi kesalahan saat mengunggah file.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan saat mengunggah file.";
+      console.error("Upload error:", message);
+      setError(message);
     } finally {
       setUploading(false);
     }

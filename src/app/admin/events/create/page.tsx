@@ -2,19 +2,45 @@
 
 import React, { useState } from "react";
 import EventForm from "../components/EventForm";
-import { createEvent, createDivision } from "@/lib/api/event";
+import {
+  createEvent,
+  createDivision,
+  DivisionPayload,
+  EventFormDivision,
+  EventPayload,
+} from "@/lib/api/event";
 import { useRouter } from "next/navigation";
-import { Event } from "@/types/event";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function toDivisionPayload(eventId: string, division: EventFormDivision): DivisionPayload {
+  return {
+    eventId,
+    name: division.name,
+    cover: division.coverUrl,
+    maxQuota: division.maxQuota === "" ? null : division.maxQuota,
+    isActive: division.isActive,
+    description: division.description,
+    jobdesc: division.jobdesc,
+    taskUrl: division.taskUrl,
+    PIC: {
+      name: division.picName,
+      contact: division.picContact,
+    },
+  };
+}
 
 export default function CreateEventPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (data: Partial<Event>, divisionsData?: any[], deletedDivisionIds?: string[]) => {
+  const handleSubmit = async (data: EventPayload, divisionsData?: EventFormDivision[]) => {
     try {
       setLoading(true);
       setError("");
@@ -23,26 +49,13 @@ export default function CreateEventPage() {
       
       if (divisionsData && divisionsData.length > 0 && newEvent.id) {
         for (const div of divisionsData) {
-          await createDivision({
-            eventId: newEvent.id,
-            name: div.name,
-            cover: div.coverUrl,
-            maxQuota: div.maxQuota,
-            isActive: div.isActive,
-            description: div.description,
-            jobdesc: div.jobdesc,
-            taskUrl: div.taskUrl,
-            PIC: {
-              name: div.picName,
-              contact: div.picContact
-            }
-          });
+          await createDivision(toDivisionPayload(newEvent.id, div));
         }
       }
       
       router.push("/admin/events");
-    } catch (err: any) {
-      setError(err.message || "Gagal membuat event");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Gagal membuat event"));
     } finally {
       setLoading(false);
     }

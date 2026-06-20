@@ -2,8 +2,6 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import Loader from "@/components/elements/Loader";
 import Link from "next/link";
 import { LogOut, User } from "lucide-react";
 
