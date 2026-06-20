@@ -1,12 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Loader from "@/components/elements/Loader";
 import { authApi } from "@/lib/auth";
-import { useRequireAuth } from "@/hooks/useAuth";
+import { useRequireRole } from "@/hooks/useAuth";
 import {
   BadgeCheck,
   KeyRound,
@@ -24,8 +23,11 @@ type CreatedAdmin = {
 };
 
 export default function SuperadminPage() {
-  const router = useRouter();
-  const { user, isLoading } = useRequireAuth("/admin/login");
+  const { user, isLoading, isAuthorized } = useRequireRole(
+    ["SUPERADMIN"],
+    "/admin/login",
+    "/admin"
+  );
   const [createdAdmins, setCreatedAdmins] = useState<CreatedAdmin[]>([]);
   const [form, setForm] = useState({
     name: "",
@@ -81,25 +83,8 @@ export default function SuperadminPage() {
     return <Loader />;
   }
 
-  if (!user) {
+  if (!user || !isAuthorized) {
     return null;
-  }
-
-  if (user.role !== "SUPERADMIN") {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[var(--bg-main)] px-5 text-white">
-        <div className="w-full max-w-md rounded-lg border border-white/10 bg-white/[0.06] p-6 text-center">
-          <ShieldCheck className="mx-auto mb-4 size-10 text-red-100" />
-          <h1 className="text-h4">Akses Ditolak</h1>
-          <p className="mt-2 text-p5 text-white/70">
-            Halaman ini hanya dapat diakses oleh superadmin.
-          </p>
-          <Button className="mt-5" onClick={() => router.push("/admin")}>
-            Kembali
-          </Button>
-        </div>
-      </main>
-    );
   }
 
   return (

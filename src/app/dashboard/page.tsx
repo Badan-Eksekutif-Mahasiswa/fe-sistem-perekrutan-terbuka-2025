@@ -1,6 +1,6 @@
 "use client";
 
-import { useRequireAuth } from "@/hooks/useAuth";
+import { useRequireRole } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/elements/Loader";
 import {
@@ -24,7 +24,11 @@ import type { MyApplication, RegistrationStatus } from "@/types/registration";
 import Link from "next/link";
 
 const DashboardPage = () => {
-  const { user, isLoading } = useRequireAuth();
+  const { user, isLoading, isAuthorized } = useRequireRole(
+    ["APPLICANT"],
+    "/login",
+    "/"
+  );
   const [applications, setApplications] = useState<MyApplication[]>([]);
   const [loadingApplications, setLoadingApplications] = useState(true);
 
@@ -49,8 +53,8 @@ const DashboardPage = () => {
     return <Loader />;
   }
 
-  if (!user) {
-    return null; // useRequireAuth will handle redirect
+  if (!user || !isAuthorized) {
+    return null; // useRequireRole will handle redirect
   }
 
   const getGreeting = () => {
