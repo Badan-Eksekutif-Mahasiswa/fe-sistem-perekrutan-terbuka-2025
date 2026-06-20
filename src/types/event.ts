@@ -8,6 +8,23 @@ export interface ApiResponse<T> {
   meta: Record<string, unknown> | null;
 }
 
+export type RequirementScope = "EVENT" | "DIVISION";
+
+export interface SubmissionRequirement {
+  id: string;
+  eventId: string;
+  divisionId: string | null;
+  scope: RequirementScope;
+  title: string;
+  instruction: string;
+  templateUrl: string | null;
+  isRequired: boolean;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Division Type
 export interface Division {
   id: string;
@@ -30,6 +47,7 @@ export interface Division {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  requirements?: SubmissionRequirement[];
 }
 
 export type EventStatus = "DRAFT" | "ACTIVE" | "CLOSED" | "ARCHIVED";
@@ -72,6 +90,7 @@ export interface Event {
   createdAt: string;
   updatedAt: string;
   divisions: Division[];
+  requirements?: SubmissionRequirement[];
 }
 
 // API Response Types

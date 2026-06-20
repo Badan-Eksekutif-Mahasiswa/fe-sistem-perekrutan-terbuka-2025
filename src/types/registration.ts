@@ -1,3 +1,5 @@
+import type { Event } from "./event";
+
 export type QuestionType = "INPUT" | "INFORMATION";
 
 export type QuestionInputType =
@@ -71,12 +73,19 @@ export interface RegistrationFormResponse {
   success: boolean;
   message: string;
   data: {
-    section: string;
-    title: string;
-    description: string;
-    data?: PersonalInfoData;
-    order?: number;
-    questions?: Question[];
+    event: Event;
+    applicant: {
+      id: string;
+      name: string;
+      npm: string | null;
+      faculty: string | null;
+      studyProgram: string | null;
+      year: string | null;
+    };
+    canRegister: boolean;
+    hasRegistration: boolean;
+    registrationId: string | null;
+    draft: RegistrationDraft | null;
   };
 }
 
@@ -100,6 +109,46 @@ export interface SubmitResponse {
     status: RegistrationStatus;
     submittedAt?: string;
   } | null;
+}
+
+export interface RegistrationSubmissionLinkInput {
+  requirementId: string;
+  submittedUrl: string;
+}
+
+export interface RegistrationPayload {
+  eventId: string;
+  contactEmail: string;
+  whatsappNumber?: string | null;
+  lineId?: string | null;
+  divisionChoices: string[];
+  submissionLinks: RegistrationSubmissionLinkInput[];
+}
+
+export interface RegistrationDraft {
+  id: string;
+  eventId: string;
+  userId: string;
+  contactEmail: string;
+  whatsappNumber: string | null;
+  lineId: string | null;
+  status: RegistrationStatus;
+  submittedAt: string;
+  reviewedAt: string | null;
+  decidedAt: string | null;
+  choices: Array<{
+    id: string;
+    registrationId: string;
+    divisionId: string;
+    choiceOrder: number;
+  }>;
+  submissionLinks: Array<{
+    id: string;
+    registrationId: string;
+    requirementId: string;
+    submittedUrl: string;
+    createdAt: string;
+  }>;
 }
 
 export interface PersonalInfoSubmit {
