@@ -1,7 +1,99 @@
-import { Event, AllEventsResponse, EventByIdResponse } from "@/types/event";
+import { Division, Event, AllEventsResponse, EventByIdResponse } from "@/types/event";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+
+type ApiResponse<T> = {
+  success: boolean;
+  message: string | null;
+  data: T;
+};
+
+type EventWrappedResponse = Event | { event: Event };
+type DivisionWrappedResponse = Division | { division: Division };
+
+export type EventTimelineItem = {
+  startDate: string;
+  endDate: string;
+  title: string;
+  description: string;
+};
+
+export type EventFaqItem = {
+  question: string;
+  answer: string;
+};
+
+export type EventTestimonialItem = {
+  name: string;
+  role: string;
+  message: string;
+  photoUrl: string;
+};
+
+export type EventDocumentationItem = {
+  title: string;
+  imageUrl: string;
+};
+
+export type EventPayload = Partial<
+  Omit<
+    Event,
+    | "divisions"
+    | "timeline"
+    | "socialMedia"
+    | "faqs"
+    | "testimonials"
+    | "documentations"
+  >
+> & {
+  ownerId?: string;
+  timeline?: EventTimelineItem[];
+  socialMedia?: Record<string, string>;
+  faqs?: EventFaqItem[];
+  testimonials?: EventTestimonialItem[];
+  documentations?: EventDocumentationItem[];
+};
+
+export type EventFormDivision = {
+  id: string;
+  name: string;
+  coverUrl: string;
+  maxQuota: number | "";
+  isActive: boolean;
+  description: string;
+  jobdesc: string;
+  taskUrl: string;
+  picName: string;
+  picContact: string;
+};
+
+export type DivisionPayload = {
+  eventId: string;
+  name: string;
+  cover?: string;
+  maxQuota?: number | null;
+  isActive?: boolean;
+  description?: string;
+  jobdesc?: string;
+  taskUrl?: string;
+  PIC?: {
+    name: string;
+    contact: string;
+  };
+};
+
+function unwrapEvent(data: EventWrappedResponse): Event {
+  return "event" in data ? data.event : data;
+}
+
+function unwrapDivision(data: DivisionWrappedResponse): Division {
+  return "division" in data ? data.division : data;
+}
+
+async function parseJson<T>(response: Response): Promise<ApiResponse<T>> {
+  return response.json() as Promise<ApiResponse<T>>;
+}
 
 /**
  * Fetch all events with their divisions
@@ -70,20 +162,55 @@ export async function getEventById(id: string): Promise<Event> {
 }
 
 /**
+ * Fetch a single admin-owned event by ID or event code.
+ */
+export async function getAdminEventById(id: string): Promise<Event> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/events/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Event not found");
+      }
+      throw new Error(`Failed to fetch event: ${response.statusText}`);
+    }
+
+    const result = await parseJson<EventWrappedResponse>(response);
+
+    if (!result.success) {
+      throw new Error(result.message || "Failed to fetch event");
+    }
+
+    return unwrapEvent(result.data);
+  } catch (error) {
+    console.error("Error fetching admin event:", error);
+    throw error;
+  }
+}
+
+/**
  * Create a new event
  */
-export async function createEvent(data: Partial<Event>): Promise<Event> {
+export async function createEvent(data: EventPayload): Promise<Event> {
   try {
-    const response = await fetch(`${API_BASE_URL}/event`, {
+    const response = await fetch(`${API_BASE_URL}/admin/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(data),
     });
 
     if (!response.ok) throw new Error("Failed to create event");
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
-    return result.data;
+    const result = await parseJson<EventWrappedResponse>(response);
+    if (!result.success) throw new Error(result.message || "Failed to create event");
+    return unwrapEvent(result.data);
   } catch (error) {
     console.error("Error creating event:", error);
     throw error;
@@ -93,18 +220,19 @@ export async function createEvent(data: Partial<Event>): Promise<Event> {
 /**
  * Update an event
  */
-export async function updateEvent(id: string, data: Partial<Event>): Promise<Event> {
+export async function updateEvent(id: string, data: EventPayload): Promise<Event> {
   try {
-    const response = await fetch(`${API_BASE_URL}/event/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/events/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(data),
     });
 
     if (!response.ok) throw new Error("Failed to update event");
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
-    return result.data;
+    const result = await parseJson<EventWrappedResponse>(response);
+    if (!result.success) throw new Error(result.message || "Failed to update event");
+    return unwrapEvent(result.data);
   } catch (error) {
     console.error("Error updating event:", error);
     throw error;
@@ -116,14 +244,15 @@ export async function updateEvent(id: string, data: Partial<Event>): Promise<Eve
  */
 export async function deleteEvent(id: string): Promise<void> {
   try {
-    const response = await fetch(`${API_BASE_URL}/event/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/events/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
     });
 
     if (!response.ok) throw new Error("Failed to delete event");
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
+    const result = await parseJson<null>(response);
+    if (!result.success) throw new Error(result.message || "Failed to update division");
   } catch (error) {
     console.error("Error deleting event:", error);
     throw error;
@@ -133,18 +262,19 @@ export async function deleteEvent(id: string): Promise<void> {
 /**
  * Create a new division
  */
-export async function createDivision(data: any): Promise<any> {
+export async function createDivision(data: DivisionPayload): Promise<Division> {
   try {
-    const response = await fetch(`${API_BASE_URL}/division`, {
+    const response = await fetch(`${API_BASE_URL}/admin/events/${data.eventId}/divisions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(data),
     });
 
     if (!response.ok) throw new Error("Failed to create division");
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
-    return result.data;
+    const result = await parseJson<DivisionWrappedResponse>(response);
+    if (!result.success) throw new Error(result.message || "Failed to delete event");
+    return unwrapDivision(result.data);
   } catch (error) {
     console.error("Error creating division:", error);
     throw error;
@@ -154,18 +284,19 @@ export async function createDivision(data: any): Promise<any> {
 /**
  * Update a division
  */
-export async function updateDivision(id: string, data: any): Promise<any> {
+export async function updateDivision(id: string, data: DivisionPayload): Promise<Division> {
   try {
-    const response = await fetch(`${API_BASE_URL}/division/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/divisions/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(data),
     });
 
     if (!response.ok) throw new Error("Failed to update division");
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
-    return result.data;
+    const result = await parseJson<DivisionWrappedResponse>(response);
+    if (!result.success) throw new Error(result.message || "Failed to create division");
+    return unwrapDivision(result.data);
   } catch (error) {
     console.error("Error updating division:", error);
     throw error;
@@ -177,14 +308,15 @@ export async function updateDivision(id: string, data: any): Promise<any> {
  */
 export async function deleteDivision(id: string): Promise<void> {
   try {
-    const response = await fetch(`${API_BASE_URL}/division/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/divisions/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
     });
 
     if (!response.ok) throw new Error("Failed to delete division");
-    const result = await response.json();
-    if (!result.success) throw new Error(result.message);
+    const result = await parseJson<null>(response);
+    if (!result.success) throw new Error(result.message || "Failed to delete division");
   } catch (error) {
     console.error("Error deleting division:", error);
     throw error;

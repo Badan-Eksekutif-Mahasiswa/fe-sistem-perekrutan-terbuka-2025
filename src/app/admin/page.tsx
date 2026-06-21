@@ -15,8 +15,6 @@ import {
   ClipboardCheck,
   FileText,
   Mail,
-  Pencil,
-  Send,
   Settings,
   Users,
 } from "lucide-react";
@@ -131,14 +129,6 @@ export default function AdminDashboardPage() {
                 <Settings className="size-4" />
                 Password
               </Link>
-            </Button>
-            <Button size="md" variant="stroke">
-              <Pencil className="size-4" />
-              Draft Event
-            </Button>
-            <Button size="md" variant="secondary">
-              <Send className="size-4" />
-              Publish
             </Button>
           </div>
         </header>
@@ -297,7 +287,7 @@ function MetricCard({
 
 function StatusBadge({ status }: { status: string }) {
   const className =
-    status === "PUBLISHED" || status === "PASSED_ADMINISTRATION"
+    status === "ACTIVE" || status === "PASSED_ADMINISTRATION"
       ? "border-green-200/30 bg-green-300/15 text-green-100"
       : status === "DRAFT" || status === "SUBMITTED"
         ? "border-yellow-200/30 bg-yellow-300/15 text-yellow-100"

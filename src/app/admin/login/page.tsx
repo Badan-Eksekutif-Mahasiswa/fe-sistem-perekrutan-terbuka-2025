@@ -18,7 +18,13 @@ export default function AdminLoginPage() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      router.push(user.role === "SUPERADMIN" ? "/superadmin" : "/admin");
+      if (user.role === "SUPERADMIN") {
+        router.push("/superadmin");
+      } else if (user.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     }
   }, [isLoading, router, user]);
 

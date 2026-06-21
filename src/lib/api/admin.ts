@@ -2,10 +2,12 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 export type AdminEvent = {
   id: string;
+  eventCode: string | null;
   title: string;
   description: string;
   organizer: string;
-  status: "DRAFT" | "PUBLISHED" | "CLOSED" | "ARCHIVED";
+  status: "DRAFT" | "ACTIVE" | "CLOSED" | "ARCHIVED";
+  typeOfEvent?: string | null;
   registrationOpen: string;
   registrationClose: string;
   ownerId: string;
@@ -18,6 +20,7 @@ export type AdminEvent = {
     registrations: number;
     divisions: number;
   };
+  divisions?: Array<{ id: string; name: string }>;
 };
 
 export type AdminRegistration = {

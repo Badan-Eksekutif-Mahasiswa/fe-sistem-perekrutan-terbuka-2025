@@ -1,26 +1,18 @@
 import {
   RegistrationFormResponse,
-  SectionsResponse,
   SubmitResponse,
-  PersonalInfoSubmit,
-  QuestionSectionSubmit,
-  Section,
-  ApplicationStatusResponse,
+  RegistrationPayload,
+  RegistrationStatusResponse,
   MyApplicationsResponse,
 } from "@/types/registration";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 export const registrationApi = {
-  // GET: Fetch registration form for a section
-  async getRegistrationForm(
-    eventId: string,
-    section: string = "personal-info"
-  ): Promise<RegistrationFormResponse> {
+  // GET: Fetch registration form data for an event
+  async getRegistrationForm(eventId: string): Promise<RegistrationFormResponse> {
     const response = await fetch(
-      `${BASE_URL}/registration/form?eventId=${eventId}&section=${encodeURIComponent(
-        section
-      )}`,
+      `${BASE_URL}/registration/form?eventId=${eventId}`,
       {
         method: "GET",
         headers: {
@@ -37,31 +29,8 @@ export const registrationApi = {
     return response.json();
   },
 
-  // GET: Fetch all sections for an event
-  async getSections(eventId: string): Promise<Section[]> {
-    const response = await fetch(
-      `${BASE_URL}/registration/sections?eventId=${eventId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch sections");
-    }
-
-    const result: SectionsResponse = await response.json();
-    return result.data.sections;
-  },
-
-  // POST: Create new registration
-  async createRegistration(
-    data: PersonalInfoSubmit | QuestionSectionSubmit
-  ): Promise<SubmitResponse> {
+  // POST: Create new draft registration
+  async createRegistration(data: RegistrationPayload): Promise<SubmitResponse> {
     const response = await fetch(`${BASE_URL}/registration/form`, {
       method: "POST",
       headers: {
@@ -79,10 +48,8 @@ export const registrationApi = {
     return response.json();
   },
 
-  // PUT: Update entire section
-  async updateRegistration(
-    data: PersonalInfoSubmit | QuestionSectionSubmit
-  ): Promise<SubmitResponse> {
+  // PUT: Replace draft registration data
+  async updateRegistration(data: RegistrationPayload): Promise<SubmitResponse> {
     const response = await fetch(`${BASE_URL}/registration/form`, {
       method: "PUT",
       headers: {
@@ -100,9 +67,9 @@ export const registrationApi = {
     return response.json();
   },
 
-  // PATCH: Partial update (for auto-save)
+  // PATCH: Partial update for draft registration
   async partialUpdateRegistration(
-    data: Partial<PersonalInfoSubmit> | Partial<QuestionSectionSubmit>
+    data: Partial<RegistrationPayload> & { eventId: string }
   ): Promise<SubmitResponse> {
     const response = await fetch(`${BASE_URL}/registration/form`, {
       method: "PATCH",
@@ -124,14 +91,14 @@ export const registrationApi = {
   },
 
   // POST: Submit registration (final submit)
-  async submitRegistration(eventId: string): Promise<SubmitResponse> {
+  async submitRegistration(data: RegistrationPayload): Promise<SubmitResponse> {
     const response = await fetch(`${BASE_URL}/registration/submit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ eventId }),
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -145,7 +112,7 @@ export const registrationApi = {
   // GET: Get application status
   async getApplicationStatus(
     eventId: string
-  ): Promise<ApplicationStatusResponse> {
+  ): Promise<RegistrationStatusResponse> {
     const response = await fetch(
       `${BASE_URL}/registration/status?eventId=${eventId}`,
       {

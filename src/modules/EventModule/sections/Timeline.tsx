@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useRef, useState } from "react";
 import type { EventTimelineType, TimelineMarkerProps } from "../type";
 import { Button } from "@/components/ui/button";
 import { NodeTimeline } from "../../../../public/svgs/NodeTimeline";
@@ -40,6 +42,11 @@ const TimelineMarker = ({ isEven, isLast }: TimelineMarkerProps) => {
 };
 
 const Timeline = ({ event }: TimelineProps) => {
+  const scrollRef = useRef<HTMLElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragStartScrollLeft, setDragStartScrollLeft] = useState(0);
+
   // Convert event.timeline JSON to timeline array
   const timelineData: EventTimelineType[] = [];
 
@@ -49,17 +56,24 @@ const Timeline = ({ event }: TimelineProps) => {
       if (
         item &&
         typeof item === "object" &&
-        "date" in item &&
+        ("date" in item || "startDate" in item) &&
         "title" in item
       ) {
         const timelineItem = item as {
           date: string;
+          startDate?: string;
           title: string;
           description?: string;
           desc?: string;
         };
+        const rawDate = timelineItem.date || timelineItem.startDate;
+        if (!rawDate) return;
+
+        const date = new Date(rawDate);
+        if (Number.isNaN(date.getTime())) return;
+
         timelineData.push({
-          date: new Date(timelineItem.date),
+          date,
           title: timelineItem.title,
           desc: timelineItem.description || timelineItem.desc || "",
         });
@@ -72,10 +86,45 @@ const Timeline = ({ event }: TimelineProps) => {
     return null;
   }
 
+  timelineData.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    if (!scrollRef.current) return;
+
+    setIsDragging(true);
+    setDragStartX(event.clientX);
+    setDragStartScrollLeft(scrollRef.current.scrollLeft);
+    scrollRef.current.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    if (!isDragging || !scrollRef.current) return;
+
+    const dragDistance = event.clientX - dragStartX;
+    scrollRef.current.scrollLeft = dragStartScrollLeft - dragDistance;
+  };
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLElement>) => {
+    if (!scrollRef.current) return;
+
+    setIsDragging(false);
+    scrollRef.current.releasePointerCapture(event.pointerId);
+  };
+
   return (
     <>
       <h1 className="text-center text-h1 text-white mb-5">Timeline</h1>
-      <main className="w-full bg-primary-500 flex flex-col gap-10 py-10  overflow-x-auto">
+      <main
+        ref={scrollRef}
+        className={`w-full bg-primary-500 flex flex-col gap-10 py-10 overflow-x-auto select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+          isDragging ? "cursor-grabbing" : "cursor-grab"
+        }`}
+        style={{ msOverflowStyle: "none" }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+      >
         <div className="relative w-max px-10 md:px-20 md:pr-40 ">
           <div className="flex justify-between items-stretch w-full relative z-10">
             {timelineData.map((item, index) => {

@@ -75,12 +75,14 @@ const OngoingSection = ({
                 startDate={new Date(event.registrationOpen)}
                 endDate={new Date(event.registrationClose)}
                 restrictions={[
-                  event.eventLevel,
+                  event.eventLevel || "Umum",
                   event.typeOfEvent === "ORGANISASI"
                     ? "Organisasi"
                     : event.typeOfEvent === "KEPANITIAAN"
                     ? "Kepanitiaan"
-                    : "UKM",
+                    : event.typeOfEvent === "UKM"
+                    ? "UKM"
+                    : "Event",
                 ]}
               />
             ))

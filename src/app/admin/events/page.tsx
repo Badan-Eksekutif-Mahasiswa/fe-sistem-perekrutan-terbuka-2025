@@ -2,17 +2,29 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getAllEvents } from "@/lib/api/event";
-import { Event } from "@/types/event";
+import { AdminEvent, adminApi } from "@/lib/api/admin";
+import { updateEvent } from "@/lib/api/event";
 import Link from "next/link";
 import Loader from "@/components/elements/Loader";
-import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
+type EventStatusFilter = "ALL" | AdminEvent["status"];
+
+const statusFilters: Array<{ label: string; value: EventStatusFilter }> = [
+  { label: "Semua", value: "ALL" },
+  { label: "Draft", value: "DRAFT" },
+  { label: "Active", value: "ACTIVE" },
+  { label: "Closed", value: "CLOSED" },
+  { label: "Archived", value: "ARCHIVED" },
+];
+
 export default function AdminEventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<AdminEvent[]>([]);
+  const [statusFilter, setStatusFilter] = useState<EventStatusFilter>("ALL");
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const displayName = user?.name || user?.email?.split("@")[0] || "Admin";
 
   useEffect(() => {
     fetchEvents();
@@ -21,8 +33,8 @@ export default function AdminEventsPage() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const data = await getAllEvents();
-      setEvents(data);
+      const data = await adminApi.getEvents();
+      setEvents(data.events);
     } catch (error) {
       console.error("Failed to fetch events", error);
     } finally {
@@ -30,24 +42,59 @@ export default function AdminEventsPage() {
     }
   };
 
+  const filteredEvents =
+    statusFilter === "ALL"
+      ? events
+      : events.filter((event) => event.status === statusFilter);
+
+  const handlePublish = async (event: AdminEvent) => {
+    const confirmed = window.confirm(`Publish event "${event.title}"?`);
+    if (!confirmed) return;
+
+    try {
+      setActionLoadingId(event.id);
+      await updateEvent(event.id, { status: "ACTIVE" });
+      await fetchEvents();
+    } catch (error) {
+      console.error("Failed to publish event", error);
+      window.alert(
+        error instanceof Error ? error.message : "Gagal publish event"
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   if (loading) return <Loader />;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 pb-20 pt-8 md:px-8 lg:px-12">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <Link href="/">
-            <Button variant="stroke" size="icon" className="rounded-full bg-white/50 border-[#475CA3] hover:bg-white text-[#475CA3]">
-              <ArrowLeft className="size-5" />
-            </Button>
-          </Link>
           <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">
-            Hello {(user as any)?.user_metadata?.name || (user as any)?.user_metadata?.full_name || user?.email?.split('@')[0] || "Admin"} 👋🏼
+            Hello {displayName}
           </h1>
         </div>
         <Link href="/admin/events/create">
           <Button variant="primary">Buat Event +</Button>
         </Link>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {statusFilters.map((filter) => (
+          <button
+            key={filter.value}
+            type="button"
+            onClick={() => setStatusFilter(filter.value)}
+            className={`rounded-md border px-4 py-2 text-p5 font-semibold transition ${
+              statusFilter === filter.value
+                ? "border-secondary-200 bg-secondary-200/20 text-secondary-100"
+                : "border-white/20 bg-white/[0.06] text-white hover:bg-white/[0.1]"
+            }`}
+          >
+            {filter.label}
+          </button>
+        ))}
       </div>
 
       <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-sm">
@@ -63,14 +110,14 @@ export default function AdminEventsPage() {
             </tr>
           </thead>
           <tbody>
-            {events.length === 0 ? (
+            {filteredEvents.length === 0 ? (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-neutral-400">
                   Belum ada event terdaftar
                 </td>
               </tr>
             ) : (
-              events.map((event) => (
+              filteredEvents.map((event) => (
                 <tr
                   key={event.id}
                   className="border-b border-neutral-100 hover:bg-neutral-50"
@@ -96,11 +143,22 @@ export default function AdminEventsPage() {
                   </td>
                   <td className="p-4 text-center">{event.divisions?.length || 0}</td>
                   <td className="p-4 flex gap-2">
-                    <Link href={`/admin/events/${event.eventCode}/edit`}>
+                    <Link href={`/admin/events/${event.eventCode || event.id}/edit`}>
                       <Button variant="ghost" size="sm">
                         Edit
                       </Button>
                     </Link>
+                    {event.status === "DRAFT" && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={actionLoadingId === event.id}
+                        onClick={() => handlePublish(event)}
+                      >
+                        {actionLoadingId === event.id ? "Publishing..." : "Publish"}
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))
