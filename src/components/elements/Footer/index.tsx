@@ -16,7 +16,7 @@ const Footer = () => {
           />
         </div>
         <h2 className="text-h3 max-md:text-h5">
-          Badan Eksekutif Mahasiswa UI 2025
+          Badan Eksekutif Mahasiswa UI 2026
         </h2>
         <div className="flex z-10 gap-6 max-md:gap-4 items-center">
           {socmed.map((item) => (
@@ -31,7 +31,7 @@ const Footer = () => {
           ))}
         </div>
         <p className="text-m4 z-10">
-          © Biro Multimedia BEM UI 2025. All Rights Reserved
+          © Biro Multimedia BEM UI 2026. All Rights Reserved
         </p>
       </div>
       <div className="relative aspect-[276/76] w-50 max-md:w-24">

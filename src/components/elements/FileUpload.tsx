@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
 import { Loader2, UploadCloud, CheckCircle2, X } from "lucide-react";
 import Image from "next/image";
 
@@ -32,6 +32,12 @@ export default function FileUpload({
 
       const file = e.target.files?.[0];
       if (!file) return;
+
+      if (!isSupabaseConfigured || !supabase) {
+        throw new Error(
+          "Upload file belum dikonfigurasi. Masukkan URL gambar secara manual."
+        );
+      }
 
       // Ensure file is an image if accept="image/*"
       if (accept.includes("image") && !file.type.startsWith("image/")) {

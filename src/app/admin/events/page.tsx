@@ -3,12 +3,25 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AdminEvent, adminApi } from "@/lib/api/admin";
+import { updateEvent } from "@/lib/api/event";
 import Link from "next/link";
 import Loader from "@/components/elements/Loader";
 import { useAuth } from "@/contexts/AuthContext";
 
+type EventStatusFilter = "ALL" | AdminEvent["status"];
+
+const statusFilters: Array<{ label: string; value: EventStatusFilter }> = [
+  { label: "Semua", value: "ALL" },
+  { label: "Draft", value: "DRAFT" },
+  { label: "Active", value: "ACTIVE" },
+  { label: "Closed", value: "CLOSED" },
+  { label: "Archived", value: "ARCHIVED" },
+];
+
 export default function AdminEventsPage() {
   const [events, setEvents] = useState<AdminEvent[]>([]);
+  const [statusFilter, setStatusFilter] = useState<EventStatusFilter>("ALL");
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const displayName = user?.name || user?.email?.split("@")[0] || "Admin";
@@ -29,6 +42,29 @@ export default function AdminEventsPage() {
     }
   };
 
+  const filteredEvents =
+    statusFilter === "ALL"
+      ? events
+      : events.filter((event) => event.status === statusFilter);
+
+  const handlePublish = async (event: AdminEvent) => {
+    const confirmed = window.confirm(`Publish event "${event.title}"?`);
+    if (!confirmed) return;
+
+    try {
+      setActionLoadingId(event.id);
+      await updateEvent(event.id, { status: "ACTIVE" });
+      await fetchEvents();
+    } catch (error) {
+      console.error("Failed to publish event", error);
+      window.alert(
+        error instanceof Error ? error.message : "Gagal publish event"
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   if (loading) return <Loader />;
 
   return (
@@ -44,6 +80,23 @@ export default function AdminEventsPage() {
         </Link>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        {statusFilters.map((filter) => (
+          <button
+            key={filter.value}
+            type="button"
+            onClick={() => setStatusFilter(filter.value)}
+            className={`rounded-md border px-4 py-2 text-p5 font-semibold transition ${
+              statusFilter === filter.value
+                ? "border-secondary-200 bg-secondary-200/20 text-secondary-100"
+                : "border-white/20 bg-white/[0.06] text-white hover:bg-white/[0.1]"
+            }`}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+
       <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -57,14 +110,14 @@ export default function AdminEventsPage() {
             </tr>
           </thead>
           <tbody>
-            {events.length === 0 ? (
+            {filteredEvents.length === 0 ? (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-neutral-400">
                   Belum ada event terdaftar
                 </td>
               </tr>
             ) : (
-              events.map((event) => (
+              filteredEvents.map((event) => (
                 <tr
                   key={event.id}
                   className="border-b border-neutral-100 hover:bg-neutral-50"
@@ -95,6 +148,17 @@ export default function AdminEventsPage() {
                         Edit
                       </Button>
                     </Link>
+                    {event.status === "DRAFT" && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={actionLoadingId === event.id}
+                        onClick={() => handlePublish(event)}
+                      >
+                        {actionLoadingId === event.id ? "Publishing..." : "Publish"}
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))

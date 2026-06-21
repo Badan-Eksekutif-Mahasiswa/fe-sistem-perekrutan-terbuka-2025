@@ -16,8 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Event } from "@/types/event";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import Loader from "@/components/elements/Loader";
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -115,14 +114,9 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   if (!event) return <div className="p-8 text-center">Event tidak ditemukan.</div>;
 
   return (
-    <div className="flex flex-col gap-6 max-w-4xl">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-5 pb-20 pt-8 md:px-8">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/events">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="size-5" />
-            </Button>
-          </Link>
+        <div>
           <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Edit Event</h1>
         </div>
         <Button variant="destructive" onClick={handleDelete} disabled={saving}>

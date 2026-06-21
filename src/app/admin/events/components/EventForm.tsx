@@ -306,7 +306,16 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     });
 
     submitData.socialMedia = cleanedSocialMedia;
-    submitData.timeline = timeline.filter(t => t.title.trim() !== "" || t.startDate.trim() !== "");
+    submitData.timeline = timeline
+      .filter(t => t.title.trim() !== "" || t.startDate.trim() !== "")
+      .sort((a, b) => {
+        const dateA = new Date(a.startDate).getTime();
+        const dateB = new Date(b.startDate).getTime();
+
+        if (Number.isNaN(dateA)) return 1;
+        if (Number.isNaN(dateB)) return -1;
+        return dateA - dateB;
+      });
     submitData.faqs = faqs.filter(f => f.question.trim() !== "");
     submitData.testimonials = testimonials.filter(t => t.name.trim() !== "");
     submitData.documentations = documentations.filter(d => d.title.trim() !== "" || d.imageUrl.trim() !== "");

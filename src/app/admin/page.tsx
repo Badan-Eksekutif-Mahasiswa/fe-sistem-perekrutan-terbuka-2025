@@ -15,8 +15,6 @@ import {
   ClipboardCheck,
   FileText,
   Mail,
-  Pencil,
-  Send,
   Settings,
   Users,
 } from "lucide-react";
@@ -131,14 +129,6 @@ export default function AdminDashboardPage() {
                 <Settings className="size-4" />
                 Password
               </Link>
-            </Button>
-            <Button size="md" variant="stroke">
-              <Pencil className="size-4" />
-              Draft Event
-            </Button>
-            <Button size="md" variant="secondary">
-              <Send className="size-4" />
-              Publish
             </Button>
           </div>
         </header>

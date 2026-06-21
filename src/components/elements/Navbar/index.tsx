@@ -157,8 +157,7 @@ const Menu = () => {
       : user?.role === "ADMIN"
       ? [
           { title: "Home", href: "/" },
-          { title: "Buat Event", href: "/admin/events/create" },
-          { title: "Password", href: "/admin/change-password" },
+          { title: "Kelola Event", href: "/admin/events" },
         ]
       : data;
 
@@ -166,7 +165,7 @@ const Menu = () => {
     user?.role === "SUPERADMIN"
       ? { href: "/superadmin", label: "Kelola Akun" }
       : user?.role === "ADMIN"
-      ? { href: "/admin/events", label: "Kelola Event" }
+      ? { href: "/admin", label: "Dashboard" }
       : { href: "/dashboard", label: "Dashboard" };
 
   return (

@@ -10,9 +10,6 @@ import {
   EventPayload,
 } from "@/lib/api/event";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
@@ -62,13 +59,8 @@ export default function CreateEventPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-4xl">
-      <div className="flex items-center gap-4">
-        <Link href="/admin/events">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="size-5" />
-          </Button>
-        </Link>
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-5 pb-20 pt-8 md:px-8">
+      <div>
         <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Buat Event Baru</h1>
       </div>
 
