@@ -6,6 +6,13 @@ export type AdminApplicationStatus =
   | "PASSED_ADMINISTRATION"
   | "REJECTED_ADMINISTRATION";
 
+export type AdminEmailType =
+  | "REGISTRATION_CONFIRMATION"
+  | "PASSED_ADMINISTRATION"
+  | "REJECTED_ADMINISTRATION";
+
+export type AdminEmailStatus = "PENDING" | "SENT" | "FAILED";
+
 export type AdminEvent = {
   id: string;
   eventCode: string | null;
@@ -86,6 +93,37 @@ export type AdminRegistrationsQuery = {
   order?: "asc" | "desc";
 };
 
+export type AdminAnnouncementSummary = {
+  type: AdminEmailType;
+  dryRun: boolean;
+  eligible: number;
+  sent: number;
+  failed: number;
+  skipped: number;
+};
+
+export type AdminEmailLog = {
+  id: string;
+  type: AdminEmailType;
+  status: AdminEmailStatus;
+  recipient_email: string;
+  subject: string;
+  additional_message: string | null;
+  error_message: string | null;
+  registration_id: string;
+  applicant_name: string | null;
+  sent_by_id: string;
+  sent_at: string | null;
+  created_at: string;
+};
+
+export type AdminEmailLogQuery = {
+  type?: AdminEmailType | "ALL";
+  status?: AdminEmailStatus | "ALL";
+  page?: number;
+  limit?: number;
+};
+
 type ApiResponse<T> = {
   success: boolean;
   message: string | null;
@@ -143,6 +181,20 @@ function toQueryString(query?: AdminRegistrationsQuery) {
   if (query.limit) params.set("limit", String(query.limit));
   if (query.sort) params.set("sort", query.sort);
   if (query.order) params.set("order", query.order);
+
+  const value = params.toString();
+  return value ? `?${value}` : "";
+}
+
+function toEmailLogQueryString(query?: AdminEmailLogQuery) {
+  if (!query) return "";
+
+  const params = new URLSearchParams();
+
+  if (query.type && query.type !== "ALL") params.set("type", query.type);
+  if (query.status && query.status !== "ALL") params.set("status", query.status);
+  if (query.page) params.set("page", String(query.page));
+  if (query.limit) params.set("limit", String(query.limit));
 
   const value = params.toString();
   return value ? `?${value}` : "";
@@ -214,5 +266,45 @@ export const adminApi = {
     }
 
     return response.blob();
+  },
+
+  async sendAnnouncement(
+    eventId: string,
+    payload: {
+      type: AdminEmailType;
+      additionalMessage?: string | null;
+      divisionId?: string | null;
+      force?: boolean;
+      dryRun?: boolean;
+    }
+  ) {
+    const result = await requestJson<AdminAnnouncementSummary>(
+      `/admin/events/${eventId}/announcements`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+
+    return result.data;
+  },
+
+  async getEventEmails(
+    eventId: string,
+    query?: AdminEmailLogQuery
+  ): Promise<PaginatedResponse<AdminEmailLog[]>> {
+    const result = await requestJson<AdminEmailLog[]>(
+      `/admin/events/${eventId}/emails${toEmailLogQueryString(query)}`
+    );
+
+    return {
+      data: result.data,
+      meta: {
+        total: Number(result.meta?.total ?? result.data.length),
+        page: Number(result.meta?.page ?? query?.page ?? 1),
+        limit: Number(result.meta?.limit ?? query?.limit ?? result.data.length),
+        total_pages: Number(result.meta?.total_pages ?? 1),
+      },
+    };
   },
 };

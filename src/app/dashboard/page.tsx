@@ -90,6 +90,21 @@ const DashboardPage = () => {
     return colors[status];
   };
 
+  const getStatusDescription = (status: RegistrationStatus) => {
+    const descriptions: Record<RegistrationStatus, string> = {
+      DRAFT: "Pendaftaranmu masih tersimpan sebagai draft dan belum dikirim.",
+      SUBMITTED:
+        "Pendaftaranmu sudah masuk. Panitia akan memeriksa berkas yang kamu kirim.",
+      UNDER_REVIEW:
+        "Berkasmu sedang direview oleh panitia. Mohon tunggu pengumuman resmi.",
+      PASSED_ADMINISTRATION:
+        "Selamat, kamu dinyatakan lolos seleksi administrasi. Periksa email untuk instruksi lanjutan dari panitia.",
+      REJECTED_ADMINISTRATION:
+        "Terima kasih sudah mendaftar. Kamu belum dapat melanjutkan ke tahap berikutnya pada kesempatan ini.",
+    };
+    return descriptions[status];
+  };
+
   return (
     <div className="min-h-screen bg-[var(--bg-main)] py-24 px-6 lg:px-12">
       <div className="max-w-7xl mx-auto ">
@@ -203,6 +218,9 @@ const DashboardPage = () => {
                             {getStatusLabel(app.status)}
                           </span>
                         </div>
+                        <p className="mt-3 max-w-3xl rounded-md border border-white/10 bg-white/[0.06] px-4 py-3 text-p5 text-white/75">
+                          {getStatusDescription(app.status)}
+                        </p>
                       </div>
 
                       {/* Divisions */}

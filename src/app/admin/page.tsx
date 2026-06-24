@@ -6,8 +6,12 @@ import { Button } from "@/components/ui/button";
 import Loader from "@/components/elements/Loader";
 import { useRequireAuth } from "@/hooks/useAuth";
 import {
+  AdminAnnouncementSummary,
   AdminApplicationDetail,
   AdminApplicationStatus,
+  AdminEmailLog,
+  AdminEmailStatus,
+  AdminEmailType,
   AdminEvent,
   AdminEventSummary,
   AdminRegistrationListItem,
@@ -20,7 +24,10 @@ import {
   Download,
   Eye,
   FileText,
+  History,
+  RefreshCcw,
   Search,
+  Send,
   Settings,
   UserCheck,
   Users,
@@ -43,6 +50,24 @@ const statusOptions: Array<{ value: AdminApplicationStatus; label: string }> = [
   { value: "UNDER_REVIEW", label: "Under review" },
   { value: "PASSED_ADMINISTRATION", label: "Lulus berkas" },
   { value: "REJECTED_ADMINISTRATION", label: "Tidak lulus" },
+];
+
+const announcementTypes: Array<{ value: AdminEmailType; label: string; hint: string }> = [
+  {
+    value: "PASSED_ADMINISTRATION",
+    label: "Lulus berkas",
+    hint: "Dikirim ke pendaftar dengan status lulus berkas.",
+  },
+  {
+    value: "REJECTED_ADMINISTRATION",
+    label: "Tidak lulus",
+    hint: "Dikirim ke pendaftar dengan status tidak lulus berkas.",
+  },
+  {
+    value: "REGISTRATION_CONFIRMATION",
+    label: "Konfirmasi pendaftaran",
+    hint: "Dikirim ke semua pendaftaran yang sudah submit.",
+  },
 ];
 
 export default function AdminDashboardPage() {
@@ -489,6 +514,8 @@ export default function AdminDashboardPage() {
               onUpdateStatus={updateSelectedStatus}
               isUpdating={isUpdatingStatus}
             />
+
+            <AnnouncementPanel event={selectedEvent} onError={setError} />
           </section>
         </section>
       </div>
@@ -626,6 +653,300 @@ function ApplicationDetailPanel({
   );
 }
 
+function AnnouncementPanel({
+  event,
+  onError,
+}: {
+  event: AdminEvent | null;
+  onError: (message: string | null) => void;
+}) {
+  const [type, setType] = useState<AdminEmailType>("PASSED_ADMINISTRATION");
+  const [statusFilter, setStatusFilter] = useState<AdminEmailStatus | "ALL">("ALL");
+  const [divisionId, setDivisionId] = useState("");
+  const [additionalMessage, setAdditionalMessage] = useState("");
+  const [force, setForce] = useState(false);
+  const [summary, setSummary] = useState<AdminAnnouncementSummary | null>(null);
+  const [logs, setLogs] = useState<AdminEmailLog[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  const [isFetchingLogs, setIsFetchingLogs] = useState(false);
+
+  const loadEmailLogs = useCallback(async () => {
+    if (!event) {
+      setLogs([]);
+      return;
+    }
+
+    try {
+      setIsFetchingLogs(true);
+      const response = await adminApi.getEventEmails(event.id, {
+        type: "ALL",
+        status: statusFilter,
+        page: 1,
+        limit: 8,
+      });
+      setLogs(response.data);
+    } catch (error) {
+      onError(
+        error instanceof Error ? error.message : "Gagal memuat riwayat email."
+      );
+    } finally {
+      setIsFetchingLogs(false);
+    }
+  }, [event, onError, statusFilter]);
+
+  useEffect(() => {
+    setSummary(null);
+    setDivisionId("");
+    setAdditionalMessage("");
+    setForce(false);
+  }, [event?.id]);
+
+  useEffect(() => {
+    void loadEmailLogs();
+  }, [loadEmailLogs]);
+
+  const processAnnouncement = async (dryRun: boolean) => {
+    if (!event) return;
+
+    if (!dryRun) {
+      const confirmed = window.confirm(
+        `Kirim email "${announcementLabel(type)}" untuk event "${event.title}"?`
+      );
+      if (!confirmed) return;
+    }
+
+    try {
+      onError(null);
+      setIsSending(true);
+      const result = await adminApi.sendAnnouncement(event.id, {
+        type,
+        additionalMessage: additionalMessage.trim() || null,
+        divisionId: divisionId || null,
+        force,
+        dryRun,
+      });
+      setSummary(result);
+      await loadEmailLogs();
+    } catch (error) {
+      onError(
+        error instanceof Error ? error.message : "Gagal memproses pengumuman."
+      );
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const selectedType = announcementTypes.find((item) => item.value === type);
+  const isArchived = event?.status === "ARCHIVED";
+
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
+      <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div>
+          <p className="text-p6 uppercase tracking-normal text-secondary-100">
+            Pengumuman
+          </p>
+          <h2 className="mt-1 text-h4">Kirim Email Status Kelulusan</h2>
+          <p className="mt-1 text-p5 text-white/60">
+            Email memakai pesan default sistem. Pesan tambahan akan ditaruh di
+            dalam email yang sama.
+          </p>
+        </div>
+        <Button
+          type="button"
+          size="md"
+          variant="stroke"
+          onClick={() => void loadEmailLogs()}
+          disabled={!event || isFetchingLogs}
+        >
+          <RefreshCcw className="size-4" />
+          Refresh Log
+        </Button>
+      </div>
+
+      {!event ? (
+        <div className="rounded-md border border-white/10 bg-white/[0.05] px-4 py-6 text-p5 text-white/65">
+          Pilih event terlebih dahulu untuk mengirim pengumuman.
+        </div>
+      ) : (
+        <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+          <div className="space-y-4">
+            {isArchived && (
+              <div className="rounded-md border border-red-200/30 bg-red-300/15 px-4 py-3 text-p5 text-red-100">
+                Event archived tidak bisa mengirim pengumuman.
+              </div>
+            )}
+
+            <label className="block">
+              <span className="mb-2 block text-p5 font-semibold">Target email</span>
+              <select
+                value={type}
+                onChange={(changeEvent) =>
+                  setType(changeEvent.target.value as AdminEmailType)
+                }
+                className="h-11 w-full rounded-md border border-white/15 bg-white px-3 text-p5 text-[#1D2642] outline-none focus:border-primary-300"
+              >
+                {announcementTypes.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-p6 text-white/55">
+                {selectedType?.hint}
+              </span>
+            </label>
+
+            <label className="block">
+              <span className="mb-2 block text-p5 font-semibold">Filter divisi</span>
+              <select
+                value={divisionId}
+                onChange={(changeEvent) => setDivisionId(changeEvent.target.value)}
+                className="h-11 w-full rounded-md border border-white/15 bg-white px-3 text-p5 text-[#1D2642] outline-none focus:border-primary-300"
+              >
+                <option value="">Semua divisi</option>
+                {event.divisions?.map((division) => (
+                  <option key={division.id} value={division.id}>
+                    {division.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="mb-2 block text-p5 font-semibold">
+                Pesan tambahan
+              </span>
+              <textarea
+                value={additionalMessage}
+                onChange={(changeEvent) =>
+                  setAdditionalMessage(changeEvent.target.value)
+                }
+                placeholder="Opsional. Contoh: Mohon bergabung ke grup LINE paling lambat besok."
+                className="min-h-28 w-full rounded-md border border-white/15 bg-white px-3 py-2 text-p5 text-[#1D2642] outline-none focus:border-primary-300"
+              />
+            </label>
+
+            <label className="flex items-start gap-3 rounded-md border border-white/10 bg-white/[0.05] px-4 py-3 text-p5 text-white/75">
+              <input
+                type="checkbox"
+                checked={force}
+                onChange={(changeEvent) => setForce(changeEvent.target.checked)}
+                className="mt-1 size-4"
+              />
+              <span>
+                Kirim ulang ke penerima yang sudah pernah mendapatkan email tipe
+                ini.
+              </span>
+            </label>
+
+            <div className="flex flex-wrap gap-3">
+              <Button
+                type="button"
+                size="lg"
+                variant="stroke"
+                onClick={() => void processAnnouncement(true)}
+                disabled={isSending || isArchived}
+              >
+                <Eye className="size-4" />
+                Cek Penerima
+              </Button>
+              <Button
+                type="button"
+                size="lg"
+                variant="primary"
+                onClick={() => void processAnnouncement(false)}
+                disabled={isSending || isArchived}
+              >
+                <Send className="size-4" />
+                {isSending ? "Memproses..." : "Kirim Email"}
+              </Button>
+            </div>
+
+            {summary && (
+              <div className="grid grid-cols-2 gap-3 rounded-md border border-white/10 bg-white/[0.05] p-4 md:grid-cols-4">
+                <SummaryValue label="Eligible" value={summary.eligible} />
+                <SummaryValue
+                  label={summary.dryRun ? "Akan dikirim" : "Terkirim"}
+                  value={summary.sent}
+                />
+                <SummaryValue label="Gagal" value={summary.failed} />
+                <SummaryValue label="Dilewati" value={summary.skipped} />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="mb-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-2">
+                <History className="size-5 text-secondary-100" />
+                <h3 className="text-p4 font-semibold">Riwayat Email</h3>
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(changeEvent) =>
+                  setStatusFilter(changeEvent.target.value as AdminEmailStatus | "ALL")
+                }
+                className="h-10 rounded-md border border-white/15 bg-white px-3 text-p5 text-[#1D2642] outline-none focus:border-primary-300"
+              >
+                <option value="ALL">Semua status</option>
+                <option value="SENT">Sent</option>
+                <option value="FAILED">Failed</option>
+                <option value="PENDING">Pending</option>
+              </select>
+            </div>
+
+            <div className="overflow-hidden rounded-md border border-white/10">
+              {isFetchingLogs ? (
+                <p className="px-4 py-5 text-p5 text-white/65">
+                  Memuat riwayat email...
+                </p>
+              ) : logs.length === 0 ? (
+                <p className="px-4 py-5 text-p5 text-white/65">
+                  Belum ada email yang dikirim untuk event ini.
+                </p>
+              ) : (
+                <div className="divide-y divide-white/10">
+                  {logs.map((log) => (
+                    <div key={log.id} className="px-4 py-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-p5 font-semibold text-white">
+                          {log.applicant_name || log.recipient_email}
+                        </p>
+                        <StatusBadge status={log.status} />
+                      </div>
+                      <p className="mt-1 text-p6 text-white/60">
+                        {announcementLabel(log.type)} · {log.recipient_email}
+                      </p>
+                      <p className="mt-1 text-p6 text-white/45">
+                        {formatDateTime(log.created_at)}
+                      </p>
+                      {log.error_message && (
+                        <p className="mt-2 rounded-md border border-red-200/25 bg-red-300/10 px-3 py-2 text-p6 text-red-100">
+                          {log.error_message}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SummaryValue({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <p className="text-p6 uppercase tracking-normal text-white/45">{label}</p>
+      <p className="mt-1 text-h4 text-white">{value}</p>
+    </div>
+  );
+}
+
 function MetricCard({
   icon: Icon,
   label,
@@ -663,11 +984,11 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
 
 function StatusBadge({ status }: { status: string }) {
   const className =
-    status === "ACTIVE" || status === "PASSED_ADMINISTRATION"
+    status === "ACTIVE" || status === "PASSED_ADMINISTRATION" || status === "SENT"
       ? "border-green-200/30 bg-green-300/15 text-green-100"
-      : status === "DRAFT" || status === "SUBMITTED"
+      : status === "DRAFT" || status === "SUBMITTED" || status === "PENDING"
         ? "border-yellow-200/30 bg-yellow-300/15 text-yellow-100"
-        : status === "REJECTED_ADMINISTRATION"
+        : status === "REJECTED_ADMINISTRATION" || status === "FAILED"
           ? "border-red-200/30 bg-red-300/15 text-red-100"
           : "border-blue-200/30 bg-blue-300/15 text-blue-100";
 
@@ -690,8 +1011,25 @@ function statusLabel(status: string) {
       return "LULUS";
     case "REJECTED_ADMINISTRATION":
       return "TIDAK LULUS";
+    case "SENT":
+      return "SENT";
+    case "FAILED":
+      return "FAILED";
+    case "PENDING":
+      return "PENDING";
     default:
       return status;
+  }
+}
+
+function announcementLabel(type: AdminEmailType) {
+  switch (type) {
+    case "PASSED_ADMINISTRATION":
+      return "Lulus berkas";
+    case "REJECTED_ADMINISTRATION":
+      return "Tidak lulus";
+    case "REGISTRATION_CONFIRMATION":
+      return "Konfirmasi pendaftaran";
   }
 }
 
