@@ -233,7 +233,7 @@ export default function RegistrationFormModule({
   });
 
   const validateForSubmit = () => {
-    if (!isValidEmail(form.contactEmail.trim())) {
+    if (form.contactEmail.trim() && !isValidEmail(form.contactEmail.trim())) {
       show("error", "Email kontak harus valid");
       return false;
     }
@@ -349,7 +349,7 @@ export default function RegistrationFormModule({
             <section>
               <h2 className="text-h4">Kontak Pendaftar</h2>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <Field label="Email Kontak" required>
+                <Field label="Email Kontak">
                   <input
                     disabled={isSubmitted}
                     type="email"
