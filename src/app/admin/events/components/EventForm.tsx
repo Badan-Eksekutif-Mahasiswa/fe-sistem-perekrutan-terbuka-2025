@@ -11,7 +11,7 @@ import {
   EventTimelineItem,
 } from "@/lib/api/event";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { AlertCircle, Info, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import FileUpload from "@/components/elements/FileUpload";
 import { toast } from "sonner";
@@ -180,6 +180,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   );
 
   const [deletedDivisions, setDeletedDivisions] = useState<string[]>([]);
+  const [formError, setFormError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -259,12 +260,58 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     setDivisions(newDivisions);
   };
 
+  const getPublishValidationError = () => {
+    if (formData.status === "DRAFT") return "";
+
+    const requiredFields: Array<[unknown, string]> = [
+      [formData.title, "Nama acara"],
+      [formData.eventCode, "URL event"],
+      [formData.description, "Deskripsi acara"],
+      [formData.organizer, "Penyelenggara"],
+      [formData.contactLineId, "ID Line kontak"],
+      [formData.registrationOpen, "Waktu buka pendaftaran"],
+      [formData.registrationClose, "Waktu tutup pendaftaran"],
+    ];
+    const missingField = requiredFields.find(([value]) => !String(value || "").trim());
+    if (missingField) return `${missingField[1]} wajib diisi sebelum event dipublish.`;
+
+    if (!/^[a-z0-9-]+$/.test(String(formData.eventCode || ""))) {
+      return "URL event hanya boleh berisi huruf kecil, angka, dan strip (-).";
+    }
+
+    if (Number(formData.maxDivisionChoices || 0) < 1) {
+      return "Maks pilih divisi minimal 1.";
+    }
+
+    const activeDivisions = divisions.filter((division) => division.isActive && division.name.trim() !== "");
+    if (activeDivisions.length < 1) {
+      return "Event harus memiliki minimal satu divisi aktif sebelum publish.";
+    }
+
+    const filledTimeline = timeline.filter((item) => item.title.trim() !== "" && item.startDate.trim() !== "");
+    if (filledTimeline.length < 1) {
+      return "Event aktif harus memiliki minimal satu timeline dengan tanggal dan judul.";
+    }
+
+    return "";
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError("");
+
+    const publishValidationError = getPublishValidationError();
+    if (publishValidationError) {
+      setFormError(publishValidationError);
+      toast.error(publishValidationError);
+      return;
+    }
 
     if (formData.registrationOpen && formData.registrationClose) {
       if (new Date(formData.registrationClose as string) <= new Date(formData.registrationOpen as string)) {
-        toast.error("Waktu Tutup Pendaftaran harus setelah Waktu Buka Pendaftaran!");
+        const message = "Waktu Tutup Pendaftaran harus setelah Waktu Buka Pendaftaran!";
+        setFormError(message);
+        toast.error(message);
         return;
       }
     }
@@ -347,6 +394,20 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         <h1 className="text-3xl font-bold">{initialData?.id ? "Edit Event" : "Buat Event"}</h1>
         <p className="text-lg">Isilah Data Acara Berikut</p>
       </div>
+
+      {formError && (
+        <div className="flex items-start gap-3 rounded-md border border-red-200/30 bg-red-500/15 px-4 py-3 text-sm text-red-50">
+          <AlertCircle className="mt-0.5 size-4 shrink-0" />
+          <span>{formError}</span>
+        </div>
+      )}
+
+      {formData.status === "DRAFT" && (
+        <div className="flex items-start gap-3 rounded-md border border-white/15 bg-white/[0.08] px-4 py-3 text-sm text-white/75">
+          <Info className="mt-0.5 size-4 shrink-0" />
+          <span>Draft boleh disimpan dengan data minimum. Saat status diubah ke ACTIVE, CLOSED, atau ARCHIVED, field wajib dan minimal satu divisi aktif akan divalidasi.</span>
+        </div>
+      )}
 
       <div className="flex flex-col gap-1">
         <label className="font-bold text-m4">Nama Acara</label>
@@ -674,11 +735,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           <div key={index} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm">Pertanyaan</label>
-              <input type="text" name="question" value={item.question} onChange={(e) => handleFaqChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Apakah event ini berbayar?" required={formData.status !== "DRAFT"} />
+              <input type="text" name="question" value={item.question} onChange={(e) => handleFaqChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Apakah event ini berbayar?" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Jawaban</label>
-              <textarea name="answer" value={item.answer} onChange={(e) => handleFaqChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Tidak, event ini 100% gratis." required={formData.status !== "DRAFT"} />
+              <textarea name="answer" value={item.answer} onChange={(e) => handleFaqChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Tidak, event ini 100% gratis." />
             </div>
             {faqs.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeFaq(index)} itemName="FAQ" />
@@ -711,15 +772,15 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Nama Responden</label>
-              <input type="text" name="name" value={item.name} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Budi" required={formData.status !== "DRAFT"} />
+              <input type="text" name="name" value={item.name} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Budi" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Peran/Posisi</label>
-              <input type="text" name="role" value={item.role} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Peserta 2024" required={formData.status !== "DRAFT"} />
+              <input type="text" name="role" value={item.role} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Peserta 2024" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Pesan Testimoni</label>
-              <textarea name="message" value={item.message} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Pesan singkat..." required={formData.status !== "DRAFT"} />
+              <textarea name="message" value={item.message} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Pesan singkat..." />
             </div>
             {testimonials.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeTestimonial(index)} itemName="Testimoni" />
@@ -752,7 +813,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Judul Foto/Kegiatan</label>
-              <input type="text" name="title" value={item.title} onChange={(e) => handleDocumentationChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Pembukaan Acara" required={formData.status !== "DRAFT"} />
+              <input type="text" name="title" value={item.title} onChange={(e) => handleDocumentationChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Pembukaan Acara" />
             </div>
             {documentations.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeDocumentation(index)} itemName="Dokumentasi" />

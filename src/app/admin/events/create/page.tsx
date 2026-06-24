@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import EventForm from "../components/EventForm";
 import {
   createEvent,
+  updateEvent,
   createDivision,
   DivisionPayload,
   EventFormDivision,
@@ -42,12 +43,22 @@ export default function CreateEventPage() {
       setLoading(true);
       setError("");
       
-      const newEvent = await createEvent(data);
+      const requestedStatus = data.status || "DRAFT";
+      const shouldFinalizeStatus = requestedStatus !== "DRAFT";
+      const eventPayload = shouldFinalizeStatus
+        ? { ...data, status: "DRAFT" as EventPayload["status"] }
+        : data;
+
+      const newEvent = await createEvent(eventPayload);
       
       if (divisionsData && divisionsData.length > 0 && newEvent.id) {
         for (const div of divisionsData) {
           await createDivision(toDivisionPayload(newEvent.id, div));
         }
+      }
+
+      if (shouldFinalizeStatus && newEvent.id) {
+        await updateEvent(newEvent.id, { status: requestedStatus });
       }
       
       router.push("/admin/events");
