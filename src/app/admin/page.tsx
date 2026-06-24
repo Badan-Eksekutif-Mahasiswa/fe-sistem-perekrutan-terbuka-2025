@@ -123,14 +123,16 @@ export default function AdminDashboardPage() {
                 : "Panitia hanya melihat event dan pendaftar yang dimilikinya."}
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Button size="md" variant="stroke" asChild>
-              <Link href="/admin/change-password">
-                <Settings className="size-4" />
-                Password
-              </Link>
-            </Button>
-          </div>
+          {user.role === "ADMIN" && (
+            <div className="flex flex-wrap gap-3">
+              <Button size="md" variant="stroke" asChild>
+                <Link href="/admin/change-password">
+                  <Settings className="size-4" />
+                  Password
+                </Link>
+              </Button>
+            </div>
+          )}
         </header>
 
         {error && (
@@ -150,9 +152,13 @@ export default function AdminDashboardPage() {
           <div className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-h4">Event Saya</h2>
+                <h2 className="text-h4">
+                  {user.role === "SUPERADMIN" ? "Semua Event" : "Event Saya"}
+                </h2>
                 <p className="mt-1 text-p5 text-white/60">
-                  Data berasal dari endpoint admin yang dibatasi oleh owner.
+                  {user.role === "SUPERADMIN"
+                    ? "Superadmin melihat semua event dari seluruh admin."
+                    : "Data berasal dari endpoint admin yang dibatasi oleh owner."}
                 </p>
               </div>
               <Button size="icon" variant="ghost" aria-label="Tambah event">

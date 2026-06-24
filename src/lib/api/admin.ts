@@ -20,7 +20,7 @@ export type AdminEvent = {
     registrations: number;
     divisions: number;
   };
-  divisions?: Array<{ id: string; name: string }>;
+  divisions?: Array<{ id: string; name: string; isActive?: boolean }>;
 };
 
 export type AdminRegistration = {
