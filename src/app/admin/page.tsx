@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/elements/Loader";
+import ActionDialog from "@/components/elements/ActionDialog";
 import { useRequireAuth } from "@/hooks/useAuth";
 import {
   AdminAnnouncementSummary,
@@ -464,7 +465,7 @@ export default function AdminDashboardPage() {
                             <td className="px-4 py-4">
                               <p className="font-semibold">{registration.user.name}</p>
                               <p className="text-p6 text-white/55">
-                                {registration.user.npm || "-"} ·{" "}
+                                {registration.user.npm || "-"} Â·{" "}
                                 {registration.user.email || "-"}
                               </p>
                             </td>
@@ -574,7 +575,7 @@ function ApplicationDetailPanel({
           </p>
           <h2 className="mt-1 text-h4">{application.user.name}</h2>
           <p className="mt-1 text-p5 text-white/60">
-            {application.user.npm || "-"} · {application.user.faculty || "-"} ·{" "}
+            {application.user.npm || "-"} Â· {application.user.faculty || "-"} Â·{" "}
             {application.user.studyProgram || "-"}
           </p>
         </div>
@@ -669,6 +670,7 @@ function AnnouncementPanel({
   const [logs, setLogs] = useState<AdminEmailLog[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [isFetchingLogs, setIsFetchingLogs] = useState(false);
+  const [sendDialogOpen, setSendDialogOpen] = useState(false);
 
   const loadEmailLogs = useCallback(async () => {
     if (!event) {
@@ -708,12 +710,6 @@ function AnnouncementPanel({
   const processAnnouncement = async (dryRun: boolean) => {
     if (!event) return;
 
-    if (!dryRun) {
-      const confirmed = window.confirm(
-        `Kirim email "${announcementLabel(type)}" untuk event "${event.title}"?`
-      );
-      if (!confirmed) return;
-    }
 
     try {
       onError(null);
@@ -855,13 +851,24 @@ function AnnouncementPanel({
                 type="button"
                 size="lg"
                 variant="primary"
-                onClick={() => void processAnnouncement(false)}
+                onClick={() => setSendDialogOpen(true)}
                 disabled={isSending || isArchived}
               >
                 <Send className="size-4" />
                 {isSending ? "Memproses..." : "Kirim Email"}
               </Button>
             </div>
+
+            <ActionDialog
+              open={sendDialogOpen}
+              onOpenChange={setSendDialogOpen}
+              title="Kirim email pengumuman?"
+              description={`Email "${announcementLabel(type)}" akan dikirim untuk event "${event.title}". Pastikan target dan filter divisi sudah benar.`}
+              confirmLabel="Kirim Email"
+              variant="primary"
+              loading={isSending}
+              onConfirm={() => processAnnouncement(false)}
+            />
 
             {summary && (
               <div className="grid grid-cols-2 gap-3 rounded-md border border-white/10 bg-white/[0.05] p-4 md:grid-cols-4">
@@ -916,7 +923,7 @@ function AnnouncementPanel({
                         <StatusBadge status={log.status} />
                       </div>
                       <p className="mt-1 text-p6 text-white/60">
-                        {announcementLabel(log.type)} · {log.recipient_email}
+                        {announcementLabel(log.type)} Â· {log.recipient_email}
                       </p>
                       <p className="mt-1 text-p6 text-white/45">
                         {formatDateTime(log.created_at)}
