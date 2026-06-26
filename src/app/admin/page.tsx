@@ -266,6 +266,8 @@ export default function AdminDashboardPage() {
     return null;
   }
 
+  const adminGreetingName = user.email?.split("@")[0] || user.name || "Admin";
+
   if (!canAccess) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[var(--bg-main)] px-5 text-white">
@@ -287,7 +289,7 @@ export default function AdminDashboardPage() {
             <p className="text-p5 uppercase tracking-normal text-secondary-100">
               Panel {user.role === "SUPERADMIN" ? "Superadmin" : "Panitia"}
             </p>
-            <h1 className="mt-2 text-h1">Dashboard Seleksi Berkas</h1>
+            <h1 className="mt-2 text-h1">Halo, {adminGreetingName}</h1>
             <p className="mt-2 max-w-2xl text-p4 text-white/70">
               {user.role === "SUPERADMIN"
                 ? "Pantau seluruh event, pendaftar, dan status seleksi dari semua panitia."
@@ -465,7 +467,7 @@ export default function AdminDashboardPage() {
                             <td className="px-4 py-4">
                               <p className="font-semibold">{registration.user.name}</p>
                               <p className="text-p6 text-white/55">
-                                {registration.user.npm || "-"} Â·{" "}
+                                {registration.user.npm || "-"} Ãƒâ€šÃ‚Â·{" "}
                                 {registration.user.email || "-"}
                               </p>
                             </td>
@@ -575,7 +577,7 @@ function ApplicationDetailPanel({
           </p>
           <h2 className="mt-1 text-h4">{application.user.name}</h2>
           <p className="mt-1 text-p5 text-white/60">
-            {application.user.npm || "-"} Â· {application.user.faculty || "-"} Â·{" "}
+            {application.user.npm || "-"} Ãƒâ€šÃ‚Â· {application.user.faculty || "-"} Ãƒâ€šÃ‚Â·{" "}
             {application.user.studyProgram || "-"}
           </p>
         </div>
@@ -923,7 +925,7 @@ function AnnouncementPanel({
                         <StatusBadge status={log.status} />
                       </div>
                       <p className="mt-1 text-p6 text-white/60">
-                        {announcementLabel(log.type)} Â· {log.recipient_email}
+                        {announcementLabel(log.type)} Ãƒâ€šÃ‚Â· {log.recipient_email}
                       </p>
                       <p className="mt-1 text-p6 text-white/45">
                         {formatDateTime(log.created_at)}

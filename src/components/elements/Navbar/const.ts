@@ -4,10 +4,6 @@ export const data = [
     href: "/",
   },
   {
-    title: "About Us",
-    href: "/#about",
-  },
-  {
     title: "Recruitment",
     href: "/event",
   },

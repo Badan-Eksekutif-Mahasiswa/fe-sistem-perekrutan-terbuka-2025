@@ -1,4 +1,5 @@
 import Calendar from "@/components/elements/Calendar";
+import type { DateRange } from "@/components/elements/Calendar/interface";
 import { Button } from "@/components/ui/button";
 import { SquarePen } from "lucide-react";
 import Image from "next/image";
@@ -23,20 +24,44 @@ const OnGoing = ({ events = [], loading }: OnGoingProps) => {
   return (
     <section className="grid grid-cols-[2fr_1fr] max-lg:grid-cols-1 gap-12 max-lg:gap-8 py-20 px-12 max-lg:px-10 max-md:px-8">
       <OngoingSection events={ongoingEvents} loading={loading} />
-      <CalendarSection />
+      <CalendarSection events={events} />
     </section>
   );
 };
 export default OnGoing;
 
-const CalendarSection = () => {
+function buildCalendarRanges(events: Event[]): DateRange[] {
+  return events
+    .flatMap((event) => {
+      const start = new Date(event.registrationOpen);
+      const end = new Date(event.registrationClose);
+
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        return [];
+      }
+
+      return [
+        {
+          start,
+          end,
+          label: event.title,
+          available: true,
+        },
+      ];
+    })
+    .sort((a, b) => a.start.getTime() - b.start.getTime());
+}
+
+const CalendarSection = ({ events }: { events: Event[] }) => {
   return (
     <div className="w-full flex flex-col gap-2">
-      <p className="text-m1 text-white text-center">Calender</p>
-      <Calendar />
-      <Button variant={"secondary"}>
-        <SquarePen />
-        Lihat Selengkapnya
+      <p className="text-m1 text-white text-center">Calendar</p>
+      <Calendar availableRanges={buildCalendarRanges(events)} />
+      <Button variant={"secondary"} asChild>
+        <Link href="/event">
+          <SquarePen />
+          Lihat Selengkapnya
+        </Link>
       </Button>
     </div>
   );

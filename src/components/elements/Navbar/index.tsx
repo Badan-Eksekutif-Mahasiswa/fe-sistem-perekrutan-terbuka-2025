@@ -143,30 +143,39 @@ export default Navbar;
 
 const Menu = () => {
   const { user, logout, isLoading } = useAuth();
+  const [hasMounted, setHasMounted] = useState(false);
 
   const handleLogout = async () => {
     await logout();
   };
 
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  const isInternalUser = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
+
   const navigationLinks =
     user?.role === "SUPERADMIN"
       ? [
-          { title: "Home", href: "/" },
+          { title: "Home", href: "/admin" },
           { title: "Kelola Event", href: "/admin/events" },
+          { title: "Kelola Akun", href: "/superadmin" },
         ]
       : user?.role === "ADMIN"
       ? [
-          { title: "Home", href: "/" },
+          { title: "Home", href: "/admin" },
           { title: "Kelola Event", href: "/admin/events" },
         ]
       : data;
 
-  const dashboardLink =
-    user?.role === "SUPERADMIN"
-      ? { href: "/superadmin", label: "Kelola Akun" }
-      : user?.role === "ADMIN"
-      ? { href: "/admin", label: "Dashboard" }
-      : { href: "/dashboard", label: "Dashboard" };
+  const dashboardLink = isInternalUser
+    ? null
+    : { href: "/dashboard", label: "Dashboard" };
+
+  if (!hasMounted) {
+    return <div className="h-8 w-48 animate-pulse rounded-md bg-white/15" />;
+  }
 
   return (
     <>
@@ -186,13 +195,15 @@ const Menu = () => {
         <div className="w-20 h-8 bg-gray-300 animate-pulse rounded-md"></div>
       ) : user ? (
         <>
-          <Link
-            href={dashboardLink.href}
-            className="flex group hover:underline items-center gap-2 text-m3 max-lg:text-m4 text-neutral-50"
-          >
-            <Diamond className="w-4 h-4 group-hover:fill-white" />
-            {dashboardLink.label}
-          </Link>
+          {dashboardLink && (
+            <Link
+              href={dashboardLink.href}
+              className="flex group hover:underline items-center gap-2 text-m3 max-lg:text-m4 text-neutral-50"
+            >
+              <Diamond className="w-4 h-4 group-hover:fill-white" />
+              {dashboardLink.label}
+            </Link>
+          )}
           <Button variant="secondary" onClick={handleLogout}>
             <LogOut />
             Logout

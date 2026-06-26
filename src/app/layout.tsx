@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
-import Navbar from "@/components/elements/Navbar";
+import ClientNavbar from "@/components/elements/Navbar/ClientNavbar";
 import Footer from "@/components/elements/Footer";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -37,7 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${jakartaSans.variable} antialiased font-jakarta`}
       >
         <AuthProvider>
-          <Navbar />
+          <ClientNavbar />
           <main>{children}</main>
           <Footer />
 
