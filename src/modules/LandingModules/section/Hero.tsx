@@ -72,9 +72,11 @@ const Hero = ({ events, loading }: HeroProps) => {
               Mulai Daftar
             </Button>
           </Link>
-          <Button variant={"secondary"}>
-            <Info />
-            Tentang SPT
+          <Button variant={"secondary"} asChild>
+            <Link href="#about">
+              <Info />
+              Tentang SPT
+            </Link>
           </Button>
         </div>
       </div>

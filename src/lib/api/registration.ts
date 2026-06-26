@@ -6,7 +6,7 @@ import {
   MyApplicationsResponse,
 } from "@/types/registration";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 export const registrationApi = {
   // GET: Fetch registration form data for an event

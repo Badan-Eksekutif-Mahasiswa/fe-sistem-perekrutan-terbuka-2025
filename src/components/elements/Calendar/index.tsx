@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { DateRange, CalendarProps } from "./interface";
+import { CalendarProps } from "./interface";
 
 const Calendar: React.FC<CalendarProps> = ({
   availableRanges = [],
@@ -14,24 +14,19 @@ const Calendar: React.FC<CalendarProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Hard-coded available ranges as example
-  const defaultAvailableRanges: DateRange[] = [
-    {
-      start: new Date(2025, 6, 6),
-      end: new Date(2025, 6, 13),
-      label: "Summer Workshop",
-      available: true,
-    },
-    {
-      start: new Date(2025, 6, 18),
-      end: new Date(2025, 6, 26),
-      label: "Summer Workshop",
-      available: true,
-    },
-  ];
+  const ranges = useMemo(
+    () => [...availableRanges].sort((a, b) => a.start.getTime() - b.start.getTime()),
+    [availableRanges]
+  );
 
-  const ranges =
-    availableRanges.length > 0 ? availableRanges : defaultAvailableRanges;
+  useEffect(() => {
+    if (ranges.length === 0) return;
+
+    const firstRange = ranges[0];
+    setCurrentDate(
+      new Date(firstRange.start.getFullYear(), firstRange.start.getMonth(), 1)
+    );
+  }, [ranges]);
 
   // Navigation functions
   const goToPreviousMonth = () => {
@@ -72,6 +67,26 @@ const Calendar: React.FC<CalendarProps> = ({
       days,
     };
   }, [currentDate]);
+
+  const visibleRanges = useMemo(() => {
+    const monthStart = new Date(monthData.year, monthData.month, 1);
+    const monthEnd = new Date(monthData.year, monthData.month + 1, 0);
+
+    return ranges.filter((range) => {
+      const rangeStart = new Date(
+        range.start.getFullYear(),
+        range.start.getMonth(),
+        range.start.getDate()
+      );
+      const rangeEnd = new Date(
+        range.end.getFullYear(),
+        range.end.getMonth(),
+        range.end.getDate()
+      );
+
+      return rangeStart <= monthEnd && rangeEnd >= monthStart;
+    });
+  }, [ranges, monthData.month, monthData.year]);
 
   // Check if a date is within any available range
   const getDateStatus = (date: Date) => {
@@ -187,7 +202,6 @@ const Calendar: React.FC<CalendarProps> = ({
             const isCurrentMonth = date.getMonth() === monthData.month;
             const status = getDateStatus(date);
             const selected = isSelected(date);
-            const isToday = new Date().toDateString() === date.toDateString();
 
             return (
               <button
@@ -200,10 +214,6 @@ const Calendar: React.FC<CalendarProps> = ({
                     // Current month styling
                     "text-white": isCurrentMonth,
                     "text-neutral-600": !isCurrentMonth,
-
-                    // Today styling
-                    "after:content-[''] after:z-0 after:absolute after:w-full after:h-full after:rounded-xl after:top-0 after:left-0 after:border-2 after:border-neutral-50":
-                      isToday && !selected,
 
                     // Selected range styling - connected without rounded corners
                     " text-white": selected,
@@ -232,16 +242,20 @@ const Calendar: React.FC<CalendarProps> = ({
 
       {/* Schedule */}
       <div className="w-full max-lg:border-l max-md:border-l-0 justify-center font-jakarta text-p6 mx-auto flex flex-col gap-2 text-neutral-100 shadow-lg px-6 py-2 pb-6">
-        {ranges.map((range, index) => (
-          <div key={index} className="flex ">
-            <p className=" bg-clip-text font-bold bg-gradient-kiwi">
-              {range.start.getDate() === range.end.getDate()
-                ? `${range.start.getDate()} `
-                : `${range.start.getDate()} - ${range.end.getDate()} `}
-            </p>
-            <p>: {range.label}</p>
-          </div>
-        ))}
+        {visibleRanges.length > 0 ? (
+          visibleRanges.map((range, index) => (
+            <div key={index} className="flex ">
+              <p className=" bg-clip-text font-bold bg-gradient-kiwi">
+                {range.start.getDate() === range.end.getDate()
+                  ? `${range.start.getDate()} `
+                  : `${range.start.getDate()} - ${range.end.getDate()} `}
+              </p>
+              <p>: {range.label}</p>
+            </div>
+          ))
+        ) : (
+          <p className="text-neutral-200/80">Tidak ada jadwal pendaftaran pada bulan ini.</p>
+        )}
       </div>
     </div>
   );

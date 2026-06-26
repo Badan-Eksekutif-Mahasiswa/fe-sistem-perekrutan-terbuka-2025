@@ -18,6 +18,7 @@ import { Event } from "@/types/event";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import Loader from "@/components/elements/Loader";
+import ActionDialog from "@/components/elements/ActionDialog";
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
@@ -48,6 +49,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const fetchEvent = useCallback(async () => {
     try {
@@ -98,15 +100,13 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   };
 
   const handleDelete = async () => {
-    if (confirm("Apakah kamu yakin ingin menghapus event ini? Semua data pendaftar dan divisi akan ikut terhapus!")) {
-      try {
-        setSaving(true);
-        await deleteEvent(id);
-        router.push("/admin/events");
-      } catch (err: unknown) {
-        setError(getErrorMessage(err, "Gagal menghapus event"));
-        setSaving(false);
-      }
+    try {
+      setSaving(true);
+      await deleteEvent(id);
+      router.push("/admin/events");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Gagal menghapus event"));
+      setSaving(false);
     }
   };
 
@@ -114,12 +114,13 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   if (!event) return <div className="p-8 text-center">Event tidak ditemukan.</div>;
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-5 pb-20 pt-8 md:px-8">
+    <>
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-5 pb-20 pt-8 md:px-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Edit Event</h1>
         </div>
-        <Button variant="destructive" onClick={handleDelete} disabled={saving}>
+        <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)} disabled={saving}>
           <Trash2 className="size-4 mr-2" /> Hapus Event
         </Button>
       </div>
@@ -127,6 +128,18 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
       {error && <div className="p-4 bg-red-100 text-red-700 rounded-lg">{error}</div>}
 
       <EventForm initialData={event} onSubmit={handleSubmit} loading={saving} />
-    </div>
+      </div>
+
+      <ActionDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Hapus event?"
+        description="Semua data pendaftar dan divisi untuk event ini akan ikut terhapus. Aksi ini tidak dapat dibatalkan."
+        confirmLabel="Hapus Event"
+        variant="destructive"
+        loading={saving}
+        onConfirm={handleDelete}
+      />
+    </>
   );
 }

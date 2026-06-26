@@ -24,6 +24,7 @@ export default function FileUpload({
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const uploadDisabled = uploading || !isSupabaseConfigured;
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -116,16 +117,23 @@ export default function FileUpload({
           </button>
         </div>
       ) : (
-        <label className="relative flex items-center justify-center w-full min-h-[100px] border-2 border-dashed border-[#475CA3] rounded-md hover:bg-blue-50/50 transition-colors cursor-pointer group">
+        <label className={`relative flex items-center justify-center w-full min-h-[100px] border-2 border-dashed border-[#475CA3] rounded-md transition-colors ${isSupabaseConfigured ? "cursor-pointer hover:bg-blue-50/50 group" : "cursor-not-allowed bg-neutral-100/80"}`}>
           <input
             type="file"
             className="hidden"
             accept={accept}
             onChange={handleUpload}
-            disabled={uploading}
+            disabled={uploadDisabled}
           />
           <div className="flex flex-col items-center justify-center gap-2 p-4 text-center">
-            {uploading ? (
+            {!isSupabaseConfigured ? (
+              <>
+                <UploadCloud className="size-8 text-neutral-400" />
+                <span className="text-sm text-neutral-600">
+                  Upload file belum dikonfigurasi. Gunakan URL gambar manual di bawah.
+                </span>
+              </>
+            ) : uploading ? (
               <>
                 <Loader2 className="size-8 text-[#475CA3] animate-spin" />
                 <span className="text-sm text-neutral-600">Mengunggah...</span>

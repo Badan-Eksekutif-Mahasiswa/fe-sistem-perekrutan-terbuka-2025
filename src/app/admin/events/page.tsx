@@ -6,6 +6,7 @@ import { AdminEvent, adminApi } from "@/lib/api/admin";
 import { updateEvent } from "@/lib/api/event";
 import Link from "next/link";
 import Loader from "@/components/elements/Loader";
+import ActionDialog from "@/components/elements/ActionDialog";
 import { useAuth } from "@/contexts/AuthContext";
 
 type EventStatusFilter = "ALL" | AdminEvent["status"];
@@ -23,8 +24,11 @@ export default function AdminEventsPage() {
   const [statusFilter, setStatusFilter] = useState<EventStatusFilter>("ALL");
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [publishTarget, setPublishTarget] = useState<AdminEvent | null>(null);
+  const [feedbackDialog, setFeedbackDialog] = useState<{ title: string; description: string } | null>(null);
   const { user } = useAuth();
   const displayName = user?.name || user?.email?.split("@")[0] || "Admin";
+  const isSuperadmin = user?.role === "SUPERADMIN";
 
   useEffect(() => {
     fetchEvents();
@@ -47,19 +51,37 @@ export default function AdminEventsPage() {
       ? events
       : events.filter((event) => event.status === statusFilter);
 
-  const handlePublish = async (event: AdminEvent) => {
-    const confirmed = window.confirm(`Publish event "${event.title}"?`);
-    if (!confirmed) return;
+  const handlePublish = (event: AdminEvent) => {
+    const activeDivisionCount =
+      event.divisions?.filter((division) => division.isActive !== false).length ??
+      event._count?.divisions ??
+      0;
+
+    if (activeDivisionCount < 1) {
+      setFeedbackDialog({
+        title: "Event belum bisa dipublish",
+        description: "Event harus memiliki minimal satu divisi aktif sebelum publish.",
+      });
+      return;
+    }
+
+    setPublishTarget(event);
+  };
+
+  const confirmPublish = async () => {
+    if (!publishTarget) return;
 
     try {
-      setActionLoadingId(event.id);
-      await updateEvent(event.id, { status: "ACTIVE" });
+      setActionLoadingId(publishTarget.id);
+      await updateEvent(publishTarget.id, { status: "ACTIVE" });
+      setPublishTarget(null);
       await fetchEvents();
     } catch (error) {
       console.error("Failed to publish event", error);
-      window.alert(
-        error instanceof Error ? error.message : "Gagal publish event"
-      );
+      setFeedbackDialog({
+        title: "Gagal publish event",
+        description: error instanceof Error ? error.message : "Gagal publish event",
+      });
     } finally {
       setActionLoadingId(null);
     }
@@ -102,6 +124,7 @@ export default function AdminEventsPage() {
           <thead>
             <tr className="bg-neutral-100 border-b border-neutral-200 text-m4 font-bold text-neutral-600">
               <th className="p-4">Nama Event</th>
+              {isSuperadmin && <th className="p-4">Pemilik</th>}
               <th className="p-4">Tipe</th>
               <th className="p-4">Status</th>
               <th className="p-4">Pendaftaran</th>
@@ -112,7 +135,10 @@ export default function AdminEventsPage() {
           <tbody>
             {filteredEvents.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-neutral-400">
+                <td
+                  colSpan={isSuperadmin ? 7 : 6}
+                  className="p-8 text-center text-neutral-400"
+                >
                   Belum ada event terdaftar
                 </td>
               </tr>
@@ -123,6 +149,18 @@ export default function AdminEventsPage() {
                   className="border-b border-neutral-100 hover:bg-neutral-50"
                 >
                   <td className="p-4 font-bold">{event.title}</td>
+                  {isSuperadmin && (
+                    <td className="p-4">
+                      <div className="flex flex-col">
+                        <span className="font-semibold">
+                          {event.owner?.name || "Tanpa nama"}
+                        </span>
+                        <span className="text-p6 text-neutral-500">
+                          {event.owner?.email || "-"}
+                        </span>
+                      </div>
+                    </td>
+                  )}
                   <td className="p-4">{event.typeOfEvent}</td>
                   <td className="p-4">
                     <span
@@ -166,6 +204,30 @@ export default function AdminEventsPage() {
           </tbody>
         </table>
       </div>
+
+      <ActionDialog
+        open={Boolean(publishTarget)}
+        onOpenChange={(open) => {
+          if (!open) setPublishTarget(null);
+        }}
+        title="Publish event?"
+        description={`Event "${publishTarget?.title || ""}" akan ditampilkan ke applicant.`}
+        confirmLabel="Publish"
+        variant="secondary"
+        loading={Boolean(actionLoadingId)}
+        onConfirm={confirmPublish}
+      />
+
+      <ActionDialog
+        open={Boolean(feedbackDialog)}
+        onOpenChange={(open) => {
+          if (!open) setFeedbackDialog(null);
+        }}
+        title={feedbackDialog?.title || "Peringatan"}
+        description={feedbackDialog?.description || ""}
+        confirmLabel="Mengerti"
+        hideCancel
+      />
     </div>
   );
 }

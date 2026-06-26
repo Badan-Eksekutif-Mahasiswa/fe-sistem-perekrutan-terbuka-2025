@@ -95,6 +95,15 @@ async function parseJson<T>(response: Response): Promise<ApiResponse<T>> {
   return response.json() as Promise<ApiResponse<T>>;
 }
 
+async function readApiError(response: Response, fallback: string) {
+  try {
+    const result = (await response.json()) as Partial<ApiResponse<unknown>>;
+    return new Error(result.message || fallback);
+  } catch {
+    return new Error(fallback);
+  }
+}
+
 /**
  * Fetch all events with their divisions
  * @returns Promise<Event[]>
@@ -207,7 +216,7 @@ export async function createEvent(data: EventPayload): Promise<Event> {
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) throw new Error("Failed to create event");
+    if (!response.ok) throw await readApiError(response, "Failed to create event");
     const result = await parseJson<EventWrappedResponse>(response);
     if (!result.success) throw new Error(result.message || "Failed to create event");
     return unwrapEvent(result.data);
@@ -229,7 +238,7 @@ export async function updateEvent(id: string, data: EventPayload): Promise<Event
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) throw new Error("Failed to update event");
+    if (!response.ok) throw await readApiError(response, "Failed to update event");
     const result = await parseJson<EventWrappedResponse>(response);
     if (!result.success) throw new Error(result.message || "Failed to update event");
     return unwrapEvent(result.data);
@@ -250,9 +259,9 @@ export async function deleteEvent(id: string): Promise<void> {
       credentials: "include",
     });
 
-    if (!response.ok) throw new Error("Failed to delete event");
+    if (!response.ok) throw await readApiError(response, "Failed to delete event");
     const result = await parseJson<null>(response);
-    if (!result.success) throw new Error(result.message || "Failed to update division");
+    if (!result.success) throw new Error(result.message || "Failed to delete event");
   } catch (error) {
     console.error("Error deleting event:", error);
     throw error;
@@ -271,9 +280,9 @@ export async function createDivision(data: DivisionPayload): Promise<Division> {
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) throw new Error("Failed to create division");
+    if (!response.ok) throw await readApiError(response, "Failed to create division");
     const result = await parseJson<DivisionWrappedResponse>(response);
-    if (!result.success) throw new Error(result.message || "Failed to delete event");
+    if (!result.success) throw new Error(result.message || "Failed to create division");
     return unwrapDivision(result.data);
   } catch (error) {
     console.error("Error creating division:", error);
@@ -293,9 +302,9 @@ export async function updateDivision(id: string, data: DivisionPayload): Promise
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) throw new Error("Failed to update division");
+    if (!response.ok) throw await readApiError(response, "Failed to update division");
     const result = await parseJson<DivisionWrappedResponse>(response);
-    if (!result.success) throw new Error(result.message || "Failed to create division");
+    if (!result.success) throw new Error(result.message || "Failed to update division");
     return unwrapDivision(result.data);
   } catch (error) {
     console.error("Error updating division:", error);
@@ -314,7 +323,7 @@ export async function deleteDivision(id: string): Promise<void> {
       credentials: "include",
     });
 
-    if (!response.ok) throw new Error("Failed to delete division");
+    if (!response.ok) throw await readApiError(response, "Failed to delete division");
     const result = await parseJson<null>(response);
     if (!result.success) throw new Error(result.message || "Failed to delete division");
   } catch (error) {
@@ -322,4 +331,3 @@ export async function deleteDivision(id: string): Promise<void> {
     throw error;
   }
 }
-
