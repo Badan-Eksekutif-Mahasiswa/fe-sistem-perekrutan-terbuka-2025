@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PersonalInfoForm } from "./components/PersonalInfoForm";
 import { QuestionItem } from "./components/QuestionItem";

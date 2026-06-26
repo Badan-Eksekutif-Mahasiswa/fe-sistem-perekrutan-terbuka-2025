@@ -18,7 +18,7 @@ export default function GedungRektoratUI({
       style={{ width, height }}
     >
       <Image
-        src="/hero.webp"
+        src="/assets/gedung-rektorat-ui.png"
         alt="Gedung Rektorat Universitas Indonesia"
         fill
         className="object-contain"

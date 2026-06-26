@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import {
   Search,
   Diamond,
@@ -36,7 +36,7 @@ import {
   CardContent,
   CardFooter,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui-legacy/card";
 
 import {
   Tooltip,
@@ -54,7 +54,7 @@ import {
   PaginationPrevious,
   PaginationLast,
   PaginationFirst,
-} from "@/components/ui/pagination";
+} from "@/components/ui-legacy/pagination";
 
 import FileInput from "@/components/elements/FileInput";
 import ContactPerson from "@/components/elements/ContactPerson";

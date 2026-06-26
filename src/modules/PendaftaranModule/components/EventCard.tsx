@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { BookmarkIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import { DiamondIcon, ArrowRightIcon } from "lucide-react";
 import type { EventType } from "../type";
 import Link from "next/link";

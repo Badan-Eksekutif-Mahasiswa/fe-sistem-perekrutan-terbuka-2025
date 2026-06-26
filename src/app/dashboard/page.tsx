@@ -1,7 +1,7 @@
 "use client";
 
 import { useRequireAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import Loader from "@/components/elements/Loader";
 import {
   User,

@@ -6,9 +6,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui-legacy/card";
 import Countdown from "@/components/elements/Countdown";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import { Event } from "@/types/event";
 
 type HeroProps = {
@@ -22,7 +22,7 @@ const Hero = ({ event }: HeroProps) => {
       className="relative w-screen overflow-x-hidden bg-primary-500 bg-linear-to-b from-secondary-300 to-secondary-100"
     >
       <div className="w-7xl max-md:hidden absolute top-16 right-20 h-[139px] z-10">
-        <Image src={"/events/sky-assets.webp"} layout="fill" alt="Sky Assets" />
+        <Image src={"/assets-legacy/sky-assets.webp"} layout="fill" alt="Sky Assets" />
       </div>
 
       <div className="absolute max-md:hidden w-xl h-[900px] bottom-0 left-60 rounded-lg pointer-events-none">
@@ -30,7 +30,7 @@ const Hero = ({ event }: HeroProps) => {
       </div>
 
       <Image
-        src={"/events/balloon-blur.webp"}
+        src={"/assets-legacy/balloon-blur.webp"}
         width={74}
         height={109}
         alt="hill"
@@ -38,7 +38,7 @@ const Hero = ({ event }: HeroProps) => {
       />
 
       <Image
-        src={"/events/balloon-blur.webp"}
+        src={"/assets-legacy/balloon-blur.webp"}
         width={74}
         height={109}
         alt="hill"
@@ -48,7 +48,7 @@ const Hero = ({ event }: HeroProps) => {
       {/* Child Hill */}
       <div className="w-full h-full max-md:bottom-[600px] absolute md:bottom-30">
         <Image
-          src={"/events/hill.webp"}
+          src={"/assets-legacy/hill.webp"}
           layout="fill"
           alt="hill"
           className="object-contain object-bottom"
@@ -58,7 +58,7 @@ const Hero = ({ event }: HeroProps) => {
       {/* Main Hill */}
       <div className="w-[105%] h-full max-md:hidden absolute bottom-0 -translate-x-1/2 left-1/2">
         <Image
-          src={"/events/hill-main.webp"}
+          src={"/assets-legacy/hill-main.webp"}
           layout="fill"
           alt="hill"
           className="object-contain object-bottom "
@@ -68,7 +68,7 @@ const Hero = ({ event }: HeroProps) => {
       <div className="absolute md:hidden bottom-0 w-full h-[560px] bg-primary-500 z-10"></div>
       <div className="w-[105%] md:hidden h-full absolute bottom-[530px] -translate-x-1/2 left-1/2 z-20">
         <Image
-          src={"/events/hill-main-mobile.webp"}
+          src={"/assets-legacy/hill-main-mobile.webp"}
           layout="fill"
           alt="hill"
           className="object-contain object-bottom"

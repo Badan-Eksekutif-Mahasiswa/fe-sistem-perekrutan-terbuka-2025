@@ -6,9 +6,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import { ArrowUpIcon, ClipboardListIcon } from "lucide-react";
-import { AirBalloon } from "../../../../public/svgs/AirBaloon";
+import { AirBalloon } from "../../../../../public/assets-legacy/svgs/AirBaloon";
 
 const FAQ = () => {
   return (
@@ -16,7 +16,7 @@ const FAQ = () => {
       <AirBalloon className="absolute max-lg:hidden size-32 left-80 top-0  animate-float" />
 
       <img
-        src="/events/bg-puzzle.webp"
+        src="/assets-legacy/bg-puzzle.webp"
         alt="bg puzzle"
         className="absolute max-md:hidden left-0 opacity-30 -z-50"
       />

@@ -2,16 +2,16 @@
 import React, { useState, useEffect } from "react";
 import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui-legacy/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { TestimonyType } from "@/modules/EventModule/type";
-import { testimoniData } from "@/modules/EventModule/const";
+} from "@/components/ui-legacy/carousel";
+import { TestimonyType } from "@/modules/legacy/EventModule/type";
+import { testimoniData } from "@/modules/legacy/EventModule/const";
 
 type CarouselElementProps = {
   testimonyData: TestimonyType[];

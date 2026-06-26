@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getEventById } from "@/lib/api/event";
-import EventModule from "@/modules/EventModule";
+import EventModule from "@/modules/legacy/EventModule";
 
 type EventPageProps = {
   params: Promise<{

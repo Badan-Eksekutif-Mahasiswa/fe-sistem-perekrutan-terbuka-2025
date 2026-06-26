@@ -1,6 +1,6 @@
 "use client";
 import { SquareIcon, SquareCheckBigIcon } from "lucide-react";
-import AnimatedPuzzle from "@/components/elements/AnimatedPuzzle";
+import AnimatedPuzzle from "@/components/elements-legacy/AnimatedPuzzle";
 import type { FilterCategoryType } from "../type";
 
 type FilterCardProps = {

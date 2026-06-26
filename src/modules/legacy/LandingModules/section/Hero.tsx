@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import { Info, UserPen } from "lucide-react";
 import OnGoing from "./OnGoing";
 import { Event } from "@/types/event";
@@ -37,7 +37,7 @@ const Hero = ({ events, loading }: HeroProps) => {
         className="absolute -translate-y-100 max-lg:-translate-y-200 inset-0 will-change-transform"
       >
         <Image
-          src="/hero.webp"
+          src="/assets-legacy/hero.webp"
           alt="Hero Background"
           fill
           className="object-cover"
@@ -59,7 +59,7 @@ const Hero = ({ events, loading }: HeroProps) => {
         <p className="text-m3">by BEM UI 2025</p>
         <div className="relative aspect-auto w-70 h-10">
           <Image
-            src="/warnai-angan.png"
+            src="/assets-legacy/warnai-angan.png"
             alt="logo"
             fill
             className="object-contain"
@@ -83,7 +83,7 @@ const Hero = ({ events, loading }: HeroProps) => {
         {/* Parallax effect */}
         <div className="absolute top-0 z-1 -translate-y-[85%] w-full aspect-[5866/3110] pointer-events-none">
           <Image
-            src="/hero-parallax.webp"
+            src="/assets-legacy/hero-parallax.webp"
             alt="Hero Background"
             fill
             className="object-contain"

@@ -10,10 +10,10 @@ import {
   CarouselNext,
   CarouselPrevious,
   type CarouselApi,
-} from "@/components/ui/carousel";
+} from "@/components/ui-legacy/carousel";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { AirBalloon } from "../../../../public/svgs/AirBaloon";
+import { AirBalloon } from "../../../../../public/assets-legacy/svgs/AirBaloon";
 
 const Dokumentasi = () => {
   const [api, setApi] = useState<CarouselApi>();
@@ -54,7 +54,7 @@ const Dokumentasi = () => {
   return (
     <section className=" flex flex-col justify-center relative items-center gap-10 px-6 md:px-20 py-10 w-full">
       <img
-        src="/events/clouds.webp"
+        src="/assets-legacy/clouds.webp"
         alt="Cloud Image"
         className="max-md:absolute top-0 -right-30"
       />

@@ -1,7 +1,7 @@
 import React from "react";
 import type { EventTimelineType, TimelineMarkerProps } from "../type";
-import { Button } from "@/components/ui/button";
-import { NodeTimeline } from "../../../../public/svgs/NodeTimeline";
+import { Button } from "@/components/ui-legacy/button";
+import { NodeTimeline } from "../../../../../public/assets-legacy/svgs/NodeTimeline";
 import { Event } from "@/types/event";
 
 type TimelineProps = {

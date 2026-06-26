@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/legacy/image";
-import { Button } from "../../ui/button";
+import { Button } from "../../ui-legacy/button";
 import { User, Diamond, LogOut } from "lucide-react";
 import Link from "next/link";
 import { data } from "./const";

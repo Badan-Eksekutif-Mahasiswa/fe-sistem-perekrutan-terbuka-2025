@@ -41,6 +41,12 @@ export type { UnionProps }               from './components/atoms/Union';
 export { default as DiamondIcon }        from './components/atoms/DiamondIcon';
 export type { DiamondIconProps }         from './components/atoms/DiamondIcon';
 
+export { default as Awan }               from './components/atoms/Awan';
+export type { AwanProps, AwanVariant }   from './components/atoms/Awan';
+
+export { default as BalonUdara }         from './components/atoms/BalonUdara';
+export type { BalonUdaraProps }          from './components/atoms/BalonUdara';
+
 // Molecules
 export { default as DSNavbar }           from './components/molecules/Navbar';
 export type { NavbarProps, NavLink }     from './components/molecules/Navbar';

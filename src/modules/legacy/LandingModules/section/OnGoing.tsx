@@ -1,5 +1,5 @@
 import Calendar from "@/components/elements/Calendar";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import { SquarePen } from "lucide-react";
 import Image from "next/image";
 import { Chip } from "@/components/ui/chip";

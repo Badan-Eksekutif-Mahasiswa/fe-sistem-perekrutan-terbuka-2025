@@ -25,10 +25,10 @@ export default function LogoBackground({
       aria-hidden="true"
     >
       <Image
-        src={variant === 'pattern' ? '/assets/puzzle.webp' : '/logo-clean.webp'}
+        src={variant === 'pattern' ? '/assets/spt-pattern.png' : '/assets/logo-spt-icon.png'}
         alt=""
         fill
-        className={cn('object-contain', variant === 'pattern' && '-rotate-[88deg]')}
+        className="object-contain"
       />
     </div>
   );

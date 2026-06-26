@@ -127,10 +127,13 @@ export default function Navbar({
           </Button>
         </div>
 
-        {/* Decorative puzzle background */}
-        <div className="absolute z-0 pointer-events-none overflow-hidden w-full h-full inset-0" aria-hidden="true">
-          <div className="absolute w-40 h-40 -left-4 -translate-y-16 opacity-30">
-            <Image src="/assets/puzzle.webp" alt="" fill className="object-cover" />
+        {/* Decorative SPT pattern background */}
+        <div className="absolute z-0 pointer-events-none overflow-hidden w-full h-full inset-0 rounded-full" aria-hidden="true">
+          <div className="absolute w-48 h-48 -left-6 -top-10 opacity-20">
+            <Image src="/assets/spt-pattern.png" alt="" fill className="object-contain" />
+          </div>
+          <div className="absolute w-48 h-48 -right-6 -top-10 opacity-20">
+            <Image src="/assets/spt-pattern.png" alt="" fill className="object-contain" />
           </div>
         </div>
       </div>
