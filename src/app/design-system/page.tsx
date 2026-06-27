@@ -136,12 +136,12 @@ function ComponentBlock({
 const colorSwatches = [
   { name: 'marun',        hex: '#5e121c',               label: '#5e121c' },
   { name: 'marun-light',  hex: '#7a1a27',               label: '#7a1a27' },
-  { name: 'primary-900',  hex: 'rgba(11,16,45,1)',       label: '#0b102d' },
-  { name: 'primary-500',  hex: '#1d2642',                label: '#1d2642' },
-  { name: 'primary-300',  hex: '#475ca3',                label: '#475ca3' },
-  { name: 'primary-100',  hex: 'rgba(156,179,211,1)',    label: '#9cb3d3' },
-  { name: 'secondary-300',hex: '#ddc446',               label: '#ddc446 — gold aksen' },
-  { name: 'secondary-200',hex: '#e5d16e',               label: '#e5d16e — gold muda' },
+  { name: 'primary-900',  hex: 'rgba(19,8,13,1)',       label: '#0b102d' },
+  { name: 'primary-500',  hex: '#241018',                label: '#241018' },
+  { name: 'primary-300',  hex: '#8f344a',                label: '#8f344a' },
+  { name: 'primary-100',  hex: 'rgba(240,184,196,1)',    label: '#9cb3d3' },
+  { name: 'secondary-300',hex: '#e05c78',               label: '#e05c78 — gold aksen' },
+  { name: 'secondary-200',hex: '#f08aa0',               label: '#f08aa0 — gold muda' },
   { name: 'pink-light',   hex: '#ffced8',                label: '#ffced8' },
   { name: 'pink-border',  hex: '#d8a6b1',                label: '#d8a6b1' },
   { name: 'neutral-100',  hex: '#ffffff',                label: '#ffffff' },
@@ -149,7 +149,7 @@ const colorSwatches = [
   { name: 'status-success',hex: '#20b80b',              label: '#20b80b' },
   { name: 'status-danger', hex: '#d01515',              label: '#d01515' },
   { name: 'status-info',   hex: '#537bff',              label: '#537bff' },
-  { name: 'status-warning',hex: '#ddc446',              label: '#ddc446' },
+  { name: 'status-warning',hex: '#e05c78',              label: '#e05c78' },
 ];
 
 const gradientSwatches = [
@@ -163,7 +163,7 @@ const gradientSwatches = [
 ];
 
 const shadowSwatches = [
-  { name: 'shadow-glass',  shadow: '0px 2px 7px 0px rgba(255,255,255,0.15)',     bg: '#1d2642' },
+  { name: 'shadow-glass',  shadow: '0px 2px 7px 0px rgba(255,255,255,0.15)',     bg: '#241018' },
   { name: 'shadow-btn',    shadow: '0px 4px 3px rgba(0,0,0,0.1), 0px 10px 7.5px rgba(0,0,0,0.1)', bg: '#ffffff' },
   { name: 'shadow-card',   shadow: '0px 10px 50px 0px rgba(0,0,0,0.3)',          bg: '#ffffff' },
   { name: 'shadow-textbox',shadow: '0px 3.857px 19.284px rgba(0,0,0,0.5)',       bg: '#ffffff' },
@@ -468,7 +468,7 @@ export default function DesignSystemPage() {
                 <span className="text-white/40 text-[10px]">filled</span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <DiamondIcon size={20} color="#ddc446" />
+                <DiamondIcon size={20} color="#e05c78" />
                 <span className="text-white/40 text-[10px]">gold</span>
               </div>
             </div>

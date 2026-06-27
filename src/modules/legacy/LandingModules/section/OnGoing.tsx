@@ -15,13 +15,7 @@ type OnGoingProps = {
 
 const OnGoing = ({ events = [], loading }: OnGoingProps) => {
   // Filter only open events
-  const ongoingEvents = events.filter((event) => {
-    const status = getEventStatus(
-      event.openRegistration,
-      event.closeRegistration
-    );
-    return status === "Dibuka";
-  });
+  const ongoingEvents = events.filter((event) => getEventStatus(event) === "Dibuka");
 
   return (
     <section className="grid grid-cols-[2fr_1fr] max-lg:grid-cols-1 gap-12 max-lg:gap-8 py-20 px-12 max-lg:px-10 max-md:px-8">
@@ -35,7 +29,7 @@ export default OnGoing;
 const CalendarSection = () => {
   return (
     <div className="w-full flex flex-col gap-2">
-      <p className="text-m1 text-white text-center">Calender</p>
+      <p className="text-m1 text-white text-center">Calendar</p>
       <Calendar />
       <Button variant={"secondary"}>
         <SquarePen />
@@ -75,8 +69,8 @@ const OngoingSection = ({
                 id={event.id}
                 logo={event.logo || "/logo-clean.webp"}
                 title={event.title}
-                startDate={new Date(event.openRegistration)}
-                endDate={new Date(event.closeRegistration)}
+                startDate={new Date(event.registrationOpen)}
+                endDate={new Date(event.registrationClose)}
                 restrictions={[
                   event.eventLevel,
                   event.typeOfEvent === "ORGANISASI"

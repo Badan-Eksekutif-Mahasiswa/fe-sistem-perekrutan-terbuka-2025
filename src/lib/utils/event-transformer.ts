@@ -5,8 +5,9 @@ import { EventType } from "@/modules/PendaftaranModule/type";
  * Get event status based on registration dates
  */
 export function getEventStatus(
-  event: Event
+  event?: Event | null
 ): "Dibuka" | "Akan Datang" | "Ditutup" {
+  if (!event) return "Ditutup";
   if (event.status === "CLOSED") return "Ditutup";
 
   const now = new Date();
@@ -75,6 +76,7 @@ export function transformEventToEventType(event: Event): EventType {
  */
 export function transformEventsToEventTypes(events: Event[]): EventType[] {
   return events
+    .filter(Boolean)
     .filter((event) => event.status !== "DRAFT" && event.status !== "ARCHIVED")
     .map(transformEventToEventType);
 }
