@@ -72,7 +72,7 @@ const OngoingSection = ({
                 startDate={new Date(event.registrationOpen)}
                 endDate={new Date(event.registrationClose)}
                 restrictions={[
-                  event.eventLevel,
+                  ...(event.eventLevel ? [event.eventLevel] : []),
                   event.typeOfEvent === "ORGANISASI"
                     ? "Organisasi"
                     : event.typeOfEvent === "KEPANITIAAN"
