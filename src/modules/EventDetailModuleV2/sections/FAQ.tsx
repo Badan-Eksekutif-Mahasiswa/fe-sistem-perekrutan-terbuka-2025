@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui-legacy/button";
 import { ArrowUpIcon, ClipboardListIcon } from "lucide-react";
-import { AirBalloon } from "../../../../../public/assets-legacy/svgs/AirBaloon";
+import { BalonUdara } from "@/design-system";
+
 import { Event } from "@/types/event";
 
 type FAQProps = {
@@ -18,13 +19,9 @@ type FAQProps = {
 const FAQ = ({ event }: FAQProps) => {
   return (
     <section className="flex relative mb-11 min-h-screen justify-center flex-col gap-4 px-12 max-lg:px-10 max-md:px-8">
-      <AirBalloon className="absolute max-lg:hidden size-32 left-80 top-0  animate-float" />
+      <BalonUdara width={128} height={160} className="absolute max-lg:hidden left-80 -top-30 animate-float" />
 
-      <img
-        src="/assets-legacy/bg-puzzle.webp"
-        alt="bg puzzle"
-        className="absolute max-md:hidden left-0 opacity-30 -z-50"
-      />
+
       <h1 className="text-center text-h1 text-neutral-50 font-jakarta">
         Frequently Asked Question
       </h1>
@@ -55,8 +52,8 @@ const FAQ = ({ event }: FAQProps) => {
 
         <div className="flex flex-col sm:flex-row justify-between w-full max-w-xl gap-3 md:gap-8">
           <Button
-            variant={"secondary"}
-            className="flex-1 flex text-primary-500"
+            className="flex-1 flex bg-gradient-card-blue backdrop-blur-md text-white border-none hover:brightness-110"
+            style={{ boxShadow: 'var(--shadow-glass)' }}
             onClick={() => {
               const heroSection = document.getElementById("hero-section");
               if (heroSection) {
@@ -70,7 +67,10 @@ const FAQ = ({ event }: FAQProps) => {
             <p className="text-m2">Scroll to Top</p>
           </Button>
 
-          <Button className="flex-1 flex" variant={"primary"}>
+          <Button
+            className="flex-1 flex bg-marun text-white hover:bg-marun-light border-none"
+            style={{ boxShadow: 'var(--shadow-glass)' }}
+          >
             <ClipboardListIcon className="size-6 mr-2" />
             <p className="text-m2">Daftar</p>
           </Button>

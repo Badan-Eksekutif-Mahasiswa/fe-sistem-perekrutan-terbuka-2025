@@ -97,13 +97,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                 }}
               >
                 <div
-                  className={`rounded-2xl px-8 pt-2 pb-6 flex flex-col items-center text-center transition-all duration-500 relative
-                  ${
-                    styles.zIndex === 10
-                      ? "bg-gradient-card shadow-2xl"
-                      : "bg-gradient-card-blur"
-                  }
-                `}
+                  className={`rounded-2xl px-8 pt-2 pb-6 flex flex-col items-center text-center transition-all duration-500 relative bg-gradient-card-blue border-none shadow-glass backdrop-blur-md`}
                 >
                   <div className="w-36 h-36 rounded-full absolute -top-24 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
                     <img
@@ -146,7 +140,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                   className="mx-10 flex h-full relative"
                 >
                   <div className="p-1 h-full">
-                    <Card className="w-full h-full flex-1 flex flex-col  ">
+                    <Card className="w-full h-full flex-1 flex flex-col bg-gradient-card-blue border-none text-white shadow-glass backdrop-blur-md">
                       <CardContent className="flex items-center justify-center p-1">
                         <div className="w-30 h-30 rounded-full absolute -top-18 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
                           <img
