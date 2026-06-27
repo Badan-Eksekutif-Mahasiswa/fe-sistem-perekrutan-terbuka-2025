@@ -1,5 +1,5 @@
-import AnimatedPuzzle from "../AnimatedPuzzle";
-import { Button } from "@/components/ui/button";
+import AnimatedPuzzle from "../../elements-legacy/AnimatedPuzzle";
+import { Button } from "@/components/ui-legacy/button";
 import { UserCircle } from "lucide-react";
 import Link from "next/link";
 

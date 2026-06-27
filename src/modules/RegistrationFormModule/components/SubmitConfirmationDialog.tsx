@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui-legacy/dialog";
+import { Button } from "@/components/ui-legacy/button";
 
 interface SubmitConfirmationDialogProps {
   open: boolean;

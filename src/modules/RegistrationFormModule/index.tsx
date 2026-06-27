@@ -1,585 +1,487 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import Loader from "@/components/elements/Loader";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Button } from "@/components/ui-legacy/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { PersonalInfoForm } from "./components/PersonalInfoForm";
+import { QuestionItem } from "./components/QuestionItem";
 import { SubmitConfirmationDialog } from "./components/SubmitConfirmationDialog";
 import { registrationApi } from "@/lib/api/registration";
-import { useRequireRole } from "@/hooks/useAuth";
+import Loader from "@/components/elements/Loader";
+import { useRouter } from "next/navigation";
+import {
+  Section,
+  PersonalInfoData,
+  QuestionSectionData,
+  AnswerSubmit,
+  SelectedDivision,
+} from "@/types/registration";
 import { useToast } from "@/hooks/useToast";
-import type { Division, Event, SubmissionRequirement } from "@/types/event";
-import type { RegistrationPayload } from "@/types/registration";
+import { Event } from "@/types/event";
 
 type RegistrationFormModuleProps = {
   event: Event;
 };
 
-type FormState = {
-  contactEmail: string;
-  whatsappNumber: string;
-  lineId: string;
-  divisionChoices: string[];
-  submissionLinks: Record<string, string>;
-};
-
-const emptyForm: FormState = {
-  contactEmail: "",
-  whatsappNumber: "",
-  lineId: "",
-  divisionChoices: [],
-  submissionLinks: {},
-};
-
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function isValidUrl(value: string) {
-  try {
-    new URL(value);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function getErrorMessage(error: unknown, fallback: string) {
-  return error instanceof Error ? error.message : fallback;
-}
-
 export default function RegistrationFormModule({
-  event: initialEvent,
+  event,
 }: RegistrationFormModuleProps) {
   const router = useRouter();
-  const { show } = useToast();
-  const { user, isLoading: authLoading, isAuthorized } = useRequireRole(
-    ["APPLICANT"],
-    "/login",
-    "/"
-  );
+  const eventId = event.id;
+  const toast = useToast();
 
-  const [event, setEvent] = useState<Event>(initialEvent);
-  const [form, setForm] = useState<FormState>(emptyForm);
-  const [hasDraft, setHasDraft] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [sections, setSections] = useState<Section[]>([]);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const maxChoices = event.maxDivisionChoices || 1;
+  // Refs for debounce timeouts
+  const lineTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const selectedDivisions = useMemo(
-    () =>
-      form.divisionChoices
-        .map((divisionId) =>
-          event.divisions.find((division) => division.id === divisionId)
-        )
-        .filter((division): division is Division => Boolean(division)),
-    [event.divisions, form.divisionChoices]
+  // Personal Info State
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfoData | null>(
+    null
+  );
+  const [lineId, setLineId] = useState("");
+  const [selectedDivisions, setSelectedDivisions] = useState<
+    SelectedDivision[]
+  >([]);
+
+  // Question Section State
+  const [questionSection, setQuestionSection] =
+    useState<QuestionSectionData | null>(null);
+  const [answers, setAnswers] = useState<Map<string, string>>(new Map());
+
+  const currentSection = sections[currentSectionIndex];
+  const isPersonalInfo = currentSection?.id === "personal-info";
+  const isLastSection = currentSectionIndex === sections.length - 1;
+
+  // Fetch sections on mount
+  useEffect(() => {
+    if (eventId) {
+      fetchSections();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId]);
+
+  // Fetch current section data when section changes
+  useEffect(() => {
+    if (currentSection) {
+      fetchSectionData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSection]);
+
+  const fetchApplicationStatus = async () => {
+    try {
+      const response = await registrationApi.getApplicationStatus(eventId);
+      if (response.success && response.data.hasApplication) {
+        setIsSubmitted(response.data.isSubmitted);
+      }
+    } catch (error) {
+      console.error("Failed to fetch application status:", error);
+    }
+  };
+
+  const fetchSections = async () => {
+    try {
+      setLoading(true);
+      await fetchApplicationStatus();
+      const sections = await registrationApi.getSections(eventId);
+      setSections(sections);
+    } catch (error) {
+      toast.show("error", "Gagal memuat daftar section");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSectionData = async () => {
+    try {
+      setLoading(true);
+      const response = await registrationApi.getRegistrationForm(
+        eventId,
+        currentSection.name
+      );
+
+      if (response.success) {
+        if (currentSection.id === "personal-info" && response.data.data) {
+          const data = response.data.data as PersonalInfoData;
+          setPersonalInfo(data);
+          setLineId(data.line || "");
+          setSelectedDivisions(data.selectedDivisions || []);
+        } else if (response.data.questions) {
+          const data = response.data as unknown as QuestionSectionData;
+          setQuestionSection(data);
+
+          // Pre-fill answers
+          const answerMap = new Map<string, string>();
+          data.questions.forEach((q) => {
+            if (q.answer) {
+              answerMap.set(q.id, q.answer);
+            }
+          });
+          setAnswers(answerMap);
+        }
+      }
+    } catch (error) {
+      toast.show("error", "Gagal memuat data section");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLineChange = useCallback(
+    (value: string) => {
+      if (isSubmitted) return;
+
+      setLineId(value);
+
+      // Clear previous timeout
+      if (lineTimeoutRef.current) {
+        clearTimeout(lineTimeoutRef.current);
+      }
+
+      // Auto-save with debounce
+      lineTimeoutRef.current = setTimeout(async () => {
+        try {
+          await registrationApi.partialUpdateRegistration({
+            eventId,
+            section: "personal-info",
+            line: value,
+          });
+        } catch (error) {
+          console.error("Auto-save failed:", error);
+        }
+      }, 1000);
+    },
+    [eventId, isSubmitted]
   );
 
-  const relevantRequirements = useMemo(() => {
-    const eventRequirements = event.requirements || [];
-    const divisionRequirements = selectedDivisions.flatMap(
-      (division) => division.requirements || []
-    );
+  const handleDivisionSelect = useCallback(
+    (divisionId: string, priority: number) => {
+      if (isSubmitted) return;
 
-    return [...eventRequirements, ...divisionRequirements].sort((a, b) => {
-      if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
-      return a.title.localeCompare(b.title);
-    });
-  }, [event.requirements, selectedDivisions]);
+      setSelectedDivisions((prev) => {
+        // Remove any division with the same priority (replacement)
+        const newDivisions = prev.filter((d) => d.priority !== priority);
 
-  useEffect(() => {
-    if (!user || !isAuthorized) return;
-
-    const loadRegistrationForm = async () => {
-      try {
-        setLoading(true);
-        const response = await registrationApi.getRegistrationForm(
-          initialEvent.id
+        const division = personalInfo?.availableDivisions.find(
+          (d) => d.id === divisionId
         );
-        const data = response.data;
-        const draft = data.draft;
 
-        setEvent(data.event);
-        setHasDraft(Boolean(draft));
-
-        if (draft) {
-          setForm({
-            contactEmail: draft.contactEmail || user.email || "",
-            whatsappNumber: draft.whatsappNumber || "",
-            lineId: draft.lineId || "",
-            divisionChoices: draft.choices
-              .slice()
-              .sort((a, b) => a.choiceOrder - b.choiceOrder)
-              .map((choice) => choice.divisionId),
-            submissionLinks: Object.fromEntries(
-              draft.submissionLinks.map((link) => [
-                link.requirementId,
-                link.submittedUrl,
-              ])
-            ),
+        if (division) {
+          newDivisions.push({
+            divisionId,
+            divisionName: division.name,
+            priority,
           });
-          return;
         }
 
-        if (data.hasRegistration) {
-          const statusResponse = await registrationApi.getApplicationStatus(
-            initialEvent.id
-          );
-          const registration = statusResponse.data.registration;
-          setIsSubmitted(Boolean(registration && registration.status !== "DRAFT"));
+        newDivisions.sort((a, b) => a.priority - b.priority);
 
-          if (registration) {
-            setForm({
-              contactEmail: registration.contactEmail || user.email || "",
-              whatsappNumber: registration.whatsappNumber || "",
-              lineId: registration.lineId || "",
-              divisionChoices: registration.choices
-                .slice()
-                .sort((a, b) => a.choiceOrder - b.choiceOrder)
-                .map((choice) => choice.divisionId),
-              submissionLinks: Object.fromEntries(
-                registration.submissionLinks.map((link) => [
-                  link.requirementId,
-                  link.submittedUrl,
-                ])
-              ),
+        // Auto-save with debounce
+        if (lineTimeoutRef.current) {
+          clearTimeout(lineTimeoutRef.current);
+        }
+
+        lineTimeoutRef.current = setTimeout(async () => {
+          try {
+            await registrationApi.partialUpdateRegistration({
+              eventId,
+              section: "personal-info",
+              divisions: newDivisions.map((d) => d.divisionId),
             });
-            return;
+          } catch (error) {
+            console.error("Auto-save divisions failed:", error);
+          }
+        }, 1000);
+
+        return newDivisions;
+      });
+    },
+    [personalInfo, eventId, isSubmitted]
+  );
+
+  const handleAnswerChange = useCallback(
+    (questionId: string, value: string) => {
+      setAnswers((prevAnswers) => {
+        // Only update if the value actually changed
+        if (prevAnswers.get(questionId) === value) {
+          return prevAnswers;
+        }
+        const newAnswers = new Map(prevAnswers);
+        newAnswers.set(questionId, value);
+        return newAnswers;
+      });
+
+      // Clear previous timeout
+      if (answerTimeoutRef.current) {
+        clearTimeout(answerTimeoutRef.current);
+      }
+
+      // Auto-save with debounce
+      answerTimeoutRef.current = setTimeout(async () => {
+        if (currentSection) {
+          try {
+            await registrationApi.partialUpdateRegistration({
+              eventId,
+              section: currentSection.name,
+              answers: [{ questionId, value }],
+            });
+          } catch (error) {
+            console.error("Auto-save failed:", error);
           }
         }
+      }, 1000);
+    },
+    [eventId, currentSection]
+  );
 
-        setForm((current) => ({
-          ...current,
-          contactEmail: user.email || "",
-        }));
-      } catch (error) {
-        show(
+  const validateCurrentSection = (): boolean => {
+    if (isPersonalInfo) {
+      if (!lineId.trim()) {
+        toast.show("error", "ID Line harus diisi");
+        return false;
+      }
+      if (
+        selectedDivisions.length === 0 ||
+        (personalInfo &&
+          selectedDivisions.length > personalInfo.maxChooseDivision)
+      ) {
+        toast.show(
           "error",
-          getErrorMessage(error, "Gagal memuat form pendaftaran")
+          `Pilih ${personalInfo?.maxChooseDivision || 1} divisi`
         );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadRegistrationForm();
-  }, [initialEvent.id, isAuthorized, show, user]);
-
-  const updateField = (field: keyof FormState, value: string) => {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
-  };
-
-  const toggleDivision = (divisionId: string) => {
-    if (isSubmitted) return;
-
-    setForm((current) => {
-      const isSelected = current.divisionChoices.includes(divisionId);
-      const divisionChoices = isSelected
-        ? current.divisionChoices.filter((id) => id !== divisionId)
-        : [...current.divisionChoices, divisionId].slice(0, maxChoices);
-
-      const relevantRequirementIds = new Set([
-        ...(event.requirements || []).map((requirement) => requirement.id),
-        ...divisionChoices.flatMap((id) => {
-          const division = event.divisions.find((item) => item.id === id);
-          return (division?.requirements || []).map(
-            (requirement) => requirement.id
-          );
-        }),
-      ]);
-
-      return {
-        ...current,
-        divisionChoices,
-        submissionLinks: Object.fromEntries(
-          Object.entries(current.submissionLinks).filter(([requirementId]) =>
-            relevantRequirementIds.has(requirementId)
-          )
-        ),
-      };
-    });
-  };
-
-  const updateSubmissionLink = (requirementId: string, value: string) => {
-    setForm((current) => ({
-      ...current,
-      submissionLinks: {
-        ...current.submissionLinks,
-        [requirementId]: value,
-      },
-    }));
-  };
-
-  const buildPayload = (): RegistrationPayload => ({
-    eventId: event.id,
-    contactEmail: form.contactEmail.trim().toLowerCase(),
-    whatsappNumber: form.whatsappNumber.trim() || null,
-    lineId: form.lineId.trim() || null,
-    divisionChoices: form.divisionChoices,
-    submissionLinks: relevantRequirements
-      .map((requirement) => ({
-        requirementId: requirement.id,
-        submittedUrl: (form.submissionLinks[requirement.id] || "").trim(),
-      }))
-      .filter((link) => link.submittedUrl !== ""),
-  });
-
-  const validateForSubmit = () => {
-    if (form.contactEmail.trim() && !isValidEmail(form.contactEmail.trim())) {
-      show("error", "Email kontak harus valid");
-      return false;
-    }
-
-    if (!form.lineId.trim()) {
-      show("error", "Line ID wajib diisi");
-      return false;
-    }
-
-    if (form.divisionChoices.length === 0) {
-      show("error", "Pilih minimal satu divisi");
-      return false;
-    }
-
-    if (form.divisionChoices.length > maxChoices) {
-      show("error", `Maksimal pilih ${maxChoices} divisi`);
-      return false;
-    }
-
-    for (const requirement of relevantRequirements) {
-      const submittedUrl = (form.submissionLinks[requirement.id] || "").trim();
-      if (requirement.isRequired && !submittedUrl) {
-        show("error", `${requirement.title} wajib diisi`);
         return false;
       }
-      if (submittedUrl && !isValidUrl(submittedUrl)) {
-        show("error", `${requirement.title} harus berupa URL valid`);
-        return false;
-      }
-    }
+      return true;
+    } else if (questionSection) {
+      const requiredQuestions = questionSection.questions.filter(
+        (q) => q.isRequired && q.type === "INPUT"
+      );
 
+      for (const question of requiredQuestions) {
+        const answer = answers.get(question.id);
+        if (!answer || answer.trim() === "") {
+          toast.show("error", `Pertanyaan "${question.question}" harus diisi`);
+          return false;
+        }
+      }
+      return true;
+    }
     return true;
   };
 
-  const handleSaveDraft = async () => {
-    if (isSubmitted) return;
-
-    try {
-      setSaving(true);
-      const payload = buildPayload();
-
-      if (hasDraft) {
-        await registrationApi.updateRegistration(payload);
-      } else {
-        await registrationApi.createRegistration(payload);
-        setHasDraft(true);
-      }
-
-      show("success", "Draft pendaftaran tersimpan");
-    } catch (error) {
-      show(
-        "error",
-        getErrorMessage(error, "Gagal menyimpan draft pendaftaran")
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleSubmitRegistration = async () => {
-    if (!validateForSubmit()) return;
+  const submitCurrentSection = async () => {
+    if (!validateCurrentSection()) return;
 
     try {
       setSubmitting(true);
-      await registrationApi.submitRegistration(buildPayload());
+
+      if (isPersonalInfo) {
+        await registrationApi.updateRegistration({
+          eventId,
+          section: "personal-info",
+          line: lineId,
+          divisions: selectedDivisions.map((d) => d.divisionId),
+        });
+      } else {
+        const answerArray: AnswerSubmit[] = Array.from(answers.entries()).map(
+          ([questionId, value]) => ({
+            questionId,
+            value,
+          })
+        );
+
+        await registrationApi.updateRegistration({
+          eventId,
+          section: currentSection.name,
+          answers: answerArray,
+        });
+      }
+    } catch (error) {
+      toast.show(
+        "error",
+        error instanceof Error ? error.message : "Gagal menyimpan data"
+      );
+      throw error;
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleNext = async () => {
+    // Jika sudah submitted, hanya navigasi tanpa save
+    if (isSubmitted) {
+      if (!isLastSection) {
+        setCurrentSectionIndex((prev) => prev + 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+
+    // Jika belum submitted, validasi dan save
+    try {
+      await submitCurrentSection();
+
+      if (!isLastSection) {
+        setCurrentSectionIndex((prev) => prev + 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        // Tampilkan dialog konfirmasi di section terakhir
+        setShowSubmitDialog(true);
+      }
+    } catch {
+      // Error already handled in submitCurrentSection
+    }
+  };
+
+  const handleFinalSubmit = async () => {
+    try {
+      setSubmitting(true);
+      // TODO: Call API endpoint POST /registration/submit
+      await registrationApi.submitRegistration(eventId);
+
       setShowSubmitDialog(false);
-      show("success", "Pendaftaran berhasil dikirim");
+      toast.show("success", "Pendaftaran berhasil diselesaikan!");
       router.push("/dashboard");
     } catch (error) {
-      show(
+      toast.show(
         "error",
-        getErrorMessage(error, "Gagal submit pendaftaran")
+        error instanceof Error ? error.message : "Gagal submit pendaftaran"
       );
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (authLoading || loading) {
+  const handlePrevious = () => {
+    if (currentSectionIndex > 0) {
+      setCurrentSectionIndex((prev) => prev - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  if (loading) {
     return <Loader />;
   }
 
-  if (!user || !isAuthorized) {
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] px-4 py-24 text-white md:px-8">
-      <main className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.95fr_1.4fr]">
-        <aside className="h-fit rounded-lg border border-white/10 bg-white/[0.06] p-5">
-          <p className="text-p5 uppercase tracking-normal text-secondary-100">
-            Form Pendaftaran
-          </p>
-          <h1 className="mt-2 text-h3">{event.title}</h1>
-          <div className="mt-5 grid gap-3 text-p5 text-white/70">
-            <InfoRow label="Nama" value={user.name} />
-            <InfoRow label="NPM" value={user.npm || "-"} />
-            <InfoRow label="Fakultas" value={user.faculty || "-"} />
-            <InfoRow label="Program Studi" value={user.studyProgram || "-"} />
-          </div>
-          <div className="mt-5 rounded-md border border-secondary-200/30 bg-secondary-300/10 px-4 py-3 text-p5 text-secondary-100">
-            Maksimal pilihan divisi: {maxChoices}
-          </div>
-          {isSubmitted && (
-            <div className="mt-3 rounded-md border border-green-200/30 bg-green-300/15 px-4 py-3 text-p5 text-green-100">
-              Pendaftaran sudah disubmit dan tidak bisa diubah.
-            </div>
-          )}
-        </aside>
+    <div className="min-h-screen relative overflow-hidden pt-20">
+      {/* Main Content */}
+      <main className="relative grid grid-cols-[1.3fr_4fr] max-lg:grid-cols-1 max-lg:gap-4 gap-10 z-10 max-w-7xl mx-auto px-4 py-8">
+        {/* Progress Tabs */}
+        <div className="bg-gradient-card-blur rounded-xl flex flex-col gap-2 h-fit p-3 overflow-x-auto">
+          {sections.map((section, index) => (
+            <Button
+              key={`${section.id}-${index}`}
+              onClick={() => setCurrentSectionIndex(index)}
+              disabled={index > currentSectionIndex}
+              variant={"secondary"}
+              className={`
+                ${
+                  index === currentSectionIndex
+                    ? ""
+                    : index < currentSectionIndex
+                    ? "bg-secondary-300/50 hover:bg-secondary-300/70"
+                    : "bg-transparent text-neutral-300 cursor-not-allowed"
+                }
+              `}
+            >
+              {section.name === "personal-info"
+                ? "Personal Info"
+                : section.name}
+            </Button>
+          ))}
+        </div>
 
-        <section className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
-          <div className="grid gap-5">
-            <section>
-              <h2 className="text-h4">Kontak Pendaftar</h2>
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <Field label="Email Kontak">
-                  <input
-                    disabled={isSubmitted}
-                    type="email"
-                    value={form.contactEmail}
-                    onChange={(event) =>
-                      updateField("contactEmail", event.target.value)
-                    }
-                    className="w-full rounded-md border border-primary-300 bg-white px-3 py-2 text-neutral-900"
-                    placeholder="nama@email.com"
-                  />
-                </Field>
-                <Field label="Nomor WhatsApp">
-                  <input
-                    disabled={isSubmitted}
-                    type="text"
-                    value={form.whatsappNumber}
-                    onChange={(event) =>
-                      updateField("whatsappNumber", event.target.value)
-                    }
-                    className="w-full rounded-md border border-primary-300 bg-white px-3 py-2 text-neutral-900"
-                    placeholder="081234567890"
-                  />
-                </Field>
-                <Field label="Line ID" required>
-                  <input
-                    disabled={isSubmitted}
-                    type="text"
-                    value={form.lineId}
-                    onChange={(event) =>
-                      updateField("lineId", event.target.value)
-                    }
-                    className="w-full rounded-md border border-primary-300 bg-white px-3 py-2 text-neutral-900"
-                    placeholder="line_id"
-                  />
-                </Field>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-h4">Pilihan Divisi</h2>
-              <div className="mt-4 grid gap-3">
-                {event.divisions.map((division, index) => {
-                  const choiceIndex = form.divisionChoices.indexOf(division.id);
-                  const isSelected = choiceIndex >= 0;
-                  const disableNewChoice =
-                    !isSelected && form.divisionChoices.length >= maxChoices;
-
-                  return (
-                    <button
-                      key={division.id}
-                      type="button"
-                      disabled={isSubmitted || disableNewChoice}
-                      onClick={() => toggleDivision(division.id)}
-                      className={`rounded-md border p-4 text-left transition ${
-                        isSelected
-                          ? "border-secondary-200 bg-secondary-300/15"
-                          : "border-white/10 bg-white/[0.04] hover:border-primary-200"
-                      } ${
-                        disableNewChoice
-                          ? "cursor-not-allowed opacity-50"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-p4 font-bold">{division.name}</p>
-                          <p className="mt-1 text-p5 text-white/65">
-                            {division.description || "Tidak ada deskripsi."}
-                          </p>
-                        </div>
-                        {isSelected && (
-                          <span className="rounded-md bg-secondary-200 px-2.5 py-1 text-p6 font-semibold text-primary-500">
-                            Pilihan {choiceIndex + 1}
-                          </span>
-                        )}
-                      </div>
-                      {index === 0 && form.divisionChoices.length === 0 && (
-                        <p className="mt-3 text-p6 text-yellow-100">
-                          Minimal pilih satu divisi.
-                        </p>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-h4">Berkas dan Link</h2>
-              <div className="mt-4 grid gap-4">
-                {relevantRequirements.length === 0 ? (
-                  <p className="rounded-md border border-white/10 bg-white/[0.04] px-4 py-3 text-p5 text-white/65">
-                    Belum ada requirement untuk event/divisi yang dipilih.
-                  </p>
-                ) : (
-                  relevantRequirements.map((requirement) => (
-                    <RequirementField
-                      key={requirement.id}
-                      requirement={requirement}
-                      value={form.submissionLinks[requirement.id] || ""}
-                      disabled={isSubmitted}
-                      onChange={(value) =>
-                        updateSubmissionLink(requirement.id, value)
-                      }
-                    />
-                  ))
-                )}
-              </div>
-            </section>
-
-            <div className="flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:justify-end">
-              {!isSubmitted && (
-                <>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    disabled={saving || submitting}
-                    onClick={handleSaveDraft}
-                  >
-                    {saving ? "Menyimpan..." : "Simpan Draft"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    disabled={saving || submitting}
-                    onClick={() => setShowSubmitDialog(true)}
-                  >
-                    Submit Pendaftaran
-                  </Button>
-                </>
-              )}
+        {/* Form Card */}
+        <div className="bg-gradient-card-blur backdrop-blur-md rounded-2xl p-8 shadow-2xl">
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-2xl font-jakarta font-bold text-neutral-100">
+                {isPersonalInfo
+                  ? "Staff Semarak Apresiasi 2026"
+                  : questionSection?.title || currentSection?.name}
+              </h2>
               {isSubmitted && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => router.push("/dashboard")}
-                >
-                  Kembali ke Dashboard
+                <Button className="cursor-default" variant={"ghost"}>
+                  Submitted
                 </Button>
               )}
             </div>
+            <p className="text-neutral-200 text-sm">
+              {isPersonalInfo
+                ? isSubmitted
+                  ? "Formulir Anda telah di-submit. Data tidak dapat diubah."
+                  : "Lengkapi form registrasi berikut"
+                : questionSection?.description}
+            </p>
           </div>
-        </section>
+
+          <div className="space-y-6">
+            {isPersonalInfo && personalInfo ? (
+              <PersonalInfoForm
+                data={{ ...personalInfo, line: lineId, selectedDivisions }}
+                onLineChange={handleLineChange}
+                onDivisionSelect={handleDivisionSelect}
+                isReadOnly={isSubmitted}
+              />
+            ) : questionSection ? (
+              questionSection.questions.map((question) => (
+                <QuestionItem
+                  key={question.id}
+                  question={question}
+                  value={answers.get(question.id) || ""}
+                  onAnswerChange={handleAnswerChange}
+                  isReadOnly={isSubmitted}
+                />
+              ))
+            ) : null}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-8 pt-6 border-t border-primary-300/30">
+            <Button
+              variant="ghost"
+              onClick={handlePrevious}
+              disabled={currentSectionIndex === 0 || submitting}
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </Button>
+
+            {/* Hide Next/Submit button only on last section when already submitted */}
+            {!(isSubmitted && isLastSection) && (
+              <Button
+                variant="secondary"
+                onClick={handleNext}
+                disabled={submitting}
+              >
+                {submitting
+                  ? "Menyimpan..."
+                  : isLastSection
+                  ? "Submit"
+                  : "Next"}
+                {!isLastSection && <ChevronRight className="w-4 h-4 ml-1" />}
+              </Button>
+            )}
+          </div>
+        </div>
       </main>
 
+      {/* Submit Confirmation Dialog */}
       <SubmitConfirmationDialog
         open={showSubmitDialog}
         onOpenChange={setShowSubmitDialog}
-        onConfirm={handleSubmitRegistration}
+        onConfirm={handleFinalSubmit}
         loading={submitting}
-      />
-    </div>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-p6 text-white/45">{label}</p>
-      <p className="text-p5 font-semibold text-white">{value}</p>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="grid gap-1">
-      <span className="text-p5 font-semibold">
-        {label}
-        {required && <span className="text-red-100"> *</span>}
-      </span>
-      {children}
-    </label>
-  );
-}
-
-function RequirementField({
-  requirement,
-  value,
-  disabled,
-  onChange,
-}: {
-  requirement: SubmissionRequirement;
-  value: string;
-  disabled: boolean;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="rounded-md border border-white/10 bg-white/[0.04] p-4">
-      <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-        <div>
-          <p className="text-p4 font-bold">
-            {requirement.title}
-            {requirement.isRequired && (
-              <span className="ml-1 text-red-100">*</span>
-            )}
-          </p>
-          <p className="mt-1 text-p5 text-white/65">
-            {requirement.instruction}
-          </p>
-        </div>
-        <span className="w-fit rounded-md border border-primary-200/30 px-2.5 py-1 text-p6 text-primary-100">
-          {requirement.scope === "EVENT" ? "Umum" : "Divisi"}
-        </span>
-      </div>
-      {requirement.templateUrl && (
-        <a
-          className="mt-3 inline-block text-p5 text-secondary-100 underline"
-          href={requirement.templateUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Buka template
-        </a>
-      )}
-      <input
-        disabled={disabled}
-        type="url"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="mt-3 w-full rounded-md border border-primary-300 bg-white px-3 py-2 text-neutral-900"
-        placeholder="https://drive.google.com/..."
       />
     </div>
   );

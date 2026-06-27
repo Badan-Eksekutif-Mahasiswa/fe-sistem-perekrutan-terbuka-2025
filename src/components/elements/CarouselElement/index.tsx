@@ -1,17 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
-import Image from "next/image";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui-legacy/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { TestimonyType } from "@/modules/EventModule/type";
+} from "@/components/ui-legacy/carousel";
+import { TestimonyType } from "@/modules/legacy/EventModule/type";
+import { testimoniData } from "@/modules/legacy/EventModule/const";
 
 type CarouselElementProps = {
   testimonyData: TestimonyType[];
@@ -42,7 +42,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
   }, [isPaused, testimonyData.length]);
 
   const getSlideStyles = (index: number) => {
-    const total = testimonyData.length;
+    const total = testimoniData.length;
 
     let distance = (index - activeIndex) % total;
 
@@ -106,15 +106,10 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                 `}
                 >
                   <div className="w-36 h-36 rounded-full absolute -top-24 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
-                    <Image
-                      src={item.profilePicture}
+                    <img
+                      src={`https://picsum.photos/seed/${index + 1}/200/200`}
                       alt="profile picture"
-                      fill
-                      className="object-cover"
-                      onError={(e) => {
-                        e.currentTarget.srcset = "";
-                        e.currentTarget.src = "/placeholder-1.webp";
-                      }}
+                      className="w-full h-full object-cover"
                     />
                   </div>
 
@@ -144,7 +139,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
           className="max-md:w-11/16 max-w-xl  mx-auto"
         >
           <CarouselContent className="items-stretch pt-20">
-            {testimonyData.map((item: TestimonyType, index) => {
+            {testimoniData.map((item: TestimonyType, index) => {
               return (
                 <CarouselItem
                   key={index}
@@ -154,15 +149,12 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                     <Card className="w-full h-full flex-1 flex flex-col  ">
                       <CardContent className="flex items-center justify-center p-1">
                         <div className="w-30 h-30 rounded-full absolute -top-18 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
-                          <Image
-                            src={item.profilePicture}
+                          <img
+                            src={`https://picsum.photos/seed/${
+                              index + 1
+                            }/200/200`}
                             alt="profile picture"
-                            fill
-                            className="object-cover"
-                            onError={(e) => {
-                              e.currentTarget.srcset = "";
-                              e.currentTarget.src = "/placeholder-1.webp";
-                            }}
+                            className="w-full h-full object-cover"
                           />
                         </div>
 

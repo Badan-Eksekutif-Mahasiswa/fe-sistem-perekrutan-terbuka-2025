@@ -1,7 +1,7 @@
 "use client";
 
-import { useRequireRole } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+import { useRequireAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui-legacy/button";
 import Loader from "@/components/elements/Loader";
 import {
   User,
@@ -20,15 +20,11 @@ import {
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { registrationApi } from "@/lib/api/registration";
-import type { MyApplication, RegistrationStatus } from "@/types/registration";
+import type { MyApplication, SelectionStage } from "@/types/registration";
 import Link from "next/link";
 
 const DashboardPage = () => {
-  const { user, isLoading, isAuthorized } = useRequireRole(
-    ["APPLICANT"],
-    "/login",
-    "/"
-  );
+  const { user, isLoading } = useRequireAuth();
   const [applications, setApplications] = useState<MyApplication[]>([]);
   const [loadingApplications, setLoadingApplications] = useState(true);
 
@@ -53,8 +49,8 @@ const DashboardPage = () => {
     return <Loader />;
   }
 
-  if (!user || !isAuthorized) {
-    return null; // useRequireRole will handle redirect
+  if (!user) {
+    return null; // useRequireAuth will handle redirect
   }
 
   const getGreeting = () => {
@@ -65,44 +61,26 @@ const DashboardPage = () => {
     return "Selamat Malam";
   };
 
-  const isSubmittedApplication = (status: RegistrationStatus) =>
-    status !== "DRAFT";
-
-  const getStatusLabel = (status: RegistrationStatus) => {
-    const statusLabels: Record<RegistrationStatus, string> = {
-      DRAFT: "Draft",
-      SUBMITTED: "Submitted",
-      UNDER_REVIEW: "Sedang Direview",
-      PASSED_ADMINISTRATION: "Lolos Berkas",
-      REJECTED_ADMINISTRATION: "Tidak Lolos Berkas",
+  const getStageLabel = (stage: SelectionStage | null) => {
+    if (!stage) return "Belum Diproses";
+    const stageLabels: Record<SelectionStage, string> = {
+      DOCUMENT_SCREENING: "Seleksi Berkas",
+      INTERVIEW: "Wawancara",
+      ACCEPTED: "Diterima",
+      REJECTED: "Ditolak",
     };
-    return statusLabels[status];
+    return stageLabels[stage];
   };
 
-  const getStatusColor = (status: RegistrationStatus) => {
-    const colors: Record<RegistrationStatus, string> = {
-      DRAFT: "bg-yellow-500/20 text-yellow-300",
-      SUBMITTED: "bg-green-500/20 text-green-300",
-      UNDER_REVIEW: "bg-primary-200/20 text-primary-100",
-      PASSED_ADMINISTRATION: "bg-green-500/20 text-green-300",
-      REJECTED_ADMINISTRATION: "bg-red-500/20 text-red-300",
+  const getStageColor = (stage: SelectionStage | null) => {
+    if (!stage) return "bg-gray-500/20 text-gray-300";
+    const colors: Record<SelectionStage, string> = {
+      DOCUMENT_SCREENING: "bg-secondary-200/20 text-secondary-100",
+      INTERVIEW: "bg-primary-200/20 text-primary-100",
+      ACCEPTED: "bg-green-500/20 text-green-300",
+      REJECTED: "bg-red-500/20 text-red-300",
     };
-    return colors[status];
-  };
-
-  const getStatusDescription = (status: RegistrationStatus) => {
-    const descriptions: Record<RegistrationStatus, string> = {
-      DRAFT: "Pendaftaranmu masih tersimpan sebagai draft dan belum dikirim.",
-      SUBMITTED:
-        "Pendaftaranmu sudah masuk. Panitia akan memeriksa berkas yang kamu kirim.",
-      UNDER_REVIEW:
-        "Berkasmu sedang direview oleh panitia. Mohon tunggu pengumuman resmi.",
-      PASSED_ADMINISTRATION:
-        "Selamat, kamu dinyatakan lolos seleksi administrasi. Periksa email untuk instruksi lanjutan dari panitia.",
-      REJECTED_ADMINISTRATION:
-        "Terima kasih sudah mendaftar. Kamu belum dapat melanjutkan ke tahap berikutnya pada kesempatan ini.",
-    };
-    return descriptions[status];
+    return colors[stage];
   };
 
   return (
@@ -151,7 +129,7 @@ const DashboardPage = () => {
               <div>
                 <p className="text-m4 text-white">Disubmit</p>
                 <p className="text-h2 text-white font-bold">
-                  {applications.filter((app) => isSubmittedApplication(app.status)).length}
+                  {applications.filter((app) => app.isSubmitted).length}
                 </p>
               </div>
               <div className="bg-secondary-200/20 p-3 rounded-full">
@@ -165,7 +143,7 @@ const DashboardPage = () => {
               <div>
                 <p className="text-m4 text-white">Draft</p>
                 <p className="text-h2 text-white font-bold">
-                  {applications.filter((app) => app.status === "DRAFT").length}
+                  {applications.filter((app) => !app.isSubmitted).length}
                 </p>
               </div>
               <div className="bg-yellow-200/20 p-3 rounded-full">
@@ -203,6 +181,18 @@ const DashboardPage = () => {
                   className="bg-gradient-card-glass backdrop-blur-sm border border-primary-300 rounded-xl p-6 hover:border-primary-200 transition-colors"
                 >
                   <div className="flex flex-col lg:flex-row gap-6">
+                    {/* Event Logo */}
+                    {app.eventLogo && (
+                      <div className="relative w-20 h-20 flex-shrink-0">
+                        <Image
+                          src={app.eventLogo}
+                          alt={app.eventTitle}
+                          fill
+                          className="object-contain rounded-lg"
+                        />
+                      </div>
+                    )}
+
                     {/* Event Info */}
                     <div className="flex-1 space-y-3">
                       <div>
@@ -210,17 +200,31 @@ const DashboardPage = () => {
                           {app.eventTitle}
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          <span
-                            className={`text-p6 px-2 py-1 rounded ${getStatusColor(
-                              app.status
-                            )}`}
-                          >
-                            {getStatusLabel(app.status)}
+                          <span className="text-p6 px-2 py-1 bg-primary-200/20 text-primary-100 rounded">
+                            {app.typeOfEvent}
                           </span>
+                          <span className="text-p6 px-2 py-1 bg-secondary-200/20 text-secondary-100 rounded">
+                            {app.eventLevel}
+                          </span>
+                          <span
+                            className={`text-p6 px-2 py-1 rounded ${
+                              app.isSubmitted
+                                ? "bg-green-500/20 text-green-300"
+                                : "bg-yellow-500/20 text-yellow-300"
+                            }`}
+                          >
+                            {app.isSubmitted ? "Submitted" : "Draft"}
+                          </span>
+                          {app.stage && (
+                            <span
+                              className={`text-p6 px-2 py-1 rounded ${getStageColor(
+                                app.stage
+                              )}`}
+                            >
+                              {getStageLabel(app.stage)}
+                            </span>
+                          )}
                         </div>
-                        <p className="mt-3 max-w-3xl rounded-md border border-white/10 bg-white/[0.06] px-4 py-3 text-p5 text-white/75">
-                          {getStatusDescription(app.status)}
-                        </p>
                       </div>
 
                       {/* Divisions */}
@@ -236,9 +240,18 @@ const DashboardPage = () => {
                                 className="text-p6 text-white flex items-center gap-2"
                               >
                                 <span className="w-5 h-5 rounded-full bg-primary-200/20 text-primary-100 flex items-center justify-center text-xs">
-                                  {div.choiceOrder}
+                                  {div.priority}
                                 </span>
                                 <span>{div.divisionName}</span>
+                                {div.stage && (
+                                  <span
+                                    className={`text-p7 px-2 py-0.5 rounded ${getStageColor(
+                                      div.stage
+                                    )}`}
+                                  >
+                                    {getStageLabel(div.stage)}
+                                  </span>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -247,7 +260,7 @@ const DashboardPage = () => {
 
                       {/* Timestamps */}
                       <div className="flex flex-wrap gap-4 text-p6 text-white/50">
-                        {isSubmittedApplication(app.status) && app.submittedAt && (
+                        {app.isSubmitted && app.submittedAt && (
                           <div className="flex items-center gap-1">
                             <CheckCircle className="w-4 h-4" />
                             <span>
@@ -258,6 +271,15 @@ const DashboardPage = () => {
                             </span>
                           </div>
                         )}
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          <span>
+                            Update terakhir:{" "}
+                            {new Date(app.lastEditedAt).toLocaleDateString(
+                              "id-ID"
+                            )}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -269,7 +291,7 @@ const DashboardPage = () => {
                           variant="ghost"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
-                          {isSubmittedApplication(app.status) ? "Lihat Detail" : "Lanjutkan"}
+                          {app.isSubmitted ? "Lihat Detail" : "Lanjutkan"}
                         </Button>
                       </Link>
                     </div>
