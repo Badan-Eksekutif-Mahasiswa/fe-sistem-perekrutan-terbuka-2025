@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Event } from "@/types/event";
 import {
   EventDocumentationItem,
@@ -71,6 +71,35 @@ function toStringValue(value: unknown): string {
 
 function getStringField(value: unknown, key: string): string {
   return toStringValue(toRecord(value)[key]);
+}
+
+type FieldErrors = Record<string, string>;
+const WHATSAPP_PATTERN = /^\+?[0-9][0-9\s-]{7,20}$/;
+
+function getWhatsappError(value: unknown) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  const digitsOnly = text.replace(/\D/g, "");
+  if (!WHATSAPP_PATTERN.test(text) || digitsOnly.length < 8 || digitsOnly.length > 15) {
+    return "Nomor WhatsApp hanya boleh berisi angka, spasi, strip, dan opsional tanda + di awal.";
+  }
+
+  return "";
+}
+
+function getInputClass(hasError: boolean) {
+  return [
+    "border bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400",
+    hasError ? "border-red-300 ring-2 ring-red-200" : "border-[#8F344A]",
+  ].join(" ");
+}
+
+function getInputClassRight(hasError: boolean) {
+  return [
+    "border bg-white p-2 rounded-r-md text-neutral-900 placeholder:text-neutral-400 flex-1 font-mono text-sm",
+    hasError ? "border-red-300 ring-2 ring-red-200" : "border-[#8F344A]",
+  ].join(" ");
 }
 
 export default function EventForm({ initialData, onSubmit, loading }: EventFormProps) {
@@ -181,9 +210,42 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const [deletedDivisions, setDeletedDivisions] = useState<string[]>([]);
   const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  const setSectionRef = (name: string) => (node: HTMLElement | null) => {
+    sectionRefs.current[name] = node;
+  };
+
+  const FieldError = ({ name }: { name: string }) => (
+    fieldErrors[name] ? <p className="text-sm font-medium text-red-100">{fieldErrors[name]}</p> : null
+  );
+
+  const clearFieldError = (...names: string[]) => {
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      names.forEach((name) => delete next[name]);
+      return next;
+    });
+  };
+
+  const focusFirstError = (errors: FieldErrors) => {
+    const firstKey = Object.keys(errors)[0];
+    if (!firstKey) return;
+
+    window.requestAnimationFrame(() => {
+      const target =
+        sectionRefs.current[firstKey] ||
+        document.querySelector<HTMLElement>(`[name="${firstKey}"]`);
+
+      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+      target?.focus?.({ preventScroll: true });
+    });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    clearFieldError(name);
     setFormData((prev) => ({
       ...prev,
       [name]: name === "eventCode" || name === "id" 
@@ -202,6 +264,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const handleTimelineChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    clearFieldError("timeline");
     const newTimeline = [...timeline];
     newTimeline[index] = { ...newTimeline[index], [name]: value };
     setTimeline(newTimeline);
@@ -211,6 +274,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const handleFaqChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    clearFieldError("faqs");
     const newFaqs = [...faqs];
     newFaqs[index] = { ...newFaqs[index], [name]: value };
     setFaqs(newFaqs);
@@ -239,6 +303,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const handleDivisionChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    clearFieldError("divisions");
     const newDivisions = [...divisions];
     newDivisions[index] = { 
       ...newDivisions[index], 
@@ -260,60 +325,83 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     setDivisions(newDivisions);
   };
 
-  const getPublishValidationError = () => {
-    if (formData.status === "DRAFT") return "";
+  const getValidationErrors = () => {
+    const errors: FieldErrors = {};
+    const isDraft = formData.status === "DRAFT";
 
-    const requiredFields: Array<[unknown, string]> = [
-      [formData.title, "Nama acara"],
-      [formData.eventCode, "URL event"],
-      [formData.description, "Deskripsi acara"],
-      [formData.organizer, "Penyelenggara"],
-      [formData.contactLineId, "ID Line kontak"],
-      [formData.registrationOpen, "Waktu buka pendaftaran"],
-      [formData.registrationClose, "Waktu tutup pendaftaran"],
-    ];
-    const missingField = requiredFields.find(([value]) => !String(value || "").trim());
-    if (missingField) return `${missingField[1]} wajib diisi sebelum event dipublish.`;
+    if (!isDraft) {
+      const requiredFields: Array<[keyof EventPayload, string]> = [
+        ["title", "Nama acara wajib diisi sebelum event dipublish."],
+        ["eventCode", "URL event wajib diisi sebelum event dipublish."],
+        ["description", "Deskripsi acara wajib diisi sebelum event dipublish."],
+        ["organizer", "Penyelenggara wajib diisi sebelum event dipublish."],
+        ["contactLineId", "ID Line kontak wajib diisi sebelum event dipublish."],
+        ["registrationOpen", "Waktu buka pendaftaran wajib diisi sebelum event dipublish."],
+        ["registrationClose", "Waktu tutup pendaftaran wajib diisi sebelum event dipublish."],
+      ];
 
-    if (!/^[a-z0-9-]+$/.test(String(formData.eventCode || ""))) {
-      return "URL event hanya boleh berisi huruf kecil, angka, dan strip (-).";
+      requiredFields.forEach(([field, message]) => {
+        if (!String(formData[field] || "").trim()) errors[String(field)] = message;
+      });
+    }
+
+    if (formData.eventCode && !/^[a-z0-9-]+$/.test(String(formData.eventCode))) {
+      errors.eventCode = "URL event hanya boleh berisi huruf kecil, angka, dan strip (-).";
     }
 
     if (Number(formData.maxDivisionChoices || 0) < 1) {
-      return "Maks pilih divisi minimal 1.";
+      errors.maxDivisionChoices = "Maks pilih divisi minimal 1.";
     }
 
-    const activeDivisions = divisions.filter((division) => division.isActive && division.name.trim() !== "");
-    if (activeDivisions.length < 1) {
-      return "Event harus memiliki minimal satu divisi aktif sebelum publish.";
-    }
-
-    const filledTimeline = timeline.filter((item) => item.title.trim() !== "" && item.startDate.trim() !== "");
-    if (filledTimeline.length < 1) {
-      return "Event aktif harus memiliki minimal satu timeline dengan tanggal dan judul.";
-    }
-
-    return "";
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError("");
-
-    const publishValidationError = getPublishValidationError();
-    if (publishValidationError) {
-      setFormError(publishValidationError);
-      toast.error(publishValidationError);
-      return;
-    }
+    const whatsappError = getWhatsappError(formData.contactWhatsapp);
+    if (whatsappError) errors.contactWhatsapp = whatsappError;
 
     if (formData.registrationOpen && formData.registrationClose) {
       if (new Date(formData.registrationClose as string) <= new Date(formData.registrationOpen as string)) {
-        const message = "Waktu Tutup Pendaftaran harus setelah Waktu Buka Pendaftaran!";
-        setFormError(message);
-        toast.error(message);
-        return;
+        errors.registrationClose = "Waktu tutup pendaftaran harus setelah waktu buka pendaftaran.";
       }
+    }
+
+    faqs.forEach((item, index) => {
+      const question = item.question.trim();
+      const answer = item.answer.trim();
+
+      if (question && !answer) {
+        errors.faqs = `Jawaban FAQ nomor ${index + 1} wajib diisi jika pertanyaannya diisi.`;
+      }
+
+      if (answer && !question) {
+        errors.faqs = `Pertanyaan FAQ nomor ${index + 1} wajib diisi jika jawabannya diisi.`;
+      }
+    });
+
+    if (!isDraft) {
+      const activeDivisions = divisions.filter((division) => division.isActive && division.name.trim() !== "");
+      if (activeDivisions.length < 1) {
+        errors.divisions = "Event harus memiliki minimal satu divisi aktif sebelum publish.";
+      }
+
+      const filledTimeline = timeline.filter((item) => item.title.trim() !== "" && item.startDate.trim() !== "");
+      if (filledTimeline.length < 1) {
+        errors.timeline = "Event aktif harus memiliki minimal satu timeline dengan tanggal dan judul.";
+      }
+    }
+
+    return errors;
+  };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+    setFieldErrors({});
+
+    const validationErrors = getValidationErrors();
+    const firstError = Object.values(validationErrors)[0];
+    if (firstError) {
+      setFieldErrors(validationErrors);
+      setFormError(firstError);
+      toast.error(firstError);
+      focusFirstError(validationErrors);
+      return;
     }
 
     // Convert local datetime to ISO string
@@ -363,7 +451,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         if (Number.isNaN(dateB)) return -1;
         return dateA - dateB;
       });
-    submitData.faqs = faqs.filter(f => f.question.trim() !== "");
+    submitData.faqs = faqs.filter(f => f.question.trim() !== "" || f.answer.trim() !== "");
     submitData.testimonials = testimonials.filter(t => t.name.trim() !== "");
     submitData.documentations = documentations.filter(d => d.title.trim() !== "" || d.imageUrl.trim() !== "");
 
@@ -387,8 +475,8 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   return (
     <form 
       onSubmit={handleSubmit} 
-      className="flex flex-col gap-4 p-6 rounded-xl border border-[#475CA3] shadow-sm text-white"
-      style={{ background: "linear-gradient(to right, #6F82C0D9, #324173D9)" }}
+      className="flex flex-col gap-4 p-6 rounded-xl border border-[#8F344A] shadow-sm text-white"
+      style={{ background: "linear-gradient(to right, #C86B7FD9, #3a1725D9)" }}
     >
       <div className="mb-2">
         <h1 className="text-3xl font-bold">{initialData?.id ? "Edit Event" : "Buat Event"}</h1>
@@ -416,26 +504,28 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           name="title"
           value={formData.title}
           onChange={handleChange}
-          className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+          className={getInputClass(!!fieldErrors.title)}
           placeholder="Contoh: Open Recruitment BEM UI 2025"
           required={formData.status !== "DRAFT"}
         />
+        <FieldError name="title" />
       </div>
 
       <div className="flex flex-col gap-1">
         <label className="font-bold text-m4">URL Event (Slug)</label>
         <div className="flex items-center">
-          <span className="bg-[#475CA3]/20 border border-[#475CA3] border-r-0 text-white/80 p-2 rounded-l-md font-mono text-sm">/events/</span>
+          <span className="bg-[#8F344A]/20 border border-[#8F344A] border-r-0 text-white/80 p-2 rounded-l-md font-mono text-sm">/events/</span>
           <input
             type="text"
             name="eventCode"
             value={formData.eventCode || ""}
             onChange={handleChange}
-            className="border border-[#475CA3] bg-white p-2 rounded-r-md text-neutral-900 placeholder:text-neutral-400 flex-1 font-mono text-sm"
+            className={getInputClassRight(!!fieldErrors.eventCode)}
             placeholder="open-recruitment"
             required={formData.status !== "DRAFT"}
           />
         </div>
+        <FieldError name="eventCode" />
         <p className="text-xs text-white/70 mt-1">*Hanya boleh menggunakan huruf kecil, angka, dan strip (-). Jika diubah, link event lama akan mati.</p>
       </div>
 
@@ -445,10 +535,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           name="description"
           value={formData.description}
           onChange={handleChange}
-          className="border border-[#475CA3] bg-white p-2 rounded-md h-32 text-neutral-900 placeholder:text-neutral-400"
+          className={`${getInputClass(!!fieldErrors.description)} h-32`}
           placeholder="Jelaskan secara singkat mengenai event ini..."
           required={formData.status !== "DRAFT"}
         />
+        <FieldError name="description" />
       </div>
 
       <div className="flex flex-col gap-1">
@@ -458,7 +549,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           name="generalTaskUrl"
           value={formData.generalTaskUrl || ""}
           onChange={handleChange}
-          className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+          className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
           placeholder="https://docs.google.com/..."
         />
       </div>
@@ -470,10 +561,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           name="organizer"
           value={formData.organizer || ""}
           onChange={handleChange}
-          className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+          className={getInputClass(!!fieldErrors.organizer)}
           placeholder="Contoh: BEM UI 2026"
           required={formData.status !== "DRAFT"}
         />
+        <FieldError name="organizer" />
       </div>
 
       <div className="flex gap-4 mt-2">
@@ -484,7 +576,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             name="contactName"
             value={formData.contactName || ""}
             onChange={handleChange}
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
             placeholder="Contoh: Budi"
           />
         </div>
@@ -495,10 +587,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             name="contactLineId"
             value={formData.contactLineId || ""}
             onChange={handleChange}
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            className={getInputClass(!!fieldErrors.contactLineId)}
             placeholder="Contoh: budi_line"
             required={formData.status !== "DRAFT"}
           />
+          <FieldError name="contactLineId" />
         </div>
       </div>
 
@@ -510,7 +603,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             name="contactEmail"
             value={formData.contactEmail || ""}
             onChange={handleChange}
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
             placeholder="Contoh: info@bem.ui.ac.id"
           />
         </div>
@@ -521,16 +614,17 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             name="contactWhatsapp"
             value={formData.contactWhatsapp || ""}
             onChange={handleChange}
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            className={getInputClass(!!fieldErrors.contactWhatsapp)}
             placeholder="Contoh: 08123456789"
           />
+          <FieldError name="contactWhatsapp" />
         </div>
       </div>
 
       <div className="flex flex-col gap-4 mt-2">
         <div className="flex flex-col gap-1">
           <label className="font-bold text-m4">Status</label>
-          <select name="status" value={formData.status || "DRAFT"} onChange={handleChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
+          <select name="status" value={formData.status || "DRAFT"} onChange={handleChange} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
             <option value="DRAFT">DRAFT</option>
             <option value="ACTIVE">ACTIVE</option>
             <option value="CLOSED">CLOSED</option>
@@ -539,7 +633,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         </div>
         <div className="flex flex-col gap-1">
           <label className="font-bold text-m4">Tipe Event</label>
-          <select name="typeOfEvent" value={formData.typeOfEvent || "ORGANISASI"} onChange={handleChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
+          <select name="typeOfEvent" value={formData.typeOfEvent || "ORGANISASI"} onChange={handleChange} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
             <option value="ORGANISASI">Organisasi</option>
             <option value="KEPANITIAAN">Kepanitiaan</option>
             <option value="UKM">UKM</option>
@@ -551,7 +645,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             name="eventLevel" 
             value={formData.eventLevel || "Universitas"} 
             onChange={handleChange} 
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
           >
             <option value="Universitas">Universitas</option>
             <option value="Fakultas">Fakultas</option>
@@ -565,10 +659,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             name="maxDivisionChoices"
             value={formData.maxDivisionChoices}
             onChange={handleChange}
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            className={getInputClass(!!fieldErrors.maxDivisionChoices)}
             min={1}
             required={formData.status !== "DRAFT"}
           />
+          <FieldError name="maxDivisionChoices" />
         </div>
       </div>
 
@@ -580,9 +675,10 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             name="registrationOpen"
             value={formData.registrationOpen as string}
             onChange={handleChange}
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            className={getInputClass(!!fieldErrors.registrationOpen)}
             required={formData.status !== "DRAFT"}
           />
+          <FieldError name="registrationOpen" />
         </div>
         <div className="flex-1 flex flex-col gap-1">
           <label className="font-bold text-m4">Waktu Tutup Pendaftaran</label>
@@ -592,9 +688,10 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             value={formData.registrationClose as string}
             onChange={handleChange}
             min={formData.registrationOpen as string}
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
+            className={getInputClass(!!fieldErrors.registrationClose)}
             required={formData.status !== "DRAFT"}
           />
+          <FieldError name="registrationClose" />
         </div>
       </div>
 
@@ -608,8 +705,9 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       </div>
 
       {/* DIVISI */}
-      <div className="flex flex-col gap-4 mt-4">
+      <div ref={setSectionRef("divisions")} tabIndex={-1} className="flex flex-col gap-4 mt-4">
         <label className="text-2xl font-bold">Divisi</label>
+        <FieldError name="divisions" />
         
         {divisions.map((item, index) => (
           <div key={index} className="flex flex-col gap-4">
@@ -627,46 +725,46 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Nama/Judul Divisi</label>
-              <input type="text" name="name" value={item.name} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Humas" required={formData.status !== "DRAFT"} />
+              <input type="text" name="name" value={item.name} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Humas" required={formData.status !== "DRAFT"} />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Kuota Maksimal</label>
-              <input type="number" name="maxQuota" value={item.maxQuota} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" min={1} />
+              <input type="number" name="maxQuota" value={item.maxQuota} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" min={1} />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Status</label>
-              <select name="isActive" value={item.isActive?.toString()} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
+              <select name="isActive" value={item.isActive?.toString()} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400">
                 <option value="true">Aktif</option>
                 <option value="false">Nonaktif</option>
               </select>
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Deskripsi Divisi</label>
-              <textarea name="description" value={item.description} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" />
+              <textarea name="description" value={item.description} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Jobdesk Divisi</label>
-              <textarea name="jobdesc" value={item.jobdesc} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" />
+              <textarea name="jobdesc" value={item.jobdesc} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Nama PIC</label>
-              <input type="text" name="picName" value={item.picName} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" />
+              <input type="text" name="picName" value={item.picName} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Kontak PIC</label>
-              <input type="text" name="picContact" value={item.picContact} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Line/WA" />
+              <input type="text" name="picContact" value={item.picContact} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Line/WA" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Link Tugas Khusus Divisi</label>
-              <input type="url" name="taskUrl" value={item.taskUrl} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="https://docs.google.com/..." />
+              <input type="url" name="taskUrl" value={item.taskUrl} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="https://docs.google.com/..." />
             </div>
             {divisions.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeDivision(index)} itemName="Divisi" />
             )}
-            <hr className="border-[#475CA3] my-2" />
+            <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addDivision} className="w-full bg-gradient-to-r from-[#AD9A37] to-[#E3DBB7] text-white border border-[#475CA3] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addDivision} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
           <Plus className="size-5 mr-2" /> Tambah Divisi
         </Button>
       </div>
@@ -677,77 +775,79 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm">Instagram</label>
-            <input type="text" name="instagram" value={socialMedia.instagram} onChange={handleSocialMediaChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="bemui_official" />
+            <input type="text" name="instagram" value={socialMedia.instagram} onChange={handleSocialMediaChange} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="bemui_official" />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm">Tiktok</label>
-            <input type="text" name="tiktok" value={socialMedia.tiktok} onChange={handleSocialMediaChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="bemui_official" />
+            <input type="text" name="tiktok" value={socialMedia.tiktok} onChange={handleSocialMediaChange} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="bemui_official" />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm">Twitter</label>
-            <input type="text" name="twitter" value={socialMedia.twitter} onChange={handleSocialMediaChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="BEMUI_Official" />
+            <input type="text" name="twitter" value={socialMedia.twitter} onChange={handleSocialMediaChange} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="BEMUI_Official" />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm">Line</label>
-            <input type="text" name="line" value={socialMedia.line} onChange={handleSocialMediaChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="bemui" />
+            <input type="text" name="line" value={socialMedia.line} onChange={handleSocialMediaChange} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="bemui" />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm">Website</label>
-            <input type="text" name="website" value={socialMedia.website} onChange={handleSocialMediaChange} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="bemui.id" />
+            <input type="text" name="website" value={socialMedia.website} onChange={handleSocialMediaChange} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="bemui.id" />
           </div>
         </div>
       </div>
 
       {/* TIMELINE */}
-      <div className="flex flex-col gap-4 mt-6">
+      <div ref={setSectionRef("timeline")} tabIndex={-1} className="flex flex-col gap-4 mt-6">
         <label className="text-2xl font-bold">Timeline</label>
+        <FieldError name="timeline" />
         
         {timeline.map((item, index) => (
           <div key={index} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm">Tanggal Mulai</label>
-              <input type="date" name="startDate" value={item.startDate} onChange={(e) => handleTimelineChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" required={formData.status !== "DRAFT"} />
+              <input type="date" name="startDate" value={item.startDate} onChange={(e) => handleTimelineChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" required={formData.status !== "DRAFT"} />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Judul Timeline</label>
-              <input type="text" name="title" value={item.title} onChange={(e) => handleTimelineChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Pembukaan Pendaftaran" required={formData.status !== "DRAFT"} />
+              <input type="text" name="title" value={item.title} onChange={(e) => handleTimelineChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Pembukaan Pendaftaran" required={formData.status !== "DRAFT"} />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Deskripsi Timeline</label>
-              <textarea name="description" value={item.description} onChange={(e) => handleTimelineChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" />
+              <textarea name="description" value={item.description} onChange={(e) => handleTimelineChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Opsional" />
             </div>
             {timeline.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeTimeline(index)} itemName="Timeline" />
             )}
-            <hr className="border-[#475CA3] my-2" />
+            <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addTimeline} className="w-full bg-gradient-to-r from-[#AD9A37] to-[#E3DBB7] text-white border border-[#475CA3] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addTimeline} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
           <Plus className="size-5 mr-2" /> Tambah Timeline
         </Button>
       </div>
 
       {/* FAQ */}
-      <div className="flex flex-col gap-4 mt-6">
+      <div ref={setSectionRef("faqs")} tabIndex={-1} className="flex flex-col gap-4 mt-6">
         <label className="text-2xl font-bold">FAQ</label>
+        <FieldError name="faqs" />
         
         {faqs.map((item, index) => (
           <div key={index} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm">Pertanyaan</label>
-              <input type="text" name="question" value={item.question} onChange={(e) => handleFaqChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Apakah event ini berbayar?" />
+              <input type="text" name="question" value={item.question} onChange={(e) => handleFaqChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Apakah event ini berbayar?" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Jawaban</label>
-              <textarea name="answer" value={item.answer} onChange={(e) => handleFaqChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Tidak, event ini 100% gratis." />
+              <textarea name="answer" value={item.answer} onChange={(e) => handleFaqChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Tidak, event ini 100% gratis." />
             </div>
             {faqs.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeFaq(index)} itemName="FAQ" />
             )}
-            <hr className="border-[#475CA3] my-2" />
+            <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addFaq} className="w-full bg-gradient-to-r from-[#AD9A37] to-[#E3DBB7] text-white border border-[#475CA3] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addFaq} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
           <Plus className="size-5 mr-2" /> Tambah FAQ
         </Button>
       </div>
@@ -772,23 +872,23 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Nama Responden</label>
-              <input type="text" name="name" value={item.name} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Budi" />
+              <input type="text" name="name" value={item.name} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Budi" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Peran/Posisi</label>
-              <input type="text" name="role" value={item.role} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Peserta 2024" />
+              <input type="text" name="role" value={item.role} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Peserta 2024" />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Pesan Testimoni</label>
-              <textarea name="message" value={item.message} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Pesan singkat..." />
+              <textarea name="message" value={item.message} onChange={(e) => handleTestimonialChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md h-20 text-neutral-900 placeholder:text-neutral-400" placeholder="Pesan singkat..." />
             </div>
             {testimonials.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeTestimonial(index)} itemName="Testimoni" />
             )}
-            <hr className="border-[#475CA3] my-2" />
+            <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addTestimonial} className="w-full bg-gradient-to-r from-[#AD9A37] to-[#E3DBB7] text-white border border-[#475CA3] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addTestimonial} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
           <Plus className="size-5 mr-2" /> Tambah Testimoni
         </Button>
       </div>
@@ -813,23 +913,23 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm">Judul Foto/Kegiatan</label>
-              <input type="text" name="title" value={item.title} onChange={(e) => handleDocumentationChange(index, e)} className="border border-[#475CA3] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Pembukaan Acara" />
+              <input type="text" name="title" value={item.title} onChange={(e) => handleDocumentationChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Pembukaan Acara" />
             </div>
             {documentations.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeDocumentation(index)} itemName="Dokumentasi" />
             )}
-            <hr className="border-[#475CA3] my-2" />
+            <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addDocumentation} className="w-full bg-gradient-to-r from-[#AD9A37] to-[#E3DBB7] text-white border border-[#475CA3] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addDocumentation} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
           <Plus className="size-5 mr-2" /> Tambah Dokumentasi
         </Button>
       </div>
 
 
 
-      <div className="mt-8 flex justify-end gap-2 border-t pt-8 border-[#475CA3]">
-        <Button variant="secondary" type="submit" disabled={loading} className="w-full text-lg font-bold py-3 bg-gradient-to-r from-[#AD9A37] to-[#E3DBB7] text-white shadow-md border-none">
+      <div className="mt-8 flex justify-end gap-2 border-t pt-8 border-[#8F344A]">
+        <Button variant="secondary" type="submit" disabled={loading} className="w-full text-lg font-bold py-3 bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white shadow-md border-none">
           {loading ? "Menyimpan..." : "Simpan Event"}
         </Button>
       </div>

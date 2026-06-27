@@ -3,7 +3,6 @@ import Image from "next/legacy/image";
 import { Button } from "../../ui-legacy/button";
 import { User, Diamond, LogOut } from "lucide-react";
 import Link from "next/link";
-import { data } from "./const";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
@@ -153,26 +152,35 @@ const Menu = () => {
     setHasMounted(true);
   }, []);
 
-  const isInternalUser = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
+  const navigationLinks = (() => {
+    if (user?.role === "SUPERADMIN") {
+      return [
+        { title: "Home", href: "/admin" },
+        { title: "Kelola Event", href: "/admin/events" },
+        { title: "Kelola Akun", href: "/superadmin" },
+      ];
+    }
 
-  const navigationLinks =
-    user?.role === "SUPERADMIN"
-      ? [
-          { title: "Home", href: "/admin" },
-          { title: "Kelola Event", href: "/admin/events" },
-          { title: "Kelola Akun", href: "/superadmin" },
-        ]
-      : user?.role === "ADMIN"
-      ? [
-          { title: "Home", href: "/admin" },
-          { title: "Kelola Event", href: "/admin/events" },
-        ]
-      : data;
+    if (user?.role === "ADMIN") {
+      return [
+        { title: "Home", href: "/admin" },
+        { title: "Kelola Event", href: "/admin/events" },
+      ];
+    }
 
-  const dashboardLink = isInternalUser
-    ? null
-    : { href: "/dashboard", label: "Dashboard" };
+    if (user?.role === "APPLICANT") {
+      return [
+        { title: "Home", href: "/" },
+        { title: "Recruitment", href: "/event" },
+        { title: "Dashboard", href: "/dashboard" },
+      ];
+    }
 
+    return [
+      { title: "Home", href: "/" },
+      { title: "Recruitment", href: "/event" },
+    ];
+  })();
   if (!hasMounted) {
     return <div className="h-8 w-48 animate-pulse rounded-md bg-white/15" />;
   }
@@ -194,21 +202,10 @@ const Menu = () => {
       {isLoading ? (
         <div className="w-20 h-8 bg-gray-300 animate-pulse rounded-md"></div>
       ) : user ? (
-        <>
-          {dashboardLink && (
-            <Link
-              href={dashboardLink.href}
-              className="flex group hover:underline items-center gap-2 text-m3 max-lg:text-m4 text-neutral-50"
-            >
-              <Diamond className="w-4 h-4 group-hover:fill-white" />
-              {dashboardLink.label}
-            </Link>
-          )}
-          <Button variant="secondary" onClick={handleLogout}>
-            <LogOut />
-            Logout
-          </Button>
-        </>
+        <Button variant="secondary" onClick={handleLogout}>
+          <LogOut />
+          Logout
+        </Button>
       ) : (
         <Link href="/login">
           <Button variant="secondary">

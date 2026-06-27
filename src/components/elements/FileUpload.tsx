@@ -89,7 +89,7 @@ export default function FileUpload({
       {label && <label className="text-sm font-bold">{label}</label>}
 
       {value ? (
-        <div className="relative border border-[#475CA3] bg-neutral-50 rounded-md p-2 flex items-center justify-between">
+        <div className="relative border border-[#8F344A] bg-neutral-50 rounded-md p-2 flex items-center justify-between">
           <div className="flex items-center gap-3 overflow-hidden">
             {value.match(/\.(jpeg|jpg|gif|png|webp)/i) || accept.includes("image") ? (
               <div className="relative w-12 h-12 rounded-md overflow-hidden shrink-0 border border-neutral-200">
@@ -102,7 +102,7 @@ export default function FileUpload({
               href={value}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-[#475CA3] truncate hover:underline"
+              className="text-sm text-[#8F344A] truncate hover:underline"
             >
               {value}
             </a>
@@ -117,7 +117,7 @@ export default function FileUpload({
           </button>
         </div>
       ) : (
-        <label className={`relative flex items-center justify-center w-full min-h-[100px] border-2 border-dashed border-[#475CA3] rounded-md transition-colors ${isSupabaseConfigured ? "cursor-pointer hover:bg-blue-50/50 group" : "cursor-not-allowed bg-neutral-100/80"}`}>
+        <label className={`relative flex items-center justify-center w-full min-h-[100px] border-2 border-dashed border-[#8F344A] rounded-md transition-colors ${isSupabaseConfigured ? "cursor-pointer hover:bg-blue-50/50 group" : "cursor-not-allowed bg-neutral-100/80"}`}>
           <input
             type="file"
             className="hidden"
@@ -135,14 +135,14 @@ export default function FileUpload({
               </>
             ) : uploading ? (
               <>
-                <Loader2 className="size-8 text-[#475CA3] animate-spin" />
+                <Loader2 className="size-8 text-[#8F344A] animate-spin" />
                 <span className="text-sm text-neutral-600">Mengunggah...</span>
               </>
             ) : (
               <>
-                <UploadCloud className="size-8 text-neutral-400 group-hover:text-[#475CA3] transition-colors" />
+                <UploadCloud className="size-8 text-neutral-400 group-hover:text-[#8F344A] transition-colors" />
                 <span className="text-sm text-neutral-500">
-                  <span className="font-semibold text-[#475CA3]">Klik untuk {placeholder}</span> atau seret file ke sini
+                  <span className="font-semibold text-[#8F344A]">Klik untuk {placeholder}</span> atau seret file ke sini
                 </span>
               </>
             )}
@@ -155,7 +155,7 @@ export default function FileUpload({
           <input
             type="url"
             placeholder="Atau masukkan URL gambar..."
-            className="border border-[#475CA3] bg-white p-2 rounded-md text-sm text-neutral-900 placeholder:text-neutral-400 flex-1"
+            className="border border-[#8F344A] bg-white p-2 rounded-md text-sm text-neutral-900 placeholder:text-neutral-400 flex-1"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();

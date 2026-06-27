@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
-import { DSNavbar, DSFooter } from "@/design-system";
+import Navbar from "@/components/elements-legacy/Navbar/ClientNavbar";
+import Footer from "@/components/elements-legacy/Footer";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
@@ -36,9 +37,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${jakartaSans.variable} antialiased font-jakarta`}
       >
         <AuthProvider>
-          <DSNavbar />
+          <Navbar />
           <main>{children}</main>
-          <DSFooter />
+          <Footer />
 
           <Toaster position="top-right" expand={false} />
         </AuthProvider>
