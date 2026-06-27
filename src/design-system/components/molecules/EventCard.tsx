@@ -13,7 +13,7 @@ export interface EventData {
   startedAt?: Date;
   closedAt?: Date;
   description?: string;
-  divisions?: string[];
+  divisions?: readonly string[];
   logoSrc?: string;
 }
 

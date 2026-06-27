@@ -1,5 +1,7 @@
 "use client";
 
+import { Event } from "@/types/event";
+
 import { useState, useEffect } from "react";
 import Autoplay from "embla-carousel-autoplay";
 
@@ -13,8 +15,7 @@ import {
 } from "@/components/ui-legacy/carousel";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { AirBalloon } from "../../../../../public/assets-legacy/svgs/AirBaloon";
-import { Event } from "@/types/event";
+import { Awan, BalonUdara } from "@/design-system";
 
 type DokumentasiProps = {
   event: Event;
@@ -58,13 +59,12 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
 
   return (
     <section className=" flex flex-col justify-center relative items-center gap-10 px-6 md:px-20 py-10 w-full">
-      <img
-        src="/assets-legacy/clouds.webp"
-        alt="Cloud Image"
-        className="max-md:absolute top-0 -right-30"
+      <Awan
+        variant="1"
+        className="max-md:absolute max-md:-top-24 max-md:-right-36 top-0 -right-10 z-10 opacity-70"
       />
-      <AirBalloon className="absolute max-lg:hidden size-32 left-80 top-0  animate-float" />
-      <AirBalloon className="absolute max-sm:hidden size-32 right-80 top-0 animate-float" />
+      <BalonUdara width={128} height={160} className="absolute max-lg:hidden left-80 top-0 animate-float" />
+      <BalonUdara width={128} height={160} className="absolute max-sm:hidden right-80 top-0 animate-float" />
 
       <h1 className="text-4xl font-bold text-white text-center">Dokumentasi</h1>
 
@@ -89,13 +89,21 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
                 key={index}
                 className="pl-4 basis-full md:basis-1/2 lg:basis-1/3"
               >
-                <div className="w-full aspect-[16/10] relative border-[8px] md:border-[10px] border-primary-300 rounded-3xl overflow-hidden bg-white/5">
-                  <Image
-                    src={`/placeholder-1.webp`}
-                    alt={`Dokumentasi ${index + 1}`}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                  />
+                <div 
+                  className="w-full aspect-[16/10] relative rounded-3xl overflow-hidden backdrop-blur-md p-2"
+                  style={{ 
+                    backgroundImage: 'linear-gradient(90deg, rgba(156,179,211,0.5) 0%, rgba(72,85,115,0.5) 49.24%, rgba(11,16,45,0.5) 99.94%)',
+                    boxShadow: 'var(--shadow-glass)'
+                  }}
+                >
+                  <div className="w-full h-full relative rounded-2xl overflow-hidden">
+                    <Image
+                      src={`/placeholder-1.webp`}
+                      alt={`Dokumentasi ${index + 1}`}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
                 </div>
               </CarouselItem>
             ))}

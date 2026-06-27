@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import GlassCard from '../atoms/GlassCard';
 import Checkbox from '../atoms/Checkbox';
-import Image from 'next/image';
+import LogoBackground from '../atoms/LogoBackground';
 
 export interface FilterSection {
   title: string;
@@ -34,7 +34,7 @@ export default function FilterCard({
   };
 
   return (
-    <GlassCard padding="none" className={cn('relative overflow-hidden w-full lg:max-w-sm', className)}>
+    <GlassCard padding="none" className={cn('relative overflow-hidden w-full h-fit lg:max-w-sm text-left', className)}>
       <div className="relative z-10 p-6 flex flex-col gap-5">
         <h2 className="text-h2 text-white font-jakarta font-extrabold max-md:text-center">
           Filter
@@ -61,12 +61,12 @@ export default function FilterCard({
       </div>
       {/* Decorative background */}
       <div className="absolute z-0 inset-0 flex justify-end -bottom-96 -right-30 lg:-right-60 items-center pointer-events-none" aria-hidden="true">
-        <Image
-          src="/assets/puzzle.webp"
-          alt=""
+        <LogoBackground
+          variant='pattern'
           width={800}
           height={700}
-          className="opacity-40 rotate-45"
+          className="-rotate-70 translate-x-10 scale-130"
+          opacity={0.3}
         />
       </div>
     </GlassCard>
