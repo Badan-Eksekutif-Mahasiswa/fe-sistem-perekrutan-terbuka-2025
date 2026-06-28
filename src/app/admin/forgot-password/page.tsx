@@ -11,20 +11,18 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [resetUrl, setResetUrl] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
     setMessage(null);
-    setResetUrl(null);
 
     const response = await authApi.forgotPassword(email);
     setMessage(
       response.message ||
         "Jika email terdaftar, instruksi reset password akan dikirim."
     );
-    setResetUrl(response.data?.resetUrl || null);
+
     setIsSubmitting(false);
   };
 
@@ -60,14 +58,7 @@ export default function ForgotPasswordPage() {
           </div>
         )}
 
-        {resetUrl && (
-          <div className="mt-3 rounded-md border border-yellow-200/30 bg-yellow-300/15 px-4 py-3 text-p5 text-yellow-100">
-            Link development:{" "}
-            <Link className="break-all underline" href={resetUrl}>
-              {resetUrl}
-            </Link>
-          </div>
-        )}
+
 
         <Button
           className="mt-5 w-full"
