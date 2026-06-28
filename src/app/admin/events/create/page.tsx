@@ -11,6 +11,7 @@ import {
   EventPayload,
 } from "@/lib/api/event";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
@@ -36,12 +37,10 @@ function toDivisionPayload(eventId: string, division: EventFormDivision): Divisi
 export default function CreateEventPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSubmit = async (data: EventPayload, divisionsData?: EventFormDivision[]) => {
     try {
       setLoading(true);
-      setError("");
       
       const requestedStatus = data.status || "DRAFT";
       const shouldFinalizeStatus = requestedStatus !== "DRAFT";
@@ -63,7 +62,8 @@ export default function CreateEventPage() {
       
       router.push("/admin/events");
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "Gagal membuat event"));
+      const message = getErrorMessage(err, "Gagal membuat event");
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -74,8 +74,6 @@ export default function CreateEventPage() {
       <div>
         <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Buat Event Baru</h1>
       </div>
-
-      {error && <div className="p-4 bg-red-100 text-red-700 rounded-lg">{error}</div>}
 
       <EventForm onSubmit={handleSubmit} loading={loading} />
     </div>

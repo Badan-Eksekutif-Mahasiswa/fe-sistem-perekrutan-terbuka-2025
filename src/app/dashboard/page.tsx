@@ -1,6 +1,8 @@
 "use client";
 
 import { useRequireAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui-legacy/button";
 import Loader from "@/components/elements/Loader";
 import {
@@ -18,8 +20,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { registrationApi } from "@/lib/api/registration";
+import { authApi } from "@/lib/auth";
 import type { MyApplication, RegistrationStatus } from "@/types/registration";
 import Link from "next/link";
 
@@ -57,8 +60,12 @@ const getEventTypeLabel = (type: MyApplication["typeOfEvent"]) => {
 
 const DashboardPage = () => {
   const { user, isLoading } = useRequireAuth();
+  const { checkAuth } = useAuth();
+  const toast = useToast();
   const [applications, setApplications] = useState<MyApplication[]>([]);
   const [loadingApplications, setLoadingApplications] = useState(true);
+  const [profileEmail, setProfileEmail] = useState("");
+  const [isSavingProfileEmail, setIsSavingProfileEmail] = useState(false);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -77,6 +84,10 @@ const DashboardPage = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    setProfileEmail(user?.email ?? "");
+  }, [user?.email]);
+
   if (isLoading) {
     return <Loader />;
   }
@@ -91,6 +102,40 @@ const DashboardPage = () => {
     if (hour < 15) return "Selamat Siang";
     if (hour < 18) return "Selamat Sore";
     return "Selamat Malam";
+  };
+
+  const needsProfileEmail = user.role === "APPLICANT" && !user.email;
+
+  const handleSaveProfileEmail = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const email = profileEmail.trim();
+    if (!email) {
+      toast.show("error", "Email aktif wajib diisi");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.show("error", "Format email tidak valid");
+      return;
+    }
+
+    setIsSavingProfileEmail(true);
+    try {
+      const response = await authApi.updateProfile({ email });
+      if (!response.success) {
+        toast.show("error", response.message || "Gagal menyimpan email");
+        return;
+      }
+
+      await checkAuth();
+      toast.show("success", "Email aktif berhasil disimpan");
+    } catch (error) {
+      console.error("Failed to save profile email:", error);
+      toast.show("error", "Gagal menyimpan email");
+    } finally {
+      setIsSavingProfileEmail(false);
+    }
   };
 
   return (
@@ -160,6 +205,51 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
+
+        {needsProfileEmail && (
+          <div className="mb-8 bg-gradient-card-glass backdrop-blur-sm border border-primary-300 rounded-xl p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="bg-primary-200/20 p-2 rounded-lg">
+                    <Mail className="w-5 h-5 text-primary-100" />
+                  </div>
+                  <h2 className="text-h3 text-white">Lengkapi Email Aktif</h2>
+                </div>
+                <p className="text-m4 text-white/80">
+                  Email ini akan dipakai sebagai default saat kamu mendaftar dan
+                  sebagai tujuan informasi hasil seleksi. Kamu tetap bisa
+                  mengganti emailnya di setiap form pendaftaran.
+                </p>
+              </div>
+
+              <form
+                onSubmit={handleSaveProfileEmail}
+                className="w-full lg:max-w-md space-y-3"
+              >
+                <label className="block text-m4 text-white" htmlFor="profile-email">
+                  Email aktif
+                </label>
+                <input
+                  id="profile-email"
+                  type="email"
+                  value={profileEmail}
+                  onChange={(event) => setProfileEmail(event.target.value)}
+                  placeholder="nama@email.com"
+                  className="w-full rounded-xl border border-primary-300 bg-white px-4 py-3 text-primary-400 outline-none focus:border-primary-100"
+                  disabled={isSavingProfileEmail}
+                />
+                <Button
+                  type="submit"
+                  className="w-full bg-primary-200 hover:bg-primary-300 text-white"
+                  disabled={isSavingProfileEmail}
+                >
+                  {isSavingProfileEmail ? "Menyimpan..." : "Simpan Email"}
+                </Button>
+              </form>
+            </div>
+          </div>
+        )}
 
         <div className="mb-8">
           <h2 className="text-h3 text-white mb-4">Pendaftaran saya</h2>
@@ -314,7 +404,9 @@ const DashboardPage = () => {
                     <Mail className="w-5 h-5 text-white mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-m4 text-white">Email</p>
-                      <p className="text-m3 text-white font-medium">{user.email}</p>
+                      <p className="text-m3 text-white font-medium">
+                        {user.email || "Belum diisi"}
+                      </p>
                     </div>
                   </div>
 

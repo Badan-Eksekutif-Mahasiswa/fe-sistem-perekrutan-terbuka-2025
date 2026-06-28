@@ -77,6 +77,7 @@ export interface RegistrationFormResponse {
     applicant: {
       id: string;
       name: string;
+      email: string | null;
       npm: string | null;
       faculty: string | null;
       studyProgram: string | null;

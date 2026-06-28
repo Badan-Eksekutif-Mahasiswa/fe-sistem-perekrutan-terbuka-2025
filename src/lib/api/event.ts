@@ -208,126 +208,96 @@ export async function getAdminEventById(id: string): Promise<Event> {
  * Create a new event
  */
 export async function createEvent(data: EventPayload): Promise<Event> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/admin/events`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(data),
-    });
+  const response = await fetch(`${API_BASE_URL}/admin/events`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
 
-    if (!response.ok) throw await readApiError(response, "Failed to create event");
-    const result = await parseJson<EventWrappedResponse>(response);
-    if (!result.success) throw new Error(result.message || "Failed to create event");
-    return unwrapEvent(result.data);
-  } catch (error) {
-    console.error("Error creating event:", error);
-    throw error;
-  }
+  if (!response.ok) throw await readApiError(response, "Failed to create event");
+  const result = await parseJson<EventWrappedResponse>(response);
+  if (!result.success) throw new Error(result.message || "Failed to create event");
+  return unwrapEvent(result.data);
 }
 
 /**
  * Update an event
  */
 export async function updateEvent(id: string, data: EventPayload): Promise<Event> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/admin/events/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(data),
-    });
+  const response = await fetch(`${API_BASE_URL}/admin/events/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
 
-    if (!response.ok) throw await readApiError(response, "Failed to update event");
-    const result = await parseJson<EventWrappedResponse>(response);
-    if (!result.success) throw new Error(result.message || "Failed to update event");
-    return unwrapEvent(result.data);
-  } catch (error) {
-    console.error("Error updating event:", error);
-    throw error;
-  }
+  if (!response.ok) throw await readApiError(response, "Failed to update event");
+  const result = await parseJson<EventWrappedResponse>(response);
+  if (!result.success) throw new Error(result.message || "Failed to update event");
+  return unwrapEvent(result.data);
 }
 
 /**
  * Delete an event
  */
 export async function deleteEvent(id: string): Promise<void> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/admin/events/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
+  const response = await fetch(`${API_BASE_URL}/admin/events/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
 
-    if (!response.ok) throw await readApiError(response, "Failed to delete event");
-    const result = await parseJson<null>(response);
-    if (!result.success) throw new Error(result.message || "Failed to delete event");
-  } catch (error) {
-    console.error("Error deleting event:", error);
-    throw error;
-  }
+  if (!response.ok) throw await readApiError(response, "Failed to delete event");
+  const result = await parseJson<null>(response);
+  if (!result.success) throw new Error(result.message || "Failed to delete event");
 }
 
 /**
  * Create a new division
  */
 export async function createDivision(data: DivisionPayload): Promise<Division> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/admin/events/${data.eventId}/divisions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(data),
-    });
+  const response = await fetch(`${API_BASE_URL}/admin/events/${data.eventId}/divisions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
 
-    if (!response.ok) throw await readApiError(response, "Failed to create division");
-    const result = await parseJson<DivisionWrappedResponse>(response);
-    if (!result.success) throw new Error(result.message || "Failed to create division");
-    return unwrapDivision(result.data);
-  } catch (error) {
-    console.error("Error creating division:", error);
-    throw error;
-  }
+  if (!response.ok) throw await readApiError(response, "Failed to create division");
+  const result = await parseJson<DivisionWrappedResponse>(response);
+  if (!result.success) throw new Error(result.message || "Failed to create division");
+  return unwrapDivision(result.data);
 }
 
 /**
  * Update a division
  */
 export async function updateDivision(id: string, data: DivisionPayload): Promise<Division> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/admin/divisions/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(data),
-    });
+  const response = await fetch(`${API_BASE_URL}/admin/divisions/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
 
-    if (!response.ok) throw await readApiError(response, "Failed to update division");
-    const result = await parseJson<DivisionWrappedResponse>(response);
-    if (!result.success) throw new Error(result.message || "Failed to update division");
-    return unwrapDivision(result.data);
-  } catch (error) {
-    console.error("Error updating division:", error);
-    throw error;
-  }
+  if (!response.ok) throw await readApiError(response, "Failed to update division");
+  const result = await parseJson<DivisionWrappedResponse>(response);
+  if (!result.success) throw new Error(result.message || "Failed to update division");
+  return unwrapDivision(result.data);
 }
 
 /**
  * Delete a division
  */
 export async function deleteDivision(id: string): Promise<void> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/admin/divisions/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
+  const response = await fetch(`${API_BASE_URL}/admin/divisions/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
 
-    if (!response.ok) throw await readApiError(response, "Failed to delete division");
-    const result = await parseJson<null>(response);
-    if (!result.success) throw new Error(result.message || "Failed to delete division");
-  } catch (error) {
-    console.error("Error deleting division:", error);
-    throw error;
-  }
+  if (!response.ok) throw await readApiError(response, "Failed to delete division");
+  const result = await parseJson<null>(response);
+  if (!result.success) throw new Error(result.message || "Failed to delete division");
 }

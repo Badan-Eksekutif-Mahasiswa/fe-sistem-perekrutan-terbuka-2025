@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import Loader from "@/components/elements/Loader";
 import ActionDialog from "@/components/elements/ActionDialog";
+import { toast } from "sonner";
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
@@ -48,16 +49,19 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const fetchEvent = useCallback(async () => {
     try {
       setLoading(true);
+      setLoadError("");
       const data = await getAdminEventById(id);
       setEvent(data);
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "Gagal memuat event"));
+      const message = getErrorMessage(err, "Gagal memuat event");
+      setLoadError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -70,7 +74,6 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   const handleSubmit = async (data: EventPayload, divisionsData?: EventFormDivision[], deletedDivisionIds?: string[]) => {
     try {
       setSaving(true);
-      setError("");
       
       await updateEvent(id, data);
       
@@ -93,7 +96,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
       
       router.push("/admin/events");
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "Gagal menyimpan event"));
+      toast.error(getErrorMessage(err, "Gagal menyimpan event"));
     } finally {
       setSaving(false);
     }
@@ -105,13 +108,24 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
       await deleteEvent(id);
       router.push("/admin/events");
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "Gagal menghapus event"));
+      toast.error(getErrorMessage(err, "Gagal menghapus event"));
       setSaving(false);
     }
   };
 
   if (loading) return <Loader />;
-  if (!event) return <div className="p-8 text-center">Event tidak ditemukan.</div>;
+  if (!event) {
+    return (
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-5 pb-20 pt-8 md:px-8">
+        <div>
+          <h1 className="text-h2 font-bold font-jakarta text-[#1D2642]">Edit Event</h1>
+        </div>
+        <div className="rounded-lg bg-red-100 p-4 text-red-700">
+          {loadError || "Event tidak ditemukan."}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -124,8 +138,6 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
           <Trash2 className="size-4 mr-2" /> Hapus Event
         </Button>
       </div>
-
-      {error && <div className="p-4 bg-red-100 text-red-700 rounded-lg">{error}</div>}
 
       <EventForm initialData={event} onSubmit={handleSubmit} loading={saving} />
       </div>
