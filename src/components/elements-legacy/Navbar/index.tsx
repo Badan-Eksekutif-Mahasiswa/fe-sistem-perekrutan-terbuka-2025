@@ -82,46 +82,48 @@ const Navbar = () => {
             : "-translate-y-full opacity-0"
         }`}
       >
-        <div className="relative w-full rounded-full flex justify-between items-center px-6 py-2 backdrop-blur-md overflow-hidden" style={{ backgroundImage: 'var(--gradient-navbar)', boxShadow: '0 4px 24px 0 rgba(0,0,0,0.18)', backdropFilter: 'blur(12px) saturate(180%)' }}>
-          <div className="relative z-1 aspect-[188/64] w-36">
-            <Image
-              src="/logo/logo-text.png"
-              alt="Logo"
-              layout="fill"
-              objectFit="contain"
-            />
+        <div className="relative">
+          <div className="relative w-full rounded-full flex justify-between items-center px-6 py-2 backdrop-blur-md overflow-hidden" style={{ backgroundImage: 'var(--gradient-navbar)', boxShadow: '0 4px 24px 0 rgba(0,0,0,0.18)', backdropFilter: 'blur(12px) saturate(180%)' }}>
+            <div className="relative z-1 aspect-188/64 w-36">
+              <Image
+                src="/logo/logo-text.png"
+                alt="Logo"
+                layout="fill"
+                objectFit="contain"
+              />
+            </div>
+
+            {/* Desktop Menu */}
+            <div className="flex z-1 gap-6 max-lg:hidden">
+              <Menu />
+            </div>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={toggleMenu}
+              className="lg:hidden z-1 p-2 rounded-lg hover:bg-primary-300/20 transition-colors duration-200"
+              aria-label="Toggle menu"
+            >
+              <HamburgerIcon isOpen={isMenuOpen} />
+            </button>
+
+            {/* Background pattern */}
+            <div className="absolute z-0 pointer-events-none w-full h-full inset-0" aria-hidden="true">
+              <div className="absolute w-48 h-48 -left-6 -top-10 opacity-20">
+                <Image src="/assets/spt-pattern.png" alt="" layout="fill" objectFit="contain" />
+              </div>
+              <div className="absolute w-48 h-48 -right-6 -top-10 opacity-20">
+                <Image src="/assets/spt-pattern.png" alt="" layout="fill" objectFit="contain" />
+              </div>
+            </div>
           </div>
 
-          {/* Desktop Menu */}
-          <div className="flex z-1 gap-6 max-lg:hidden">
-            <Menu />
-          </div>
-
-          {/* Mobile Hamburger Button */}
-          <button
-            onClick={toggleMenu}
-            className="lg:hidden z-1 p-2 rounded-lg hover:bg-primary-300/20 transition-colors duration-200"
-            aria-label="Toggle menu"
-          >
-            <HamburgerIcon isOpen={isMenuOpen} />
-          </button>
-
-          {/* Mobile Menu Dropdown */}
+          {/* Mobile Menu Dropdown — outside overflow-hidden pill */}
           <div
-            className={`absolute py-3 px-4 min-w-40 flex flex-col gap-4 rounded-xl border border-primary-300 backdrop-blur-sm -bottom-2 translate-y-full right-6 max-lg:right-4 lg:hidden z-50 transition-all duration-300 ease-in-out transform origin-top-right ${isMenuOpen ? "opacity-100 scale-100 translate-y-full" : "opacity-0 scale-95 translate-y-[calc(100%-8px)] pointer-events-none"}`}
+            className={`absolute top-full right-4 mt-2 py-3 px-4 min-w-40 flex flex-col gap-4 rounded-xl border border-primary-300 backdrop-blur-sm lg:hidden z-50 transition-all duration-300 ease-in-out transform origin-top-right ${isMenuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
             style={{ backgroundImage: 'var(--gradient-navbar)' }}
           >
             <Menu />
-          </div>
-
-          {/* Background pattern */}
-          <div className="absolute z-0 pointer-events-none w-full h-full inset-0" aria-hidden="true">
-            <div className="absolute w-48 h-48 -left-6 -top-10 opacity-20">
-              <Image src="/assets/spt-pattern.png" alt="" layout="fill" objectFit="contain" />
-            </div>
-            <div className="absolute w-48 h-48 -right-6 -top-10 opacity-20">
-              <Image src="/assets/spt-pattern.png" alt="" layout="fill" objectFit="contain" />
-            </div>
           </div>
         </div>
       </nav>

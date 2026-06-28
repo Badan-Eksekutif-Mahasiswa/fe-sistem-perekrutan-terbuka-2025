@@ -37,20 +37,20 @@ const Hero = ({ events, loading }: HeroProps) => {
       {/* Background image full cover with parallax */}
       <div
         ref={parallaxRef}
-        className="absolute inset-0 will-change-transform"
+        className="absolute inset-x-0 top-0 h-screen will-change-transform"
       >
         <Image
           src="/assets/hero.png"
           alt="Hero Background"
           fill
-          className="object-contain object-top"
+          className="object-cover object-top xl:object-contain"
           priority
         />
       </div>
 
       {/* Awan decorative overlays */}
-      <Awan variant="1" className="absolute top-6 left-0 z-10 opacity-90" width={480} height={140} />
-      <Awan variant="2" className="absolute top-16 right-0 z-10 opacity-80" width={320} height={160} />
+      <Awan variant="1" className="absolute top-6 left-0 z-10 opacity-90 max-xl:hidden" width={480} height={140} />
+      <Awan variant="2" className="absolute top-16 right-0 z-10 opacity-80 max-xl:hidden" width={320} height={160} />
 
       {/* Konten di atas gambar */}
       <div className="relative text-white min-h-screen flex flex-col gap-4 text-center justify-center items-center z-20">
@@ -64,11 +64,11 @@ const Hero = ({ events, loading }: HeroProps) => {
         </div>
         <h1
           className="text-4xl font-bold"
-          style={{ textShadow: "0 0 55px #324173, 0 0 30px #324173, 0 0 80px rgba(50,65,115,0.6)" }}
+          style={{ textShadow: "0 0 55px #324173, 0 0 30px #324173, 0 0 12px #1d2642" }}
         >
           Sistem Perekrutan Terbuka
         </h1>
-        <p className="text-m3">by BEM UI 2026</p>
+        <p className="text-m3" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8), 0 -1px 4px rgba(0,0,0,0.8)" }}>by BEM UI 2026</p>
         <div className="relative aspect-auto w-70 h-10">
           <Image
             src="/assets/terus-terang.png"
