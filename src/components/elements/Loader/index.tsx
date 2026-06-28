@@ -5,7 +5,7 @@ const Loader = () => {
     <div className="min-h-screen animate-pulse text-neutral-50 font-jakarta flex flex-col justify-center items-center">
       <div className="relative w-48 h-48">
         <Image
-          src="/logo-clean.webp"
+          src="/assets/logo-bem-ui.png"
           alt="loader"
           layout="fill"
           className="object-contain"

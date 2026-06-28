@@ -1,10 +1,9 @@
 import Calendar from "@/components/elements/Calendar";
-import { Button } from "@/components/ui-legacy/button";
-import { SquarePen } from "lucide-react";
+import Button from "@/design-system/components/atoms/Button";
 import Image from "next/image";
+import BalonUdara from "@/design-system/components/atoms/BalonUdara";
 import { Chip } from "@/components/ui/chip";
-import { ArrowRight, Diamond } from "lucide-react";
-import Link from "next/link";
+import { Diamond } from "lucide-react";
 import { Event } from "@/types/event";
 import { getEventStatus } from "@/lib/utils/event-transformer";
 
@@ -18,7 +17,10 @@ const OnGoing = ({ events = [], loading }: OnGoingProps) => {
   const ongoingEvents = events.filter((event) => getEventStatus(event) === "Dibuka");
 
   return (
-    <section className="grid grid-cols-[2fr_1fr] max-lg:grid-cols-1 gap-12 max-lg:gap-8 py-20 px-12 max-lg:px-10 max-md:px-8">
+    <section className="relative overflow-hidden grid grid-cols-[2fr_1fr] max-lg:grid-cols-1 gap-12 max-lg:gap-8 py-20 px-12 max-lg:px-10 max-md:px-8">
+      <BalonUdara width={85} height={125} className="absolute -z-10 -left-4 top-6 opacity-70 max-lg:hidden animate-float [animation-delay:1s]" />
+      {/* Balon kanan — 118×174px per Figma */}
+      <BalonUdara width={118} height={174} className="absolute -z-10 -right-4 bottom-10 opacity-70 max-lg:hidden animate-float [animation-delay:2.5s]" />
       <OngoingSection events={ongoingEvents} loading={loading} />
       <CalendarSection />
     </section>
@@ -31,9 +33,8 @@ const CalendarSection = () => {
     <div className="w-full flex flex-col gap-2">
       <p className="text-m1 text-white text-center">Calendar</p>
       <Calendar />
-      <Button variant={"secondary"}>
-        <SquarePen />
-        Lihat Selengkapnya
+      <Button variant="external">
+        Cek Pendaftaran Lainnya
       </Button>
     </div>
   );
@@ -67,7 +68,7 @@ const OngoingSection = ({
               <EventCard
                 key={event.id}
                 id={event.id}
-                logo={event.logo || "/logo-clean.webp"}
+                logo={event.logo ?? "/logo-clean.webp"}
                 title={event.title}
                 startDate={new Date(event.registrationOpen)}
                 endDate={new Date(event.registrationClose)}
@@ -139,11 +140,9 @@ const EventCard = ({
           </div>
         </div>
       </div>
-      <Link className="max-lg:w-full" href={`/${id}`}>
-        <Button className="max-lg:w-full" variant={"secondary"}>
-          Lihat Selengkapnya <ArrowRight />
-        </Button>
-      </Link>
+      <Button className="max-lg:w-full" variant="external" href={`/${id}`}>
+        Selengkapnya
+      </Button>
     </div>
   );
 };

@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import AnimatedSptPattern from '../atoms/AnimatedSptPattern';
 import { Youtube, Linkedin, Globe, Twitter, MessageCircle, Instagram } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -37,16 +38,13 @@ export default function Footer({
   return (
     <footer
       className={cn(
-        'relative text-white overflow-hidden font-jakarta border-t border-primary-300/40',
+        'relative text-white overflow-hidden font-jakarta border-t border-primary-300/40 backdrop-blur-sm',
         'flex justify-between items-center max-md:flex-col gap-6 px-20 py-8 max-lg:px-10 max-md:px-6',
         className,
       )}
       style={{ backgroundImage: 'var(--gradient-footer-ds)' }}
     >
-      {/* ── Left: identity + social ─────────────────────────────── */}
       <div className="flex z-10 flex-col gap-3 max-md:items-center">
-
-        {/* BEM UI logo + #TerusTerang tagline */}
         <div className="flex items-center gap-3">
           <div className="relative w-12 h-12 shrink-0">
             <Image
@@ -102,18 +100,11 @@ export default function Footer({
       </div>
 
       {/* ── Decorative SPT pattern ───────────────────────────────── */}
-      <div
-        className="absolute z-0 right-0 top-0 h-full w-72 pointer-events-none"
-        aria-hidden="true"
-        style={{ opacity: 0.12 }}
-      >
-        <Image
-          src="/assets/spt-pattern.png"
-          alt=""
-          fill
-          className="object-cover object-right"
-        />
-      </div>
+      <AnimatedSptPattern
+        width={260}
+        height={260}
+        className="absolute z-0 right-8 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none"
+      />
     </footer>
   );
 }

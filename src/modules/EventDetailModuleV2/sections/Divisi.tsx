@@ -72,7 +72,7 @@ const Divisi = ({ event }: DivisiProps) => {
                   : "bg-gradient-card-blue text-white/70 backdrop-blur-sm"
               }`}
               style={{
-                backgroundImage: indexDivisi === i ? 'linear-gradient(to bottom, #9CB3D3, #485573)' : undefined,
+                backgroundImage: indexDivisi === i ? 'var(--gradient-card-blue)' : undefined,
                 boxShadow: 'var(--shadow-glass)'
               }}
               onClick={() => setIndexDivisi(i)}
