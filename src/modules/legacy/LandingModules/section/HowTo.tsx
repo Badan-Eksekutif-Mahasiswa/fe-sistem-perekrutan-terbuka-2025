@@ -1,4 +1,5 @@
 import Image from "next/image";
+import BalonUdara from "@/design-system/components/atoms/BalonUdara";
 
 const step = [
   {
@@ -29,13 +30,15 @@ const step = [
 
 const HowTo = () => {
   return (
-    <section className="flex flex-col text-white font-jakarta gap-4 px-12 max-lg:px-10 max-md:px-8">
+    <section className="relative overflow-hidden flex flex-col text-white font-jakarta gap-4 px-12 max-lg:px-10 max-md:px-8">
+      <BalonUdara width={130} height={192} className="absolute -z-10 -left-6 top-1/3 opacity-70 max-lg:hidden animate-float [animation-delay:2s]" />
       <h1 className="text-center text-h1">Cara menggunakan SPT</h1>
       <div className="flex gap-6 flex-wrap justify-center">
         {step.map((item, index) => (
           <div
             key={index}
-            className="flex flex-col rounded-2xl bg-gradient-card items-center gap-2 p-6 h-60 w-50"
+            className="flex flex-col rounded-2xl bg-gradient-card-blue backdrop-blur-sm items-center gap-2 p-6 h-60 w-50"
+            style={{ boxShadow: 'var(--shadow-glass)' }}
           >
             <div className="relative aspect-video w-full">
               <Image

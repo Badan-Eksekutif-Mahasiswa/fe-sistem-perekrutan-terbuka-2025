@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui-legacy/button";
+import Button from "@/design-system/components/atoms/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { CalendarProps } from "./interface";
@@ -169,17 +169,13 @@ const Calendar: React.FC<CalendarProps> = ({
   const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   return (
-    <div className="w-full rounded-xl border border-primary-300 bg-linear-to-r from-primary-200 to-primary-400 flex flex-col gap-2 max-lg:grid max-lg:grid-cols-[2fr_1fr] max-md:flex">
+    <div className="w-full rounded-xl bg-gradient-card-blue flex flex-col gap-2 max-lg:grid max-lg:grid-cols-[2fr_1fr] max-md:flex" style={{ boxShadow: 'var(--shadow-glass)' }}>
       <div className={cn("w-full mx-auto px-6 pt-6", className)}>
         {/* Header */}
         <div className="rounded-xl w-full cursor-default text-m3 text-white font-jakarta py-2 px-2 flex items-center justify-between">
-          <Button className="w-9 h-9 p-2" onClick={goToPreviousMonth}>
-            <ChevronLeft />
-          </Button>
+          <Button variant="secondary" onClick={goToPreviousMonth} className="w-9 h-9 p-0" leftIcon={<ChevronLeft size={16} />} />
           {monthNames[monthData.month]} {monthData.year}
-          <Button className="w-9 h-9 p-2" onClick={goToNextMonth}>
-            <ChevronRight />
-          </Button>
+          <Button variant="secondary" onClick={goToNextMonth} className="w-9 h-9 p-0" leftIcon={<ChevronRight size={16} />} />
         </div>
 
         {/* Day headers */}

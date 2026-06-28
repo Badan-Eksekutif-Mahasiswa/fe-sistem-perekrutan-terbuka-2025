@@ -1,17 +1,20 @@
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { socmed } from "./const";
 import Link from "next/link";
-import AnimatedPuzzle from "../AnimatedPuzzle";
+import AnimatedSptPattern from "@/design-system/components/atoms/AnimatedSptPattern";
 
 const Footer = () => {
   return (
-    <footer className="relative text-neutral-50 overflow-hidden font-jakarta bg-gradient-card flex border-t border-primary-300 justify-between items-center max-md:flex-col gap-5 px-20 py-8 max-lg:px-10 max-md:px-5">
+    <footer
+      className="relative text-neutral-50 overflow-hidden font-jakarta flex border-t border-primary-300/40 backdrop-blur-sm justify-between items-center max-md:flex-col gap-5 px-20 py-8 max-lg:px-10 max-md:px-5"
+      style={{ backgroundImage: 'var(--gradient-footer-ds)' }}
+    >
       <div className="flex z-10 flex-col gap-4 max-md:items-center">
         <div className="relative z-10 w-[390px] max-md:w-[250px] h-[100px] max-md:h-[70px]">
           <Image
-            src="/logo-warnai.webp"
+            src="/assets/logo-terus-terang.png"
             alt="Logo Footer"
-            layout="fill"
+            fill
             className="object-contain"
           />
         </div>
@@ -38,18 +41,16 @@ const Footer = () => {
         <Image
           src="/mulmed-logo.webp"
           alt="Logo Footer"
-          layout="fill"
-          objectFit="contain"
+          fill
+          className="object-contain"
         />
       </div>
 
-      <div className="absolute z-0 right-60 max-md:-bottom-20 max-md:right-0">
-        <AnimatedPuzzle
-          width={300}
-          height={600}
-          className="opacity-40 rotate-45"
-        />
-      </div>
+      <AnimatedSptPattern
+        width={260}
+        height={260}
+        className="absolute z-0 right-8 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none"
+      />
     </footer>
   );
 };

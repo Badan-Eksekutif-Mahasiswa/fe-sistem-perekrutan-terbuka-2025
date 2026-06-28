@@ -20,9 +20,9 @@ const TimelineCard = ({ date, title, desc }: EventTimelineType) => {
     <div className="flex flex-col text-white gap-4 items-center text-center">
       <Button 
         className="text-white text-m2 max-md:text-m3 px-6 py-2 rounded-full border-none" 
-        style={{ 
-          backgroundImage: 'linear-gradient(90deg, #0B102D -25%, #9CB3D3 50%, #0B102D 125%)', 
-          boxShadow: 'var(--shadow-glass)' 
+        style={{
+          backgroundImage: 'var(--gradient-btn-1)',
+          boxShadow: 'var(--shadow-glass)'
         }}
       >
         {formattedDate}

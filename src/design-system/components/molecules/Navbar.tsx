@@ -133,7 +133,7 @@ export default function Navbar({
       aria-label="Main navigation"
     >
       <div
-        className="relative w-full border border-primary-300 rounded-full flex justify-between items-center px-6 py-2 overflow-hidden"
+        className="relative w-full border border-primary-300 rounded-full flex justify-between items-center px-6 py-2 overflow-hidden backdrop-blur-sm"
         style={{ backgroundImage: 'var(--gradient-navbar)' }}
       >
         <Link href="/" aria-label="SPT BEM UI - Beranda">
@@ -173,7 +173,7 @@ export default function Navbar({
         <div
           id="mobile-menu"
           className={cn(
-            'absolute top-full right-4 mt-2 min-w-44 flex flex-col gap-3 rounded-xl border border-primary-300 p-4 lg:hidden z-50',
+            'absolute top-full right-4 mt-2 min-w-44 flex flex-col gap-3 rounded-xl border border-primary-300 p-4 lg:hidden z-50 backdrop-blur-sm',
             'transition-all duration-300 origin-top-right',
             isMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none',
           )}

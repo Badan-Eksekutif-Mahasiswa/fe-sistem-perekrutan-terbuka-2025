@@ -473,10 +473,10 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit} 
-      className="flex flex-col gap-4 p-6 rounded-xl border border-[#8F344A] shadow-sm text-white"
-      style={{ background: "linear-gradient(to right, #C86B7FD9, #3a1725D9)" }}
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4 p-6 rounded-xl border border-primary-300 backdrop-blur-md text-white"
+      style={{ backgroundImage: 'var(--gradient-card-blue)', boxShadow: 'var(--shadow-glass)' }}
     >
       <div className="mb-2">
         <h1 className="text-3xl font-bold">{initialData?.id ? "Edit Event" : "Buat Event"}</h1>
@@ -764,7 +764,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addDivision} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addDivision} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md hover:from-[#8F1A35] hover:to-[#F0A8B8] active:from-[#6B0D26] active:to-[#E08098] transition-all duration-200">
           <Plus className="size-5 mr-2" /> Tambah Divisi
         </Button>
       </div>
@@ -821,7 +821,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addTimeline} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addTimeline} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md hover:from-[#8F1A35] hover:to-[#F0A8B8] active:from-[#6B0D26] active:to-[#E08098] transition-all duration-200">
           <Plus className="size-5 mr-2" /> Tambah Timeline
         </Button>
       </div>
@@ -847,7 +847,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addFaq} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addFaq} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md hover:from-[#8F1A35] hover:to-[#F0A8B8] active:from-[#6B0D26] active:to-[#E08098] transition-all duration-200">
           <Plus className="size-5 mr-2" /> Tambah FAQ
         </Button>
       </div>
@@ -888,7 +888,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addTestimonial} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addTestimonial} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md hover:from-[#8F1A35] hover:to-[#F0A8B8] active:from-[#6B0D26] active:to-[#E08098] transition-all duration-200">
           <Plus className="size-5 mr-2" /> Tambah Testimoni
         </Button>
       </div>
@@ -921,7 +921,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             <hr className="border-[#8F344A] my-2" />
           </div>
         ))}
-        <Button variant="secondary" type="button" onClick={addDocumentation} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md">
+        <Button variant="secondary" type="button" onClick={addDocumentation} className="w-full bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white border border-[#8F344A] font-semibold shadow-md hover:from-[#8F1A35] hover:to-[#F0A8B8] active:from-[#6B0D26] active:to-[#E08098] transition-all duration-200">
           <Plus className="size-5 mr-2" /> Tambah Dokumentasi
         </Button>
       </div>
@@ -929,7 +929,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
 
       <div className="mt-8 flex justify-end gap-2 border-t pt-8 border-[#8F344A]">
-        <Button variant="secondary" type="submit" disabled={loading} className="w-full text-lg font-bold py-3 bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white shadow-md border-none">
+        <Button variant="secondary" type="submit" disabled={loading} className="w-full text-lg font-bold py-3 bg-gradient-to-r from-[#B83A5A] to-[#FFD8DF] text-white shadow-md border-none hover:from-[#8F1A35] hover:to-[#F0A8B8] active:from-[#6B0D26] active:to-[#E08098] transition-all duration-200">
           {loading ? "Menyimpan..." : "Simpan Event"}
         </Button>
       </div>

@@ -7,7 +7,9 @@ import HowTo from "./section/HowTo";
 import ContactPerson from "@/components/elements/ContactPerson";
 import Partners from "./section/Partners";
 import FrequentlyAsked from "./section/Frequently";
+import MeetTheTeam from "./section/MeetTheTeam";
 import { Event } from "@/types/event";
+import { BalonUdara, LogoBackground } from "@/design-system";
 
 const LandingModules = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -36,15 +38,17 @@ const LandingModules = () => {
   }, []);
 
   return (
-    <main className="flex flex-col gap-20 pb-20">
+    <main className="relative flex flex-col gap-20 pb-20 overflow-x-hidden">
       <Hero events={events} loading={loading} />
       <About />
       <HowTo />
       <Partners />
-      <div className="px-12 max-lg:px-10 max-md:px-8">
+      <div className="relative overflow-hidden px-12 max-lg:px-10 max-md:px-8">
+        {/* Balon kanan — 118×174px per Figma */}
+        <BalonUdara width={118} height={174} className="absolute -z-10 -right-4 top-1/3 opacity-70 max-lg:hidden animate-float [animation-delay:0.5s]" />
         <ContactPerson
-          title="Contact Person"
-          description="Reach out to our team for questions or support."
+          title="Tertarik Buka Pendaftaran di SPT?"
+          description="Hubungi contact person kami"
           contact={[
             {
               name: "Fauzan",
@@ -59,7 +63,19 @@ const LandingModules = () => {
           ]}
         />
       </div>
+      <MeetTheTeam />
       <FrequentlyAsked />
+      <div className="absolute z-[-1] inset-0 flex justify-end items-end pointer-events-none overflow-hidden" aria-hidden="true">
+        <div className="translate-x-[20%] translate-y-[20%]">
+          <LogoBackground
+            variant="pattern"
+            width={1200}
+            height={1200}
+            className="-rotate-75 translate-x-75 scale-140"
+            opacity={0.15}
+          />
+        </div>
+      </div>
     </main>
   );
 };

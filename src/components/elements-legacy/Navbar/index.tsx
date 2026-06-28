@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/legacy/image";
-import { Button } from "../../ui-legacy/button";
+import Button from "@/design-system/components/atoms/Button";
 import { User, Diamond, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -82,10 +82,10 @@ const Navbar = () => {
             : "-translate-y-full opacity-0"
         }`}
       >
-        <div className="relative w-full border border-primary-300 bg-gradient-card rounded-full flex justify-between items-center px-6 py-2">
-          <div className="relative z-1 aspect-[188/64] w-30">
+        <div className="relative w-full border border-primary-300 rounded-full flex justify-between items-center px-6 py-2 backdrop-blur-sm overflow-hidden" style={{ backgroundImage: 'var(--gradient-navbar)' }}>
+          <div className="relative z-1 aspect-[188/64] w-36">
             <Image
-              src="/logo.webp"
+              src="/logo/logo-text.png"
               alt="Logo"
               layout="fill"
               objectFit="contain"
@@ -108,29 +108,19 @@ const Navbar = () => {
 
           {/* Mobile Menu Dropdown */}
           <div
-            className={`
-            absolute py-3 px-4 min-w-40 flex flex-col gap-4 rounded-xl border border-primary-300 bg-gradient-card bg-primary-300 
-            -bottom-2 translate-y-full right-6 max-lg:right-4 lg:hidden z-50
-            transition-all duration-300 ease-in-out transform origin-top-right
-            ${
-              isMenuOpen
-                ? "opacity-100 scale-100 translate-y-full"
-                : "opacity-0 scale-95 translate-y-[calc(100%-8px)] pointer-events-none"
-            }
-          `}
+            className={`absolute py-3 px-4 min-w-40 flex flex-col gap-4 rounded-xl border border-primary-300 backdrop-blur-sm -bottom-2 translate-y-full right-6 max-lg:right-4 lg:hidden z-50 transition-all duration-300 ease-in-out transform origin-top-right ${isMenuOpen ? "opacity-100 scale-100 translate-y-full" : "opacity-0 scale-95 translate-y-[calc(100%-8px)] pointer-events-none"}`}
+            style={{ backgroundImage: 'var(--gradient-navbar)' }}
           >
             <Menu />
           </div>
 
-          {/* Background */}
-          <div className="absolute z-0 overflow-hidden w-full h-full">
-            <div className="absolute w-50 h-50 -left-5  -translate-y-20">
-              <Image
-                src="/assets/puzzle.webp"
-                alt="Background"
-                layout="fill"
-                objectFit="cover"
-              />
+          {/* Background pattern */}
+          <div className="absolute z-0 pointer-events-none w-full h-full inset-0" aria-hidden="true">
+            <div className="absolute w-48 h-48 -left-6 -top-10 opacity-20">
+              <Image src="/assets/spt-pattern.png" alt="" layout="fill" objectFit="contain" />
+            </div>
+            <div className="absolute w-48 h-48 -right-6 -top-10 opacity-20">
+              <Image src="/assets/spt-pattern.png" alt="" layout="fill" objectFit="contain" />
             </div>
           </div>
         </div>
@@ -202,17 +192,13 @@ const Menu = () => {
       {isLoading ? (
         <div className="w-20 h-8 bg-gray-300 animate-pulse rounded-md"></div>
       ) : user ? (
-        <Button variant="secondary" onClick={handleLogout}>
-          <LogOut />
+        <Button variant="signin" size="sm" onClick={handleLogout} leftIcon={<LogOut size={16} />}>
           Logout
         </Button>
       ) : (
-        <Link href="/login">
-          <Button variant="secondary">
-            <User />
-            Sign in
-          </Button>
-        </Link>
+        <Button variant="signin" size="sm" href="/login" leftIcon={<User size={16} />}>
+          Sign in
+        </Button>
       )}
     </>
   );

@@ -47,6 +47,9 @@ export type { AwanProps, AwanVariant }   from './components/atoms/Awan';
 export { default as BalonUdara }         from './components/atoms/BalonUdara';
 export type { BalonUdaraProps }          from './components/atoms/BalonUdara';
 
+export { default as AnimatedSptPattern } from './components/atoms/AnimatedSptPattern';
+export type { AnimatedSptPatternProps }  from './components/atoms/AnimatedSptPattern';
+
 // Molecules
 export { default as DSNavbar }           from './components/molecules/Navbar';
 export type { NavbarProps, NavLink }     from './components/molecules/Navbar';

@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui-legacy/button";
 import { Info, UserPen } from "lucide-react";
 import OnGoing from "./OnGoing";
 import { Event } from "@/types/event";
-import Link from "next/link";
+import Awan from "@/design-system/components/atoms/Awan";
+import Button from "@/design-system/components/atoms/Button";
 
 type HeroProps = {
   events: Event[];
@@ -20,7 +20,7 @@ const Hero = ({ events, loading }: HeroProps) => {
     const handleScroll = () => {
       if (parallaxRef.current) {
         const scrolled = window.scrollY;
-        const rate = scrolled * 0.5; // Adjust speed (0.5 = slower parallax)
+        const rate = scrolled * 0.5;
         parallaxRef.current.style.transform = `translateY(${rate}px)`;
       }
     };
@@ -30,53 +30,59 @@ const Hero = ({ events, loading }: HeroProps) => {
   }, []);
 
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <section
+      className="relative min-h-screen overflow-hidden"
+      style={{ background: "linear-gradient(90deg, #0B102D 0%, #9CB3D3 50%, #0B102D 100%)" }}
+    >
       {/* Background image full cover with parallax */}
       <div
         ref={parallaxRef}
-        className="absolute -translate-y-100 max-lg:-translate-y-200 inset-0 will-change-transform"
+        className="absolute inset-0 will-change-transform"
       >
         <Image
-          src="/assets-legacy/hero.webp"
+          src="/assets/hero.png"
           alt="Hero Background"
           fill
-          className="object-cover"
+          className="object-contain object-top"
           priority
         />
       </div>
+
+      {/* Awan decorative overlays */}
+      <Awan variant="1" className="absolute top-6 left-0 z-10 opacity-90" width={480} height={140} />
+      <Awan variant="2" className="absolute top-16 right-0 z-10 opacity-80" width={320} height={160} />
 
       {/* Konten di atas gambar */}
       <div className="relative text-white min-h-screen flex flex-col gap-4 text-center justify-center items-center z-20">
         <div className="relative aspect-square w-30">
           <Image
-            src="/logo-clean.webp"
+            src="/assets/logo-bem-ui.png"
             alt="logo"
             fill
             className="object-contain"
           />
         </div>
-        <h1 className="text-4xl font-bold">Sistem Perekrutan Terbuka</h1>
-        <p className="text-m3">by BEM UI 2025</p>
+        <h1
+          className="text-4xl font-bold"
+          style={{ textShadow: "0 0 55px #324173, 0 0 30px #324173, 0 0 80px rgba(50,65,115,0.6)" }}
+        >
+          Sistem Perekrutan Terbuka
+        </h1>
+        <p className="text-m3">by BEM UI 2026</p>
         <div className="relative aspect-auto w-70 h-10">
           <Image
-            src="/assets-legacy/warnai-angan.png"
+            src="/assets/terus-terang.png"
             alt="logo"
             fill
             className="object-contain"
           />
         </div>
         <div className="flex gap-2">
-          <Link href="/event">
-            <Button>
-              <UserPen />
-              Mulai Daftar
-            </Button>
-          </Link>
-          <Button variant={"secondary"} asChild>
-            <Link href="#about">
-              <Info />
-              Tentang SPT
-            </Link>
+          <Button href="/event" variant="primary" leftIcon={<UserPen size={16} />}>
+            Mulai Daftar
+          </Button>
+          <Button href="#about" variant="secondary" leftIcon={<Info size={16} />}>
+            Tentang SPT
           </Button>
         </div>
       </div>
@@ -85,14 +91,13 @@ const Hero = ({ events, loading }: HeroProps) => {
         {/* Parallax effect */}
         <div className="absolute top-0 z-1 -translate-y-[85%] w-full aspect-[5866/3110] pointer-events-none">
           <Image
-            src="/assets-legacy/hero-parallax.webp"
+            src="/assets/hero-parallax-new.png"
             alt="Hero Background"
             fill
             className="object-contain"
             priority
           />
         </div>
-        {/* End parallax Effect */}
 
         {/* OnGoing Section */}
         <div className="relative z-10">
