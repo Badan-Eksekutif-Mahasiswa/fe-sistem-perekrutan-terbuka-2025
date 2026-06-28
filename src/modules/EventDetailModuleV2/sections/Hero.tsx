@@ -18,8 +18,10 @@ type HeroProps = {
 };
 
 const Hero = ({ event }: HeroProps) => {
-  const eventPath = event.eventCode || event.id;
+  const eventPath = event.eventCode;
   const isRegistrationClosed = getEventStatus(event) === "Ditutup";
+  const isRegistrationUnavailable = isRegistrationClosed || !eventPath;
+  const registrationButtonLabel = !eventPath ? "Slug belum tersedia" : "Pendaftaran Ditutup";
 
   return (
     <main
@@ -123,9 +125,9 @@ const Hero = ({ event }: HeroProps) => {
             />
           </CardContent>
           <CardFooter className="flex items-center z-20 justify-center">
-            {isRegistrationClosed ? (
+            {isRegistrationUnavailable ? (
               <Button className="w-full bg-marun/50 text-white cursor-not-allowed" style={{ boxShadow: 'var(--shadow-glass)' }} disabled>
-                Pendaftaran Ditutup
+                {registrationButtonLabel}
               </Button>
             ) : (
               <Link href={`/${eventPath}/form`} className="w-full">

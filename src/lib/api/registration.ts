@@ -3,14 +3,39 @@ import {
   SubmitResponse,
   RegistrationPayload,
   RegistrationStatusResponse,
+  SectionsResponse,
   MyApplicationsResponse,
 } from "@/types/registration";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 export const registrationApi = {
+  async getSections(eventId: string) {
+    const response = await fetch(
+      `${BASE_URL}/registration/sections?eventId=${eventId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to fetch registration sections");
+    }
+
+    const result = (await response.json()) as SectionsResponse;
+    return result.data.sections;
+  },
+
   // GET: Fetch registration form data for an event
-  async getRegistrationForm(eventId: string): Promise<RegistrationFormResponse> {
+  async getRegistrationForm(
+    eventId: string,
+    _section?: string
+  ): Promise<RegistrationFormResponse> {
     const response = await fetch(
       `${BASE_URL}/registration/form?eventId=${eventId}`,
       {

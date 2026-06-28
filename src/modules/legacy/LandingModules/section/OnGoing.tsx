@@ -66,7 +66,7 @@ const OngoingSection = ({
             events.map((event) => (
               <EventCard
                 key={event.id}
-                id={event.eventCode || event.id}
+                id={event.eventCode || undefined}
                 logo={event.logo ?? "/logo-clean.webp"}
                 title={event.title}
                 startDate={new Date(event.registrationOpen)}
@@ -100,7 +100,7 @@ const EventCard = ({
   endDate,
   restrictions,
 }: {
-  id: string;
+  id?: string;
   logo: string;
   title: string;
   startDate: Date;
@@ -139,9 +139,15 @@ const EventCard = ({
           </div>
         </div>
       </div>
-      <Button className="max-lg:w-full" variant="external" href={`/${id}`}>
-        Selengkapnya
-      </Button>
+      {id ? (
+        <Button className="max-lg:w-full" variant="external" href={`/${id}`}>
+          Selengkapnya
+        </Button>
+      ) : (
+        <Button className="max-lg:w-full cursor-not-allowed opacity-60" variant="external" disabled>
+          Slug belum tersedia
+        </Button>
+      )}
     </div>
   );
 };

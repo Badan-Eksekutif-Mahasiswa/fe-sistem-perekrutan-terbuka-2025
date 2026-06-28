@@ -59,7 +59,7 @@ export function transformEventToEventType(event: Event): EventType {
 
   return {
     id: event.id,
-    eventCode: event.eventCode || event.id,
+    eventCode: event.eventCode || undefined,
     title: event.title,
     logo: event.logo || "/placeholders/logo-event.webp",
     desc: event.description,

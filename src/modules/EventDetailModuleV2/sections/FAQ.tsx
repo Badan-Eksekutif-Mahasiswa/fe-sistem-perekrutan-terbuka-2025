@@ -22,8 +22,10 @@ const FAQ = ({ event }: FAQProps) => {
   const faqs = (event.faqs || []).filter(
     (item) => item.question?.trim() && item.answer?.trim()
   );
-  const eventPath = event.eventCode || event.id;
+  const eventPath = event.eventCode;
   const isRegistrationClosed = getEventStatus(event) === "Ditutup";
+  const isRegistrationUnavailable = isRegistrationClosed || !eventPath;
+  const registrationButtonLabel = !eventPath ? "Slug belum tersedia" : "Pendaftaran Ditutup";
 
   if (faqs.length === 0) {
     return null;
@@ -69,14 +71,14 @@ const FAQ = ({ event }: FAQProps) => {
             <p className="text-m2">Scroll to Top</p>
           </Button>
 
-          {isRegistrationClosed ? (
+          {isRegistrationUnavailable ? (
             <Button
               disabled
               className="flex-1 flex bg-neutral-500 text-white border-none opacity-70 cursor-not-allowed"
               style={{ boxShadow: "var(--shadow-glass)" }}
             >
               <ClipboardListIcon className="size-6 mr-2" />
-              <p className="text-m2">Pendaftaran Ditutup</p>
+              <p className="text-m2">{registrationButtonLabel}</p>
             </Button>
           ) : (
             <Link href={`/${eventPath}/form`} className="flex-1">

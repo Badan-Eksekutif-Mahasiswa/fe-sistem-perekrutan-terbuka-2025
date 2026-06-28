@@ -215,9 +215,14 @@ export interface ApplicationDivision {
 export interface MyApplication {
   id: string;
   eventId: string;
+  eventCode: string | null;
   eventTitle: string;
+  eventLogo: string | null;
+  typeOfEvent: Event["typeOfEvent"];
+  eventLevel: Event["eventLevel"];
   status: RegistrationStatus;
   submittedAt: string | null;
+  lastEditedAt: string | null;
   selectedDivisions: ApplicationDivision[];
 }
 
