@@ -26,10 +26,10 @@ const teamMembers: TeamMember[] = [
     instagram: "#",
   },
   {
-    name: "Nama Anggota",
-    position: "Jabatan",
-    description: "Deskripsi singkat mengenai anggota tim ini dan perannya di organisasi.",
-    photo: "",
+    name: "Syahid Arkan",
+    position: "Staf Developer BEM UI 2026",
+    description: "UI/UX Lead & Fullstack Developer. Bertanggung jawab atas DS, Prototype, dan implementasi frontend",
+    photo: "/meet-the-team/acan.jpg",
     linkedin: "#",
     instagram: "#",
   },
@@ -186,7 +186,8 @@ const TeamCard = ({ member }: { member: TeamMember }) => {
               src={member.photo}
               alt={member.name}
               fill
-              className="object-cover"
+              unoptimized
+              className="object-cover object-[50%_15%]"
               onError={() => setImgError(true)}
             />
           ) : (

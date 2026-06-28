@@ -16,45 +16,50 @@ const FrequentlyAsked = () => {
         defaultValue="item-1"
       >
         <AccordionItem value="item-1">
-          <AccordionTrigger>Product Information</AccordionTrigger>
+          <AccordionTrigger>Siapa saja yang bisa mendaftar di SPT?</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
             <p>
-              Our flagship product combines cutting-edge technology with sleek
-              design. Built with premium materials, it offers unparalleled
-              performance and reliability.
-            </p>
-            <p>
-              Key features include advanced processing capabilities, and an
-              intuitive user interface designed for both beginners and experts.
+              Seluruh mahasiswa aktif Universitas Indonesia yang terdaftar sebagai Ikatan Keluarga Mahasiswa (IKM UI) dapat mendaftar melalui SPT menggunakan akun SSO UI.
             </p>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
-          <AccordionTrigger>Shipping Details</AccordionTrigger>
+          <AccordionTrigger>Berapa banyak event yang bisa saya daftarkan sekaligus?</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
             <p>
-              We offer worldwide shipping through trusted courier partners.
-              Standard delivery takes 3-5 business days, while express shipping
-              ensures delivery within 1-2 business days.
-            </p>
-            <p>
-              All orders are carefully packaged and fully insured. Track your
-              shipment in real-time through our dedicated tracking portal.
+              Kamu bisa mendaftar ke lebih dari satu event rekrutmen secara bersamaan, namun setiap event hanya mengizinkan satu pendaftaran per akun.
             </p>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-3">
-          <AccordionTrigger>Return Policy</AccordionTrigger>
+          <AccordionTrigger>Apakah saya bisa mengubah pilihan divisi setelah mendaftar?</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
             <p>
-              We stand behind our products with a comprehensive 30-day return
-              policy. If you&apos;re not completely satisfied, simply return the
-              item in its original condition.
+              Pilihan divisi dapat diubah selama status pendaftaranmu masih Draft dan pendaftaran belum disubmit secara resmi.
             </p>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-4">
+          <AccordionTrigger>Bagaimana cara mengetahui jadwal interview saya?</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-4 text-balance">
             <p>
-              Our hassle-free return process includes free return shipping and
-              full refunds processed within 48 hours of receiving the returned
-              item.
+              Jadwal interview dapat dilihat langsung di halaman pendaftaranmu setelah kamu berhasil melakukan booking slot interview.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-5">
+          <AccordionTrigger>Apa yang terjadi jika saya tidak menghadiri interview?</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-4 text-balance">
+            <p>
+              Ketidakhadiran tanpa konfirmasi sebelumnya dapat mempengaruhi proses seleksimu. Hubungi panitia terkait jika ada kendala sebelum jadwal interview.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-6">
+          <AccordionTrigger>Di mana saya bisa mendapatkan informasi lebih lanjut?</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-4 text-balance">
+            <p>
+              Informasi lebih lanjut dapat diperoleh melalui akun media sosial resmi BEM UI 2026 atau menghubungi contact person yang tertera di halaman event.
             </p>
           </AccordionContent>
         </AccordionItem>

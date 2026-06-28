@@ -133,7 +133,7 @@ export default function Navbar({
       aria-label="Main navigation"
     >
       <div
-        className="relative w-full border border-primary-300 rounded-full flex justify-between items-center px-6 py-2 overflow-hidden backdrop-blur-sm"
+        className="relative w-full rounded-full flex justify-between items-center px-6 py-2 overflow-hidden backdrop-blur-sm"
         style={{ backgroundImage: 'var(--gradient-navbar)' }}
       >
         <Link href="/" aria-label="SPT BEM UI - Beranda">
