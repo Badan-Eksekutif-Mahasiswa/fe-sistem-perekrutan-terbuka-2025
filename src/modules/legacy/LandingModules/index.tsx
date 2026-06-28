@@ -51,20 +51,30 @@ const LandingModules = () => {
           description="Hubungi contact person kami"
           contact={[
             {
-              name: "Fauzan",
-              method: "Line",
-              link: "https://google2.com",
+              name: "Zidan",
+              method: "WhatsApp",
+              link: "https://wa.me/6282141535328",
             },
             {
-              name: "Fauzan2",
+              name: "Dyah",
               method: "Line",
-              link: "https://google.com",
+              link: "https://line.me/ti/p/~dyazhaa",
+            },
+            {
+              name: "Dyah",
+              method: "WhatsApp",
+              link: "https://wa.me/62859106884466",
+            },
+            {
+              name: "Septian",
+              method: "Line",
+              link: "https://line.me/ti/p/~aseptian21",
             },
           ]}
         />
       </div>
-      <MeetTheTeam />
       <FrequentlyAsked />
+      <MeetTheTeam />
       <div className="absolute z-[-1] inset-0 flex justify-end items-end pointer-events-none overflow-hidden" aria-hidden="true">
         <div className="translate-x-[20%] translate-y-[20%]">
           <LogoBackground

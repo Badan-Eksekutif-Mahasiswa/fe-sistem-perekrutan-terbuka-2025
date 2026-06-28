@@ -36,7 +36,7 @@ const About = () => {
               className="object-contain"
             />
           </div>
-          <Button variant="secondary" leftIcon={<UserRound size={16} />} className="w-[60%]">
+          <Button variant="secondary" leftIcon={<UserRound size={16} />} href="#meet-the-team" className="w-[60%]">
             Meet the team
           </Button>
         </div>

@@ -14,6 +14,7 @@ export interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   href?: string;
+  target?: string;
   onClick?: () => void;
   children?: ReactNode;
   fullWidth?: boolean;
@@ -52,6 +53,7 @@ export default function Button({
   fullWidth = false,
   className,
   type = 'button',
+  target,
   'aria-label': ariaLabel,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
@@ -89,7 +91,7 @@ export default function Button({
 
   if (href && !isDisabled) {
     return (
-      <Link href={href} className={baseClasses} style={inlineStyle} aria-label={ariaLabel}>
+      <Link href={href} className={baseClasses} style={inlineStyle} aria-label={ariaLabel} target={target} rel={target === '_blank' ? 'noopener noreferrer' : undefined}>
         {content}
       </Link>
     );

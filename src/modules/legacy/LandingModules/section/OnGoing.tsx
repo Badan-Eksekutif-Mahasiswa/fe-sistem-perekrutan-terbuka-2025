@@ -13,7 +13,6 @@ type OnGoingProps = {
 };
 
 const OnGoing = ({ events = [], loading }: OnGoingProps) => {
-  // Filter only open events
   const ongoingEvents = events.filter((event) => getEventStatus(event) === "Dibuka");
 
   return (
@@ -22,17 +21,24 @@ const OnGoing = ({ events = [], loading }: OnGoingProps) => {
       {/* Balon kanan — 118×174px per Figma */}
       <BalonUdara width={118} height={174} className="absolute -z-10 -right-4 bottom-10 opacity-70 max-lg:hidden animate-float [animation-delay:2.5s]" />
       <OngoingSection events={ongoingEvents} loading={loading} />
-      <CalendarSection />
+      <CalendarSection events={events} />
     </section>
   );
 };
 export default OnGoing;
 
-const CalendarSection = () => {
+const CalendarSection = ({ events }: { events: Event[] }) => {
+  const availableRanges = events.map((event) => ({
+    start: new Date(event.registrationOpen),
+    end: new Date(event.registrationClose),
+    label: event.title,
+    available: true,
+  }));
+
   return (
     <div className="w-full flex flex-col gap-2">
       <p className="text-m1 text-white text-center">Calendar</p>
-      <Calendar />
+      <Calendar availableRanges={availableRanges} />
       <Button variant="external">
         Cek Pendaftaran Lainnya
       </Button>

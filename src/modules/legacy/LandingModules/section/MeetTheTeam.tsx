@@ -18,52 +18,52 @@ type TeamMember = {
 
 const teamMembers: TeamMember[] = [
   {
-    name: "Nama Anggota",
-    position: "Jabatan",
-    description: "Deskripsi singkat mengenai anggota tim ini dan perannya di organisasi.",
-    photo: "",
-    linkedin: "#",
-    instagram: "#",
+    name: "Refki Septian",
+    position: "BPH Multimedia 2026",
+    description: "Full Stack Developer",
+    photo: "/meet-the-team/refki.png",
+    linkedin: "https://www.linkedin.com/in/refki-septian/",
+    instagram: "https://www.instagram.com/septian_gumay",
+  },
+  {
+    name: "Nadhif Ibrahim",
+    position: "Staff Developer",
+    description: "Full Stack Developer",
+    photo: "/meet-the-team/nadhif.png",
+    linkedin: "https://www.linkedin.com/in/muhammad-nadhif-ibrahim/",
+    instagram: "https://www.instagram.com/nadhifibr",
   },
   {
     name: "Syahid Arkan",
-    position: "Staf Developer BEM UI 2026",
-    description: "UI/UX Lead & Fullstack Developer. Bertanggung jawab atas DS, Prototype, dan implementasi frontend",
-    photo: "/meet-the-team/acan.jpg",
-    linkedin: "#",
-    instagram: "#",
+    position: "Staff Developer",
+    description: "Full Stack Developer",
+    photo: "/meet-the-team/arkan.png",
+    linkedin: "https://www.linkedin.com/in/syahidarkan/",
+    instagram: "https://www.instagram.com/rrcaan",
   },
   {
-    name: "Nama Anggota",
-    position: "Jabatan",
-    description: "Deskripsi singkat mengenai anggota tim ini dan perannya di organisasi.",
-    photo: "",
-    linkedin: "#",
-    instagram: "#",
+    name: "Dyah Zhafira",
+    position: "Staff Developer",
+    description: "Full Stack Developer",
+    photo: "/meet-the-team/dyah.png",
+    linkedin: "https://www.linkedin.com/in/dyahzhafira",
+    instagram: "https://www.instagram.com/dyazhaa_",
   },
   {
-    name: "Nama Anggota",
-    position: "Jabatan",
-    description: "Deskripsi singkat mengenai anggota tim ini dan perannya di organisasi.",
-    photo: "",
-    linkedin: "#",
-    instagram: "#",
+    name: "Sultan Zidan",
+    position: "Staff Developer",
+    description: "Full Stack Developer",
+    photo: "/meet-the-team/zidan.png",
+    linkedin: "https://www.linkedin.com/in/muhammadsultanzidan/",
+    instagram: "https://www.instagram.com/zydanidn",
   },
   {
-    name: "Nama Anggota",
-    position: "Jabatan",
-    description: "Deskripsi singkat mengenai anggota tim ini dan perannya di organisasi.",
-    photo: "",
-    linkedin: "#",
-    instagram: "#",
-  },
-  {
-    name: "Nama Anggota",
-    position: "Jabatan",
-    description: "Deskripsi singkat mengenai anggota tim ini dan perannya di organisasi.",
-    photo: "",
-    linkedin: "#",
-    instagram: "#",
+    name: "Nugraha Kautsarrizqi",
+    position: "Staff Developer",
+    description: "Full Stack Developer",
+    photo: "/meet-the-team/nugraha.png",
+    linkedin: "https://www.linkedin.com/in/nugrahakc/",
+    instagram: "https://www.instagram.com/nugrahakc",
   },
 ];
 
@@ -122,18 +122,19 @@ const MeetTheTeam = () => {
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
-    <section className="relative overflow-hidden flex flex-col gap-8 font-jakarta text-white px-12 max-lg:px-10 max-md:px-8">
+    <section id="meet-the-team" className="relative overflow-hidden flex flex-col gap-8 font-jakarta text-white px-12 max-lg:
+    px-10 max-md:px-8">
       <BalonUdara width={188} height={277} className="absolute -z-10 -left-12 top-1/3 opacity-30 max-lg:hidden animate-float [animation-delay:0.8s]" />
       <h2 className="text-h2 text-center">Meet the Team</h2>
 
-      <div className="relative">
+      <div className="relative max-md:-mx-8">
         {/* Viewport */}
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {teamMembers.map((member, idx) => (
               <div
                 key={idx}
-                className="shrink-0 pl-4 basis-83.75"
+                className="shrink-0 pl-4 basis-83.75 max-md:basis-[85vw]"
               >
                 {/* data-card is the element that gets scaled */}
                 <div
@@ -176,8 +177,8 @@ const TeamCard = ({ member }: { member: TeamMember }) => {
     <div className="flex flex-col items-center gap-4 w-full">
       {/* Main glass card */}
       <div
-        className="w-full h-auto rounded-xl bg-gradient-card-blue backdrop-blur-sm flex flex-col items-center p-6 gap-5 text-center text-white"
-        style={{ boxShadow: "var(--shadow-glass)" }}
+        className="w-full h-auto rounded-xl backdrop-blur-md border border-primary-300/40 flex flex-col items-center p-6 gap-5 text-center text-white"
+        style={{ boxShadow: "var(--shadow-glass)", backgroundImage: "linear-gradient(180deg, rgba(156,179,211,1) 0%, rgba(72,85,115,1) 49.24%, rgba(11,16,45,1) 99.94%)" }}
       >
         {/* Photo — 1:1 square */}
         <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-primary-300/20 shrink-0 flex items-center justify-center">
@@ -211,6 +212,7 @@ const TeamCard = ({ member }: { member: TeamMember }) => {
           variant="secondary"
           leftIcon={<LucideLinkedin size={14} />}
           href={member.linkedin}
+          target="_blank"
           className="flex-1 justify-center"
         >
           LinkedIn
@@ -219,6 +221,7 @@ const TeamCard = ({ member }: { member: TeamMember }) => {
           variant="secondary"
           leftIcon={<LucideInstagram size={14} />}
           href={member.instagram}
+          target="_blank"
           className="flex-1 justify-center"
         >
           Instagram

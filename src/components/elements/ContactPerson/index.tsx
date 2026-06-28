@@ -20,12 +20,13 @@ const ContactPerson = ({
         <p className="text-p2">{description}</p>
       </div>
       <div className="flex relative z-10 max-lg:w-full justify-center flex-wrap gap-3 md:gap-6 h-fit">
-        {contact.map((person) => (
+        {contact.map((person, idx) => (
           <Button
-            key={person.name}
+            key={`${person.name}-${idx}`}
             variant="secondary"
             leftIcon={<UserCircle size={16} />}
             href={person.link}
+            target="_blank"
             className="max-lg:w-full"
           >
             {person.name} ({person.method})

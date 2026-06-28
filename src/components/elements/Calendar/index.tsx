@@ -215,11 +215,11 @@ const Calendar: React.FC<CalendarProps> = ({
                     " text-white": selected,
 
                     // Only round the start and end dates of each range
-                    "rounded-l-lg border-l-2 border-y-2 border-secondary-200":
+                    "rounded-l-lg border-l-2 border-y-2 border-white":
                       status.isStart && status.inRange,
-                    "rounded-r-lg border-r-2  border-y-2 border-secondary-200  ":
+                    "rounded-r-lg border-r-2  border-y-2 border-white  ":
                       status.isEnd && status.inRange,
-                    "border-y-2 border-secondary-200":
+                    "border-y-2 border-white":
                       !status.isStart && status.inRange && !status.isEnd, // Single day range
 
                     // Disabled styling
@@ -239,16 +239,22 @@ const Calendar: React.FC<CalendarProps> = ({
       {/* Schedule */}
       <div className="w-full max-lg:border-l max-md:border-l-0 justify-center font-jakarta text-p6 mx-auto flex flex-col gap-2 text-neutral-100 shadow-lg px-6 py-2 pb-6">
         {visibleRanges.length > 0 ? (
-          visibleRanges.map((range, index) => (
-            <div key={index} className="flex ">
-              <p className=" bg-clip-text font-bold bg-gradient-kiwi">
-                {range.start.getDate() === range.end.getDate()
-                  ? `${range.start.getDate()} `
-                  : `${range.start.getDate()} - ${range.end.getDate()} `}
-              </p>
-              <p>: {range.label}</p>
-            </div>
-          ))
+          visibleRanges.map((range, index) => {
+            const fmt = (d: Date) => d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+            const sameDay = range.start.toDateString() === range.end.toDateString();
+            const sameMonth = range.start.getMonth() === range.end.getMonth();
+            const dateLabel = sameDay
+              ? fmt(range.start)
+              : sameMonth
+                ? `${range.start.getDate()} - ${fmt(range.end)}`
+                : `${fmt(range.start)} - ${fmt(range.end)}`;
+            return (
+              <div key={index} className="flex gap-1">
+                <p className="font-bold text-white shrink-0">{dateLabel}</p>
+                <p>: {range.label}</p>
+              </div>
+            );
+          })
         ) : (
           <p className="text-neutral-200/80">Tidak ada jadwal pendaftaran pada bulan ini.</p>
         )}
