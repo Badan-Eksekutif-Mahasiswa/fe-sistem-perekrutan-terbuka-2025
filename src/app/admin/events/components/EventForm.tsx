@@ -11,7 +11,7 @@ import {
   EventTimelineItem,
 } from "@/lib/api/event";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Info, Plus, Trash2 } from "lucide-react";
+import { Info, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import FileUpload from "@/components/elements/FileUpload";
 import { toast } from "sonner";
@@ -75,6 +75,7 @@ function getStringField(value: unknown, key: string): string {
 
 type FieldErrors = Record<string, string>;
 const WHATSAPP_PATTERN = /^\+?[0-9][0-9\s-]{7,20}$/;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 function getWhatsappError(value: unknown) {
   const text = String(value || "").trim();
@@ -209,7 +210,6 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   );
 
   const [deletedDivisions, setDeletedDivisions] = useState<string[]>([]);
-  const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -245,7 +245,12 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    clearFieldError(name);
+    if (name === "registrationOpen" || name === "registrationClose") {
+      clearFieldError("registrationOpen", "registrationClose");
+    } else {
+      clearFieldError(name);
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: name === "eventCode" || name === "id" 
@@ -391,14 +396,12 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setFormError("");
     setFieldErrors({});
 
     const validationErrors = getValidationErrors();
     const firstError = Object.values(validationErrors)[0];
     if (firstError) {
       setFieldErrors(validationErrors);
-      setFormError(firstError);
       toast.error(firstError);
       focusFirstError(validationErrors);
       return;
@@ -417,12 +420,17 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       if (!submitData.organizer) submitData.organizer = "Draft Organizer";
       if (!submitData.contactLineId) submitData.contactLineId = "draftline";
       
-      submitData.registrationOpen = submitData.registrationOpen 
-        ? new Date(submitData.registrationOpen).toISOString() 
-        : new Date().toISOString();
-      submitData.registrationClose = submitData.registrationClose 
-        ? new Date(submitData.registrationClose).toISOString() 
-        : new Date().toISOString();
+      const draftOpen = submitData.registrationOpen
+        ? new Date(submitData.registrationOpen)
+        : submitData.registrationClose
+          ? new Date(new Date(submitData.registrationClose).getTime() - ONE_DAY_MS)
+          : new Date();
+      const draftClose = submitData.registrationClose
+        ? new Date(submitData.registrationClose)
+        : new Date(draftOpen.getTime() + ONE_DAY_MS);
+
+      submitData.registrationOpen = draftOpen.toISOString();
+      submitData.registrationClose = draftClose.toISOString();
     } else {
       if (submitData.registrationOpen) submitData.registrationOpen = new Date(submitData.registrationOpen).toISOString();
       if (submitData.registrationClose) submitData.registrationClose = new Date(submitData.registrationClose).toISOString();
@@ -482,13 +490,6 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         <h1 className="text-3xl font-bold">{initialData?.id ? "Edit Event" : "Buat Event"}</h1>
         <p className="text-lg">Isilah Data Acara Berikut</p>
       </div>
-
-      {formError && (
-        <div className="flex items-start gap-3 rounded-md border border-red-200/30 bg-red-500/15 px-4 py-3 text-sm text-red-50">
-          <AlertCircle className="mt-0.5 size-4 shrink-0" />
-          <span>{formError}</span>
-        </div>
-      )}
 
       {formData.status === "DRAFT" && (
         <div className="flex items-start gap-3 rounded-md border border-white/15 bg-white/[0.08] px-4 py-3 text-sm text-white/75">
@@ -667,7 +668,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         </div>
       </div>
 
-      <div className="flex gap-4 mt-2">
+      <div
+        ref={setSectionRef("registrationClose")}
+        tabIndex={-1}
+        className="flex gap-4 mt-2"
+      >
         <div className="flex-1 flex flex-col gap-1">
           <label className="font-bold text-m4">Waktu Buka Pendaftaran</label>
           <input

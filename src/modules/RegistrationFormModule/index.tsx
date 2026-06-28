@@ -39,6 +39,7 @@ export default function RegistrationFormModule({
   const [hasRegistration, setHasRegistration] = useState(false);
 
   // Refs for debounce timeouts
+  const emailTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lineTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -46,6 +47,7 @@ export default function RegistrationFormModule({
   const [personalInfo, setPersonalInfo] = useState<PersonalInfoData | null>(
     null
   );
+  const [email, setEmail] = useState("");
   const [lineId, setLineId] = useState("");
   const [selectedDivisions, setSelectedDivisions] = useState<
     SelectedDivision[]
@@ -144,7 +146,7 @@ export default function RegistrationFormModule({
           const data: PersonalInfoData = {
             name: applicant.name,
             npm: applicant.npm ?? "",
-            email: draft?.contactEmail ?? "",
+            email: draft?.contactEmail || applicant.email || "",
             faculty: applicant.faculty ?? "",
             studyProgram: applicant.studyProgram ?? "",
             line: draft?.lineId ?? "",
@@ -158,6 +160,7 @@ export default function RegistrationFormModule({
           };
 
           setPersonalInfo(data);
+          setEmail(data.email || "");
           setLineId(data.line || "");
           setSelectedDivisions(data.selectedDivisions || []);
         } else {
@@ -215,7 +218,7 @@ export default function RegistrationFormModule({
   const buildRegistrationPayload = useCallback(
     (answerMap = answers): RegistrationPayload => ({
       eventId,
-      contactEmail: personalInfo?.email || "",
+      contactEmail: email.trim(),
       whatsappNumber: null,
       lineId,
       divisionChoices: selectedDivisions.map((division) => division.divisionId),
@@ -226,7 +229,31 @@ export default function RegistrationFormModule({
           submittedUrl: submittedUrl.trim(),
         })),
     }),
-    [answers, eventId, lineId, personalInfo?.email, selectedDivisions]
+    [answers, email, eventId, lineId, selectedDivisions]
+  );
+
+  const handleEmailChange = useCallback(
+    (value: string) => {
+      if (isSubmitted) return;
+
+      setEmail(value);
+
+      if (emailTimeoutRef.current) {
+        clearTimeout(emailTimeoutRef.current);
+      }
+
+      emailTimeoutRef.current = setTimeout(async () => {
+        try {
+          await registrationApi.partialUpdateRegistration({
+            eventId,
+            contactEmail: value,
+          });
+        } catch (error) {
+          console.error("Auto-save email failed:", error);
+        }
+      }, 1000);
+    },
+    [eventId, isSubmitted]
   );
 
   const handleLineChange = useCallback(
@@ -342,6 +369,14 @@ export default function RegistrationFormModule({
 
   const validateCurrentSection = (): boolean => {
     if (isPersonalInfo) {
+      if (!email.trim()) {
+        toast.show("error", "Email aktif wajib diisi");
+        return false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        toast.show("error", "Format email tidak valid");
+        return false;
+      }
       if (!lineId.trim()) {
         toast.show("error", "ID Line harus diisi");
         return false;
@@ -510,7 +545,8 @@ export default function RegistrationFormModule({
           <div className="space-y-6">
             {isPersonalInfo && personalInfo ? (
               <PersonalInfoForm
-                data={{ ...personalInfo, line: lineId, selectedDivisions }}
+                data={{ ...personalInfo, email, line: lineId, selectedDivisions }}
+                onEmailChange={handleEmailChange}
                 onLineChange={handleLineChange}
                 onDivisionSelect={handleDivisionSelect}
                 isReadOnly={isSubmitted}

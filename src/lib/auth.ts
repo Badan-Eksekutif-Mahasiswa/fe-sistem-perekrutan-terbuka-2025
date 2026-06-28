@@ -81,6 +81,37 @@ export const authApi = {
     }
   },
 
+  updateProfile: async (payload: { email: string }): Promise<AuthResponse> => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/auth/profile`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Failed to update profile",
+          errors: data.errors,
+        };
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Update profile failed:", error);
+      return {
+        success: false,
+        message: "Network error or server unavailable",
+      };
+    }
+  },
+
   /**
    * Logout user and destroy session
    */
