@@ -10,6 +10,7 @@ import {
 import Countdown from "@/components/elements/Countdown";
 import { Button } from "@/components/ui-legacy/button";
 import { Event } from "@/types/event";
+import { getEventStatus } from "@/lib/utils/event-transformer";
 import { Awan, BalonUdara } from "@/design-system";
 
 type HeroProps = {
@@ -17,6 +18,9 @@ type HeroProps = {
 };
 
 const Hero = ({ event }: HeroProps) => {
+  const eventPath = event.eventCode || event.id;
+  const isRegistrationClosed = getEventStatus(event) === "Ditutup";
+
   return (
     <main
       id="hero-section"
@@ -119,12 +123,12 @@ const Hero = ({ event }: HeroProps) => {
             />
           </CardContent>
           <CardFooter className="flex items-center z-20 justify-center">
-            {event.status === "CLOSED" ? (
+            {isRegistrationClosed ? (
               <Button className="w-full bg-marun/50 text-white cursor-not-allowed" style={{ boxShadow: 'var(--shadow-glass)' }} disabled>
                 Pendaftaran Ditutup
               </Button>
             ) : (
-              <Link href={`/${event.id}/form`} className="w-full">
+              <Link href={`/${eventPath}/form`} className="w-full">
                 <Button className="w-full bg-marun text-white hover:bg-marun-light border-none" style={{ boxShadow: 'var(--shadow-glass)' }}>
                   Daftar Sekarang!
                 </Button>

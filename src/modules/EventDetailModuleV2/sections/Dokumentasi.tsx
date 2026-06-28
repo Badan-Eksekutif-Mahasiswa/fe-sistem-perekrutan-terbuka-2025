@@ -22,6 +22,7 @@ type DokumentasiProps = {
 };
 
 const Dokumentasi = ({ event }: DokumentasiProps) => {
+  const documentations = (event.documentations || []).filter((item) => item.imageUrl?.trim());
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
@@ -57,6 +58,10 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
     api.reInit();
   }, [api, slidesToScroll]);
 
+  if (documentations.length === 0) {
+    return null;
+  }
+
   return (
     <section className=" flex flex-col justify-center relative items-center gap-10 px-6 md:px-20 py-10 w-full">
       <Awan
@@ -78,28 +83,28 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
           ]}
           opts={{
             align: "start",
-            loop: true,
+            loop: documentations.length > slidesToScroll,
             slidesToScroll: slidesToScroll,
           }}
           className="w-full"
         >
           <CarouselContent className="-ml-4">
-            {Array.from({ length: 15 }).map((_, index) => (
+            {documentations.map((item, index) => (
               <CarouselItem
-                key={index}
+                key={`${item.imageUrl}-${index}`}
                 className="pl-4 basis-full md:basis-1/2 lg:basis-1/3"
               >
                 <div 
                   className="w-full aspect-[16/10] relative rounded-3xl overflow-hidden backdrop-blur-md p-2"
                   style={{ 
-                    backgroundImage: 'linear-gradient(90deg, rgba(156,179,211,0.5) 0%, rgba(72,85,115,0.5) 49.24%, rgba(11,16,45,0.5) 99.94%)',
-                    boxShadow: 'var(--shadow-glass)'
+                    backgroundImage: "linear-gradient(90deg, rgba(156,179,211,0.5) 0%, rgba(72,85,115,0.5) 49.24%, rgba(11,16,45,0.5) 99.94%)",
+                    boxShadow: "var(--shadow-glass)"
                   }}
                 >
                   <div className="w-full h-full relative rounded-2xl overflow-hidden">
                     <Image
-                      src={`/placeholder-1.webp`}
-                      alt={`Dokumentasi ${index + 1}`}
+                      src={item.imageUrl}
+                      alt={item.title || `Dokumentasi ${index + 1}`}
                       fill
                       className="object-cover hover:scale-105 transition-transform duration-500"
                     />

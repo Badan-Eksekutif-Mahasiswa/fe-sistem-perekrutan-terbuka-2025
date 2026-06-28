@@ -71,6 +71,15 @@ const announcementTypes: Array<{ value: AdminEmailType; label: string; hint: str
   },
 ];
 
+const getEffectiveAdminEventStatus = (event: AdminEvent): AdminEvent["status"] => {
+  if (event.status !== "ACTIVE") return event.status;
+
+  const registrationClose = new Date(event.registrationClose);
+  if (Number.isNaN(registrationClose.getTime())) return event.status;
+
+  return new Date() > registrationClose ? "CLOSED" : event.status;
+};
+
 export default function AdminDashboardPage() {
   const { user, isLoading } = useRequireAuth("/admin/login");
   const [events, setEvents] = useState<AdminEvent[]>([]);
@@ -364,7 +373,7 @@ export default function AdminDashboardPage() {
                             : event.organizer}
                         </p>
                       </div>
-                      <StatusBadge status={event.status} />
+                      <StatusBadge status={getEffectiveAdminEventStatus(event)} />
                     </div>
                     <div className="mt-3 flex flex-wrap gap-3 text-p6 text-white/55">
                       <span>{event._count?.divisions ?? event.divisions?.length ?? 0} divisi</span>

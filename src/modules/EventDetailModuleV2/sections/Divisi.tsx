@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs-v2";
 import { Event } from "@/types/event";
+import { getEventStatus } from "@/lib/utils/event-transformer";
 
 type DivisiProps = {
   event: Event;
@@ -25,6 +26,8 @@ const Divisi = ({ event }: DivisiProps) => {
   const [indexDivisi, setIndexDivisi] = useState(0);
   const divisiData = event.divisions || [];
   const divisiDipilih = divisiData[indexDivisi];
+  const eventPath = event.eventCode || event.id;
+  const isRegistrationClosed = getEventStatus(event) === "Ditutup";
 
   if (!divisiData || divisiData.length === 0 || !divisiDipilih) {
     return (
@@ -157,7 +160,7 @@ const Divisi = ({ event }: DivisiProps) => {
               </div>
             </div>
           </div>
-          {event.status === "CLOSED" ? (
+          {isRegistrationClosed ? (
             <Button
               className="w-full bg-marun/50 text-white cursor-not-allowed items-center text-center"
               style={{ boxShadow: 'var(--shadow-glass)' }}
@@ -167,7 +170,7 @@ const Divisi = ({ event }: DivisiProps) => {
               <p className="text-m2">Pendaftaran Ditutup</p>
             </Button>
           ) : (
-            <Link href={`/${event.id}/form`}>
+            <Link href={`/${eventPath}/form`}>
               <Button
                 className="w-full bg-marun text-white hover:bg-marun-light border-none items-center text-center"
                 style={{ boxShadow: 'var(--shadow-glass)' }}
@@ -257,7 +260,7 @@ const Divisi = ({ event }: DivisiProps) => {
             </div>
           </TabsContent>
         </Tabs>
-        {event.status === "CLOSED" ? (
+        {isRegistrationClosed ? (
           <Button
             className="w-full bg-marun/50 text-white cursor-not-allowed items-center text-center"
             style={{ boxShadow: 'var(--shadow-glass)' }}
@@ -267,7 +270,7 @@ const Divisi = ({ event }: DivisiProps) => {
             <p className="text-m2">Pendaftaran Ditutup</p>
           </Button>
         ) : (
-          <Link href={`/${event.id}/form`} className="w-full">
+          <Link href={`/${eventPath}/form`} className="w-full">
             <Button
               className="w-full bg-marun text-white hover:bg-marun-light border-none items-center text-center"
               style={{ boxShadow: 'var(--shadow-glass)' }}

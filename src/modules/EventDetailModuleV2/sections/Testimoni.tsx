@@ -6,14 +6,15 @@ type TestimoniProps = {
 };
 
 const Testimoni = ({ event }: TestimoniProps) => {
-  const testimonies = event.testimonials || [];
+  const testimonies = (event.testimonials || []).filter(
+    (t) => t.name?.trim() && t.message?.trim()
+  );
 
   if (testimonies.length === 0) return null;
 
-  // Map API format to CarouselElement format
   const formattedTestimonies = testimonies.map((t) => ({
     name: t.name,
-    profilePicture: t.photoUrl || "/placeholder-1.webp",
+    profilePicture: t.photoUrl || "",
     desc: t.message,
     jabatan: t.role,
   }));

@@ -11,6 +11,15 @@ import { useAuth } from "@/contexts/AuthContext";
 
 type EventStatusFilter = "ALL" | AdminEvent["status"];
 
+const getEffectiveEventStatus = (event: AdminEvent): AdminEvent["status"] => {
+  if (event.status !== "ACTIVE") return event.status;
+
+  const registrationClose = new Date(event.registrationClose);
+  if (Number.isNaN(registrationClose.getTime())) return event.status;
+
+  return new Date() > registrationClose ? "CLOSED" : event.status;
+};
+
 const statusFilters: Array<{ label: string; value: EventStatusFilter }> = [
   { label: "Semua", value: "ALL" },
   { label: "Draft", value: "DRAFT" },
@@ -49,7 +58,7 @@ export default function AdminEventsPage() {
   const filteredEvents =
     statusFilter === "ALL"
       ? events
-      : events.filter((event) => event.status === statusFilter);
+      : events.filter((event) => getEffectiveEventStatus(event) === statusFilter);
 
   const handlePublish = (event: AdminEvent) => {
     const activeDivisionCount =
@@ -143,7 +152,10 @@ export default function AdminEventsPage() {
                 </td>
               </tr>
             ) : (
-              filteredEvents.map((event) => (
+              filteredEvents.map((event) => {
+                const effectiveStatus = getEffectiveEventStatus(event);
+
+                return (
                 <tr
                   key={event.id}
                   className="border-b border-neutral-100 hover:bg-neutral-50"
@@ -165,14 +177,14 @@ export default function AdminEventsPage() {
                   <td className="p-4">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        event.status === "ACTIVE"
+                        effectiveStatus === "ACTIVE"
                           ? "bg-green-100 text-green-700"
-                          : event.status === "CLOSED"
+                          : effectiveStatus === "CLOSED"
                           ? "bg-red-100 text-red-700"
                           : "bg-neutral-200 text-neutral-700"
                       }`}
                     >
-                      {event.status}
+                      {effectiveStatus}
                     </span>
                   </td>
                   <td className="p-4 text-p5 text-neutral-500">
@@ -199,7 +211,8 @@ export default function AdminEventsPage() {
                     )}
                   </td>
                 </tr>
-              ))
+                );
+              })
             )}
           </tbody>
         </table>
