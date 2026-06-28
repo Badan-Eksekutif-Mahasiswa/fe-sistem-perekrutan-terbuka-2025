@@ -227,7 +227,7 @@ const EventModuleV2 = ({ events }: PendaftaranModuleProps) => {
               <EventGrid
                 className="mt-5"
                 events={paginatedEvents.map((e) => ({
-                  id: e.id,
+                  id: e.eventCode || "",
                   title: e.title,
                   status: getBadgeStatus(e.status),
                   startedAt: e.startedAt,

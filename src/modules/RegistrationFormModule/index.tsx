@@ -13,8 +13,8 @@ import {
   Section,
   PersonalInfoData,
   QuestionSectionData,
-  AnswerSubmit,
   SelectedDivision,
+  RegistrationPayload,
 } from "@/types/registration";
 import { useToast } from "@/hooks/useToast";
 import { Event } from "@/types/event";
@@ -36,6 +36,7 @@ export default function RegistrationFormModule({
   const [submitting, setSubmitting] = useState(false);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [hasRegistration, setHasRegistration] = useState(false);
 
   // Refs for debounce timeouts
   const lineTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -78,8 +79,13 @@ export default function RegistrationFormModule({
   const fetchApplicationStatus = async () => {
     try {
       const response = await registrationApi.getApplicationStatus(eventId);
-      if (response.success && response.data.hasApplication) {
-        setIsSubmitted(response.data.isSubmitted);
+      if (response.success && response.data.hasRegistration) {
+        const status = response.data.registration?.status;
+        setHasRegistration(true);
+        setIsSubmitted(Boolean(status && status !== "DRAFT"));
+      } else {
+        setHasRegistration(false);
+        setIsSubmitted(false);
       }
     } catch (error) {
       console.error("Failed to fetch application status:", error);
@@ -90,8 +96,11 @@ export default function RegistrationFormModule({
     try {
       setLoading(true);
       await fetchApplicationStatus();
-      const sections = await registrationApi.getSections(eventId);
-      setSections(sections);
+      const nextSections: Section[] = [
+        { id: "personal-info", name: "personal-info", order: 1 },
+        { id: "submission-links", name: "submission-links", order: 2 },
+      ];
+      setSections(nextSections);
     } catch (error) {
       toast.show("error", "Gagal memuat daftar section");
       console.error(error);
@@ -103,22 +112,89 @@ export default function RegistrationFormModule({
   const fetchSectionData = async () => {
     try {
       setLoading(true);
-      const response = await registrationApi.getRegistrationForm(
-        eventId,
-        currentSection.name
-      );
+      const response = await registrationApi.getRegistrationForm(eventId);
 
       if (response.success) {
-        if (currentSection.id === "personal-info" && response.data.data) {
-          const data = response.data.data as PersonalInfoData;
+        const { applicant, draft, event: formEvent } = response.data;
+        const draftChoices = draft?.choices ?? [];
+        const draftLinks = new Map(
+          (draft?.submissionLinks ?? []).map((link) => [
+            link.requirementId,
+            link.submittedUrl,
+          ])
+        );
+
+        if (currentSection.id === "personal-info") {
+          const selectedChoices = draftChoices
+            .map((choice) => {
+              const division = formEvent.divisions.find(
+                (item) => item.id === choice.divisionId
+              );
+
+              if (!division) return null;
+
+              return {
+                divisionId: division.id,
+                divisionName: division.name,
+                priority: choice.choiceOrder,
+              };
+            })
+            .filter(Boolean) as SelectedDivision[];
+
+          const data: PersonalInfoData = {
+            name: applicant.name,
+            npm: applicant.npm ?? "",
+            email: draft?.contactEmail ?? "",
+            faculty: applicant.faculty ?? "",
+            studyProgram: applicant.studyProgram ?? "",
+            line: draft?.lineId ?? "",
+            availableDivisions: formEvent.divisions.map((division) => ({
+              id: division.id,
+              name: division.name,
+              description: division.description ?? "",
+            })),
+            maxDivisionChoices: formEvent.maxDivisionChoices || 1,
+            selectedDivisions: selectedChoices,
+          };
+
           setPersonalInfo(data);
           setLineId(data.line || "");
           setSelectedDivisions(data.selectedDivisions || []);
-        } else if (response.data.questions) {
-          const data = response.data as unknown as QuestionSectionData;
+        } else {
+          const selectedDivisionIds =
+            selectedDivisions.length > 0
+              ? selectedDivisions.map((division) => division.divisionId)
+              : draftChoices.map((choice) => choice.divisionId);
+          const divisionRequirements = formEvent.divisions
+            .filter((division) => selectedDivisionIds.includes(division.id))
+            .flatMap((division) => division.requirements ?? []);
+          const requirements = [
+            ...(formEvent.requirements ?? []),
+            ...divisionRequirements,
+          ].sort((a, b) => a.sortOrder - b.sortOrder);
+
+          const data: QuestionSectionData = {
+            section: "submission-links",
+            title: "Berkas Pendaftaran",
+            description: "Masukkan link dokumen sesuai instruksi panitia.",
+            order: 2,
+            questions: requirements.map((requirement) => ({
+              id: requirement.id,
+              question: requirement.title,
+              description: requirement.templateUrl
+                ? `${requirement.instruction}\nTemplate: ${requirement.templateUrl}`
+                : requirement.instruction,
+              order: requirement.sortOrder,
+              type: "INPUT",
+              inputType: "SHORT_TEXT",
+              isRequired: requirement.isRequired,
+              answer: draftLinks.get(requirement.id) ?? null,
+              options: [],
+            })),
+          };
+
           setQuestionSection(data);
 
-          // Pre-fill answers
           const answerMap = new Map<string, string>();
           data.questions.forEach((q) => {
             if (q.answer) {
@@ -136,6 +212,23 @@ export default function RegistrationFormModule({
     }
   };
 
+  const buildRegistrationPayload = useCallback(
+    (answerMap = answers): RegistrationPayload => ({
+      eventId,
+      contactEmail: personalInfo?.email || "",
+      whatsappNumber: null,
+      lineId,
+      divisionChoices: selectedDivisions.map((division) => division.divisionId),
+      submissionLinks: Array.from(answerMap.entries())
+        .filter(([, submittedUrl]) => submittedUrl.trim())
+        .map(([requirementId, submittedUrl]) => ({
+          requirementId,
+          submittedUrl: submittedUrl.trim(),
+        })),
+    }),
+    [answers, eventId, lineId, personalInfo?.email, selectedDivisions]
+  );
+
   const handleLineChange = useCallback(
     (value: string) => {
       if (isSubmitted) return;
@@ -152,8 +245,7 @@ export default function RegistrationFormModule({
         try {
           await registrationApi.partialUpdateRegistration({
             eventId,
-            section: "personal-info",
-            line: value,
+            lineId: value,
           });
         } catch (error) {
           console.error("Auto-save failed:", error);
@@ -194,8 +286,7 @@ export default function RegistrationFormModule({
           try {
             await registrationApi.partialUpdateRegistration({
               eventId,
-              section: "personal-info",
-              divisions: newDivisions.map((d) => d.divisionId),
+              divisionChoices: newDivisions.map((d) => d.divisionId),
             });
           } catch (error) {
             console.error("Auto-save divisions failed:", error);
@@ -229,10 +320,16 @@ export default function RegistrationFormModule({
       answerTimeoutRef.current = setTimeout(async () => {
         if (currentSection) {
           try {
+            const nextAnswers = new Map(answers);
+            nextAnswers.set(questionId, value);
             await registrationApi.partialUpdateRegistration({
               eventId,
-              section: currentSection.name,
-              answers: [{ questionId, value }],
+              submissionLinks: Array.from(nextAnswers.entries())
+                .filter(([, submittedUrl]) => submittedUrl.trim())
+                .map(([requirementId, submittedUrl]) => ({
+                  requirementId,
+                  submittedUrl: submittedUrl.trim(),
+                })),
             });
           } catch (error) {
             console.error("Auto-save failed:", error);
@@ -240,7 +337,7 @@ export default function RegistrationFormModule({
         }
       }, 1000);
     },
-    [eventId, currentSection]
+    [answers, eventId, currentSection]
   );
 
   const validateCurrentSection = (): boolean => {
@@ -252,11 +349,11 @@ export default function RegistrationFormModule({
       if (
         selectedDivisions.length === 0 ||
         (personalInfo &&
-          selectedDivisions.length > personalInfo.maxChooseDivision)
+          selectedDivisions.length > personalInfo.maxDivisionChoices)
       ) {
         toast.show(
           "error",
-          `Pilih ${personalInfo?.maxChooseDivision || 1} divisi`
+          `Pilih maksimal ${personalInfo?.maxDivisionChoices || 1} divisi`
         );
         return false;
       }
@@ -283,27 +380,13 @@ export default function RegistrationFormModule({
 
     try {
       setSubmitting(true);
+      const payload = buildRegistrationPayload();
 
-      if (isPersonalInfo) {
-        await registrationApi.updateRegistration({
-          eventId,
-          section: "personal-info",
-          line: lineId,
-          divisions: selectedDivisions.map((d) => d.divisionId),
-        });
+      if (!hasRegistration) {
+        await registrationApi.createRegistration(payload);
+        setHasRegistration(true);
       } else {
-        const answerArray: AnswerSubmit[] = Array.from(answers.entries()).map(
-          ([questionId, value]) => ({
-            questionId,
-            value,
-          })
-        );
-
-        await registrationApi.updateRegistration({
-          eventId,
-          section: currentSection.name,
-          answers: answerArray,
-        });
+        await registrationApi.updateRegistration(payload);
       }
     } catch (error) {
       toast.show(
@@ -345,8 +428,7 @@ export default function RegistrationFormModule({
   const handleFinalSubmit = async () => {
     try {
       setSubmitting(true);
-      // TODO: Call API endpoint POST /registration/submit
-      await registrationApi.submitRegistration(eventId);
+      await registrationApi.submitRegistration(buildRegistrationPayload());
 
       setShowSubmitDialog(false);
       toast.show("success", "Pendaftaran berhasil diselesaikan!");

@@ -26,8 +26,10 @@ const Divisi = ({ event }: DivisiProps) => {
   const [indexDivisi, setIndexDivisi] = useState(0);
   const divisiData = event.divisions || [];
   const divisiDipilih = divisiData[indexDivisi];
-  const eventPath = event.eventCode || event.id;
+  const eventPath = event.eventCode;
   const isRegistrationClosed = getEventStatus(event) === "Ditutup";
+  const isRegistrationUnavailable = isRegistrationClosed || !eventPath;
+  const registrationButtonLabel = !eventPath ? "Slug belum tersedia" : "Pendaftaran Ditutup";
 
   if (!divisiData || divisiData.length === 0 || !divisiDipilih) {
     return (
@@ -160,14 +162,14 @@ const Divisi = ({ event }: DivisiProps) => {
               </div>
             </div>
           </div>
-          {isRegistrationClosed ? (
+          {isRegistrationUnavailable ? (
             <Button
               className="w-full bg-marun/50 text-white cursor-not-allowed items-center text-center"
               style={{ boxShadow: 'var(--shadow-glass)' }}
               disabled
             >
               <ClipboardListIcon className="size-6" />
-              <p className="text-m2">Pendaftaran Ditutup</p>
+              <p className="text-m2">{registrationButtonLabel}</p>
             </Button>
           ) : (
             <Link href={`/${eventPath}/form`}>
@@ -260,14 +262,14 @@ const Divisi = ({ event }: DivisiProps) => {
             </div>
           </TabsContent>
         </Tabs>
-        {isRegistrationClosed ? (
+        {isRegistrationUnavailable ? (
           <Button
             className="w-full bg-marun/50 text-white cursor-not-allowed items-center text-center"
             style={{ boxShadow: 'var(--shadow-glass)' }}
             disabled
           >
             <ClipboardListIcon className="size-6" />
-            <p className="text-m2">Pendaftaran Ditutup</p>
+            <p className="text-m2">{registrationButtonLabel}</p>
           </Button>
         ) : (
           <Link href={`/${eventPath}/form`} className="w-full">

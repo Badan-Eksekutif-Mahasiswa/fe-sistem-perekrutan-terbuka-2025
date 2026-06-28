@@ -30,6 +30,7 @@ function formatDate(date?: Date) {
 }
 
 export default function EventCard({ event, onRegister, onDetail, className }: EventCardProps) {
+  const hasDetailPath = Boolean(event.id);
   const dateRange = event.startedAt && event.closedAt
     ? `${formatDate(event.startedAt)} – ${formatDate(event.closedAt)}`
     : event.deadline
@@ -75,8 +76,9 @@ export default function EventCard({ event, onRegister, onDetail, className }: Ev
             <Button
               variant="external"
               size="sm"
-              href={onDetail ? undefined : `/${event.id}`}
-              onClick={onDetail ? () => onDetail(event.id) : undefined}
+              href={!onDetail && hasDetailPath ? `/${event.id}` : undefined}
+              onClick={onDetail && hasDetailPath ? () => onDetail(event.id) : undefined}
+              disabled={!hasDetailPath}
             >
               Detail
             </Button>
@@ -111,8 +113,9 @@ export default function EventCard({ event, onRegister, onDetail, className }: Ev
           <Button
             variant="external"
             size="sm"
-            href={onDetail ? undefined : `/${event.id}`}
-            onClick={onDetail ? () => onDetail(event.id) : undefined}
+            href={!onDetail && hasDetailPath ? `/${event.id}` : undefined}
+            onClick={onDetail && hasDetailPath ? () => onDetail(event.id) : undefined}
+            disabled={!hasDetailPath}
             fullWidth
           >
             Detail

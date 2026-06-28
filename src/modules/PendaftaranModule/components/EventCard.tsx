@@ -10,6 +10,7 @@ type EventCardProps = {
 };
 
 const EventCard = ({ event }: EventCardProps) => {
+  const eventPath = event.eventCode;
   const formattedDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-GB", {
       day: "2-digit",
@@ -69,12 +70,18 @@ const EventCard = ({ event }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Link href={`/${event.eventCode || event.id}`}>
+          {eventPath ? (
+          <Link href={`/${eventPath}`}>
             <Button variant={"secondary"} className="h-fit">
               <p className="text-primary-500 text-m3">Selengkapnya</p>
               <ArrowRightIcon className="size-4 text-primary-500" />
             </Button>
           </Link>
+          ) : (
+            <Button variant={"secondary"} className="h-fit cursor-not-allowed opacity-60" disabled>
+              <p className="text-primary-500 text-m3">Slug belum tersedia</p>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -123,12 +130,18 @@ const EventCard = ({ event }: EventCardProps) => {
               </Button>
             ))}
           </div>
-          <Link className="w-full" href={`/${event.eventCode || event.id}`}>
+          {eventPath ? (
+          <Link className="w-full" href={`/${eventPath}`}>
             <Button variant={"secondary"} className="w-full">
               <p className="text-primary-500 text-m3">Selengkapnya</p>
               <ArrowRightIcon className="size-4 text-primary-500" />
             </Button>
           </Link>
+          ) : (
+            <Button variant={"secondary"} className="w-full cursor-not-allowed opacity-60" disabled>
+              <p className="text-primary-500 text-m3">Slug belum tersedia</p>
+            </Button>
+          )}
         </div>
       </div>
     </div>
