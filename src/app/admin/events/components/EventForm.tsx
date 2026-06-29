@@ -538,7 +538,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           value={formData.title}
           onChange={handleChange}
           className={getInputClass(!!fieldErrors.title)}
-          placeholder="Contoh: Open Recruitment BEM UI 2025"
+          placeholder="Contoh: Open Recruitment BEM UI 2026"
           required={formData.status !== "DRAFT"}
         />
         <FieldError name="title" />
