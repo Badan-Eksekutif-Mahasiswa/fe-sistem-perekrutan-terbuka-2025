@@ -44,7 +44,7 @@ export default function EventCard({ event, onRegister, onDetail, className }: Ev
         <div className="flex gap-6">
           <div className="relative w-36 h-32 shrink-0 rounded-lg overflow-hidden">
             <Image
-              src={event.logoSrc ?? '/placeholders/logo-event.webp'}
+              src={event.logoSrc ?? '/assets/logo-bem-ui.png'}
               alt={`Logo ${event.title}`}
               fill
               className="object-contain"
@@ -96,7 +96,7 @@ export default function EventCard({ event, onRegister, onDetail, className }: Ev
         <div className="flex gap-4">
           <div className="relative w-24 h-24 shrink-0 rounded overflow-hidden">
             <Image
-              src={event.logoSrc ?? '/placeholders/logo-event.webp'}
+              src={event.logoSrc ?? '/assets/logo-bem-ui.png'}
               alt={`Logo ${event.title}`}
               fill
               className="object-contain"

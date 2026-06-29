@@ -28,7 +28,8 @@ const OnGoing = ({ events = [], loading }: OnGoingProps) => {
 export default OnGoing;
 
 const CalendarSection = ({ events }: { events: Event[] }) => {
-  const availableRanges = events.map((event) => ({
+  const activeEvents = events.filter((event) => getEventStatus(event) === "Dibuka");
+  const availableRanges = activeEvents.map((event) => ({
     start: new Date(event.registrationOpen),
     end: new Date(event.registrationClose),
     label: event.title,
@@ -39,7 +40,7 @@ const CalendarSection = ({ events }: { events: Event[] }) => {
     <div className="w-full flex flex-col gap-2">
       <p className="text-m1 text-white text-center">Calendar</p>
       <Calendar availableRanges={availableRanges} />
-      <Button variant="external">
+      <Button variant="external" href="/event">
         Cek Pendaftaran Lainnya
       </Button>
     </div>

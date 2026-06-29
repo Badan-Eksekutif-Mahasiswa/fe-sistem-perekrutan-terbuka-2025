@@ -145,7 +145,7 @@ const DashboardPage = () => {
           <div className="flex items-center gap-4 mb-4">
             <div className="relative w-16 h-16">
               <Image
-                src="/logo-clean.webp"
+                src="/assets/logo-bem-ui.png"
                 alt="Logo"
                 fill
                 className="object-contain"

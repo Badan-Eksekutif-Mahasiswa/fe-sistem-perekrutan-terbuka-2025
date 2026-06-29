@@ -61,7 +61,7 @@ export function transformEventToEventType(event: Event): EventType {
     id: event.id,
     eventCode: event.eventCode || undefined,
     title: event.title,
-    logo: event.logo || "/placeholders/logo-event.webp",
+    logo: event.logo || "/assets/logo-bem-ui.png",
     desc: event.description,
     status: getEventStatus(event),
     startedAt: new Date(event.registrationOpen),
