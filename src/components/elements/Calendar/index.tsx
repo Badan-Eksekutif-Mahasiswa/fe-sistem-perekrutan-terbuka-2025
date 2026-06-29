@@ -169,7 +169,7 @@ const Calendar: React.FC<CalendarProps> = ({
   const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   return (
-    <div className="w-full rounded-xl bg-gradient-card-blue flex flex-col gap-2 max-lg:grid max-lg:grid-cols-[2fr_1fr] max-md:flex" style={{ boxShadow: 'var(--shadow-glass)' }}>
+    <div className="w-full rounded-xl bg-gradient-card-blue flex flex-col gap-2" style={{ boxShadow: 'var(--shadow-glass)' }}>
       <div className={cn("w-full mx-auto px-6 pt-6", className)}>
         {/* Header */}
         <div className="rounded-xl w-full cursor-default text-m3 text-white font-jakarta py-2 px-2 flex items-center justify-between">
