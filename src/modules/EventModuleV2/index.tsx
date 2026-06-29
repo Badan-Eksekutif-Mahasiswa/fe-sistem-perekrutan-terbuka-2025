@@ -234,7 +234,7 @@ const EventModuleV2 = ({ events }: PendaftaranModuleProps) => {
                   closedAt: e.closedAt,
                   description: e.desc,
                   divisions: e.categories,
-                  logoSrc: e.logo || undefined
+                  logoSrc: e.logo || "/assets/logo-bem-ui.png"
                 }))}
               />
 

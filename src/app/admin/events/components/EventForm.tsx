@@ -51,6 +51,9 @@ type EventFormProps = {
   loading?: boolean;
 };
 
+const TASK_TEMPLATE_DOC_URL =
+  "https://docs.google.com/document/d/13DkccXusn-4MMkloH79SSYMGd0AQKovZBecHzw_1aV0/edit?usp=sharing";
+
 type SocialMediaLinks = {
   instagram: string;
   tiktok: string;
@@ -586,6 +589,14 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           placeholder="https://docs.google.com/..."
         />
         <p className="text-xs text-white/60 mt-1">Pastikan URL diawali dengan <span className="font-mono">https://</span></p>
+        <a
+          href={TASK_TEMPLATE_DOC_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs font-semibold text-[#FFD8DF] underline underline-offset-4 hover:text-white"
+        >
+          Buka template dokumen tugas
+        </a>
       </div>
 
       <div className="flex flex-col gap-1">
@@ -795,6 +806,14 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
               <label className="text-sm">Link Tugas Khusus Divisi</label>
               <input type="url" name="taskUrl" value={item.taskUrl} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="https://docs.google.com/..." />
               <p className="text-xs text-white/60 mt-1">Pastikan URL diawali dengan <span className="font-mono">https://</span></p>
+              <a
+                href={TASK_TEMPLATE_DOC_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs font-semibold text-[#FFD8DF] underline underline-offset-4 hover:text-white"
+              >
+                Buka template dokumen tugas
+              </a>
             </div>
             {divisions.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeDivision(index)} itemName="Divisi" />

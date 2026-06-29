@@ -14,7 +14,7 @@ const Testimoni = ({ event }: TestimoniProps) => {
 
   const formattedTestimonies = testimonies.map((t) => ({
     name: t.name,
-    profilePicture: t.photoUrl || "",
+    profilePicture: t.photoUrl || "/assets/logo-bem-ui.png",
     desc: t.message,
     jabatan: t.role,
   }));

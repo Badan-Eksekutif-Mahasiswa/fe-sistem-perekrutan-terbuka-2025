@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
+import {
+  isSupabaseConfigured,
+  SUPABASE_MEDIA_BUCKET,
+  supabase,
+} from "@/lib/supabaseClient";
 import { Loader2, UploadCloud, CheckCircle2, X } from "lucide-react";
-import Image from "next/image";
 
 interface FileUploadProps {
   value?: string;
@@ -14,12 +17,27 @@ interface FileUploadProps {
   accept?: string;
 }
 
+function isValidUploadUrl(value: string) {
+  if (value.startsWith("/")) return true;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function isImageUrl(value: string) {
+  return /\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i.test(value);
+}
+
 export default function FileUpload({
   value,
   onChange,
   label,
   placeholder = "Upload gambar",
-  bucketName = "spt-media",
+  bucketName = SUPABASE_MEDIA_BUCKET,
   accept = "image/*",
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
@@ -88,6 +106,19 @@ export default function FileUpload({
     onChange("");
   };
 
+  const handleManualUrl = (rawUrl: string) => {
+    const url = rawUrl.trim();
+    if (!url) return;
+
+    if (!isValidUploadUrl(url)) {
+      setError("URL gambar tidak valid. Gunakan URL lengkap yang diawali https://");
+      return;
+    }
+
+    setError(null);
+    onChange(url);
+  };
+
   return (
     <div className="flex flex-col gap-2">
       {label && <label className="text-sm font-bold">{label}</label>}
@@ -95,21 +126,27 @@ export default function FileUpload({
       {value ? (
         <div className="relative border border-[#8F344A] bg-neutral-50 rounded-md p-2 flex items-center justify-between">
           <div className="flex items-center gap-3 overflow-hidden">
-            {value.match(/\.(jpeg|jpg|gif|png|webp)/i) || accept.includes("image") ? (
+            {isValidUploadUrl(value) && (isImageUrl(value) || accept.includes("image")) ? (
               <div className="relative w-12 h-12 rounded-md overflow-hidden shrink-0 border border-neutral-200">
-                <Image src={value} alt="Uploaded" fill className="object-cover" />
+                <img src={value} alt="Uploaded" className="w-full h-full object-cover" />
               </div>
             ) : (
               <CheckCircle2 className="size-6 text-green-500 shrink-0" />
             )}
-            <a
-              href={value}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-[#8F344A] truncate hover:underline"
-            >
-              {value}
-            </a>
+            {isValidUploadUrl(value) ? (
+              <a
+                href={value}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[#8F344A] truncate hover:underline"
+              >
+                {value}
+              </a>
+            ) : (
+              <span className="text-sm text-red-500 truncate">
+                URL tersimpan tidak valid. Hapus lalu masukkan URL yang diawali https://
+              </span>
+            )}
           </div>
           <button
             type="button"
@@ -163,13 +200,11 @@ export default function FileUpload({
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                const url = e.currentTarget.value.trim();
-                if (url) onChange(url);
+                handleManualUrl(e.currentTarget.value);
               }
             }}
             onBlur={(e) => {
-              const url = e.target.value.trim();
-              if (url) onChange(url);
+              handleManualUrl(e.target.value);
             }}
           />
         </div>

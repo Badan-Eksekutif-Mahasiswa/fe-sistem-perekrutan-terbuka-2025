@@ -91,7 +91,7 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
               >
                 <div className="w-full aspect-[16/10] relative border-[8px] md:border-[10px] border-primary-300 rounded-3xl overflow-hidden bg-white/5">
                   <Image
-                    src={`/placeholder-1.webp`}
+                    src={`/assets/logo-bem-ui.png`}
                     alt={`Dokumentasi ${index + 1}`}
                     fill
                     className="object-cover hover:scale-105 transition-transform duration-500"

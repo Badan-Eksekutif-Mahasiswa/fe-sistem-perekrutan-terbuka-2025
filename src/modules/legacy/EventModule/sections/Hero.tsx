@@ -86,7 +86,7 @@ const Hero = ({ event }: HeroProps) => {
           </h1>
           <div className="relative w-32 h-32 md:w-72 md:h-72">
             <img
-              src={event.logo || "/placeholders/logo-event.webp"}
+              src={event.logo || "/assets/logo-bem-ui.png"}
               alt="Logo"
               className="w-full h-full object-contain"
             />

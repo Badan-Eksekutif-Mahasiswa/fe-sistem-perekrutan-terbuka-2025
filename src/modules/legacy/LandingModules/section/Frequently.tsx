@@ -40,18 +40,18 @@ const FrequentlyAsked = () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-4">
-          <AccordionTrigger>Bagaimana cara mengetahui jadwal interview saya?</AccordionTrigger>
+          <AccordionTrigger>Bagaimana cara mengetahui hasil seleksi berkas?</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
             <p>
-              Jadwal interview dapat dilihat langsung di halaman pendaftaranmu setelah kamu berhasil melakukan booking slot interview.
+              Panitia akan mengirimkan informasi hasil seleksi berkas melalui email yang kamu cantumkan saat mendaftar.
             </p>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-5">
-          <AccordionTrigger>Apa yang terjadi jika saya tidak menghadiri interview?</AccordionTrigger>
+          <AccordionTrigger>Apakah pendaftaran bisa diubah setelah submit?</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
             <p>
-              Ketidakhadiran tanpa konfirmasi sebelumnya dapat mempengaruhi proses seleksimu. Hubungi panitia terkait jika ada kendala sebelum jadwal interview.
+              Setelah pendaftaran disubmit, data tidak bisa diubah lagi oleh pendaftar. Pastikan seluruh data dan link tugas sudah benar sebelum menekan tombol submit.
             </p>
           </AccordionContent>
         </AccordionItem>

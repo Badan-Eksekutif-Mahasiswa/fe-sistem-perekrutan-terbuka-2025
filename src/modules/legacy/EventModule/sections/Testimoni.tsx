@@ -13,7 +13,7 @@ const Testimoni = ({ event }: TestimoniProps) => {
   // Map API format to CarouselElement format
   const formattedTestimonies = testimonies.map((t) => ({
     name: t.name,
-    profilePicture: t.photoUrl || "/placeholder-1.webp",
+    profilePicture: t.photoUrl || "/assets/logo-bem-ui.png",
     desc: t.message,
     jabatan: t.role,
   }));

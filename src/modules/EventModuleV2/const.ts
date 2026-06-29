@@ -16,7 +16,7 @@ const filterCategory = [
 const eventsData = [
   {
     title: "Staff Semarak Apresiasi",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Dibuka",
     startedAt: new Date("2025-08-11"),
@@ -26,7 +26,7 @@ const eventsData = [
   },
   {
     title: "Staff SUS",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Akan Datang",
     startedAt: new Date("2025-08-12"),
@@ -36,7 +36,7 @@ const eventsData = [
   },
   {
     title: "Staff Bahlil",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Ditutup",
     startedAt: new Date("2025-08-13"),
@@ -46,7 +46,7 @@ const eventsData = [
   },
   {
     title: "Staff Kreatif",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Dibuka",
     startedAt: new Date("2025-08-14"),
@@ -56,7 +56,7 @@ const eventsData = [
   },
   {
     title: "Staff Inovasi",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Akan Datang",
     startedAt: new Date("2025-08-15"),
@@ -66,7 +66,7 @@ const eventsData = [
   },
   {
     title: "Staff Inspirasi",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Ditutup",
     startedAt: new Date("2025-08-16"),
@@ -76,7 +76,7 @@ const eventsData = [
   },
   {
     title: "Staff Prestasi",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Dibuka",
     startedAt: new Date("2025-08-17"),
@@ -86,7 +86,7 @@ const eventsData = [
   },
   {
     title: "Staff Semangat",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Akan Datang",
     startedAt: new Date("2025-08-18"),
@@ -96,7 +96,7 @@ const eventsData = [
   },
   {
     title: "Staff Kreator",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Ditutup",
     startedAt: new Date("2025-08-19"),
@@ -106,7 +106,7 @@ const eventsData = [
   },
   {
     title: "Staff Visioner",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Dibuka",
     startedAt: new Date("2025-08-20"),
@@ -116,7 +116,7 @@ const eventsData = [
   },
   {
     title: "Staff Kreativitas",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Akan Datang",
     startedAt: new Date("2025-08-21"),
@@ -126,7 +126,7 @@ const eventsData = [
   },
   {
     title: "Staff Aksi",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Ditutup",
     startedAt: new Date("2025-08-22"),
@@ -136,7 +136,7 @@ const eventsData = [
   },
   {
     title: "Staff Hebat",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Dibuka",
     startedAt: new Date("2025-08-23"),
@@ -146,7 +146,7 @@ const eventsData = [
   },
   {
     title: "Staff Unggul",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Akan Datang",
     startedAt: new Date("2025-08-24"),
@@ -156,7 +156,7 @@ const eventsData = [
   },
   {
     title: "Staff Vision",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Ditutup",
     startedAt: new Date("2025-08-25"),
@@ -166,7 +166,7 @@ const eventsData = [
   },
   {
     title: "Staff Pioneer",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Dibuka",
     startedAt: new Date("2025-08-26"),
@@ -176,7 +176,7 @@ const eventsData = [
   },
   {
     title: "Staff Champion",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Akan Datang",
     startedAt: new Date("2025-08-27"),
@@ -186,7 +186,7 @@ const eventsData = [
   },
   {
     title: "Staff Kreator Hebat",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Ditutup",
     startedAt: new Date("2025-08-28"),
@@ -196,7 +196,7 @@ const eventsData = [
   },
   {
     title: "Staff Inspiratif",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Dibuka",
     startedAt: new Date("2025-08-29"),
@@ -206,7 +206,7 @@ const eventsData = [
   },
   {
     title: "Staff Kreatif Muda",
-    logo: "/placeholders/logo-event.webp",
+    logo: "/assets/logo-bem-ui.png",
     desc: "Lorem ipsum, dolor sit amet consectetur adipisicing elit.",
     status: "Akan Datang",
     startedAt: new Date("2025-08-30"),
