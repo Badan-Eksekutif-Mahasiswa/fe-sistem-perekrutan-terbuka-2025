@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui-legacy/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { PersonalInfoForm } from "./components/PersonalInfoForm";
 import { QuestionItem } from "./components/QuestionItem";
 import { SubmitConfirmationDialog } from "./components/SubmitConfirmationDialog";
@@ -15,9 +15,54 @@ import {
   QuestionSectionData,
   SelectedDivision,
   RegistrationPayload,
+  Question,
 } from "@/types/registration";
 import { useToast } from "@/hooks/useToast";
-import { Event } from "@/types/event";
+import { Event, SubmissionRequirement } from "@/types/event";
+import { cn } from "@/lib/utils";
+
+/**
+ * Link tugas sementara selama admin belum mengisi link asli.
+ * Nanti diganti otomatis oleh generalTaskUrl / taskUrl / interviewLink dari backend.
+ */
+const FALLBACK_TASK_URL = "https://google.com";
+
+/** Satu grup Tugas Khusus untuk satu divisi pilihan pendaftar. */
+interface DivisionTaskGroup {
+  divisionId: string;
+  divisionName: string;
+  priority: number;
+  guidebookUrl: string;
+  interviewUrl: string;
+  questions: Question[];
+}
+
+/** Pengelompokan submisi tugas: umum (event) + khusus (per divisi). */
+interface TaskGroups {
+  generalGuidebookUrl: string;
+  generalQuestions: Question[];
+  divisions: DivisionTaskGroup[];
+}
+
+/** Tombol link (Guidebook / Jadwalkan Interview) yang membuka tab baru. */
+function TaskLinkButton({
+  href,
+  icon,
+  children,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <Button asChild variant="stroke" size="md" className="w-fit">
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {icon}
+        {children}
+      </a>
+    </Button>
+  );
+}
 
 type RegistrationFormModuleProps = {
   event: Event;
@@ -56,6 +101,7 @@ export default function RegistrationFormModule({
   // Question Section State
   const [questionSection, setQuestionSection] =
     useState<QuestionSectionData | null>(null);
+  const [taskGroups, setTaskGroups] = useState<TaskGroups | null>(null);
   const [answers, setAnswers] = useState<Map<string, string>>(new Map());
 
   const currentSection = sections[currentSectionIndex];
@@ -164,42 +210,84 @@ export default function RegistrationFormModule({
           setLineId(data.line || "");
           setSelectedDivisions(data.selectedDivisions || []);
         } else {
-          const selectedDivisionIds =
+          // Ubah satu requirement backend jadi Question yang dipakai QuestionItem.
+          const toQuestion = (requirement: SubmissionRequirement): Question => ({
+            id: requirement.id,
+            question: requirement.title,
+            description: requirement.instruction,
+            order: requirement.sortOrder,
+            type: "INPUT",
+            inputType: "SHORT_TEXT",
+            isRequired: requirement.isRequired,
+            answer: draftLinks.get(requirement.id) ?? null,
+            options: [],
+          });
+
+          // Tugas Umum: requirement ber-scope EVENT.
+          const generalQuestions = (formEvent.requirements ?? [])
+            .slice()
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map(toQuestion);
+
+          // Tugas Khusus: per divisi yang dipilih, urut prioritas pilihan.
+          const choiceList =
             selectedDivisions.length > 0
-              ? selectedDivisions.map((division) => division.divisionId)
-              : draftChoices.map((choice) => choice.divisionId);
-          const divisionRequirements = formEvent.divisions
-            .filter((division) => selectedDivisionIds.includes(division.id))
-            .flatMap((division) => division.requirements ?? []);
-          const requirements = [
-            ...(formEvent.requirements ?? []),
-            ...divisionRequirements,
-          ].sort((a, b) => a.sortOrder - b.sortOrder);
+              ? selectedDivisions.map((division) => ({
+                  divisionId: division.divisionId,
+                  priority: division.priority,
+                }))
+              : draftChoices.map((choice) => ({
+                  divisionId: choice.divisionId,
+                  priority: choice.choiceOrder,
+                }));
+
+          const divisionGroups = choiceList
+            .slice()
+            .sort((a, b) => a.priority - b.priority)
+            .map((choice) => {
+              const division = formEvent.divisions.find(
+                (item) => item.id === choice.divisionId
+              );
+              if (!division) return null;
+
+              return {
+                divisionId: division.id,
+                divisionName: division.name,
+                priority: choice.priority,
+                guidebookUrl: division.taskUrl ?? FALLBACK_TASK_URL,
+                interviewUrl: division.interviewLink ?? FALLBACK_TASK_URL,
+                questions: (division.requirements ?? [])
+                  .slice()
+                  .sort((a, b) => a.sortOrder - b.sortOrder)
+                  .map(toQuestion),
+              } satisfies DivisionTaskGroup;
+            })
+            .filter((group): group is DivisionTaskGroup => group !== null);
+
+          setTaskGroups({
+            generalGuidebookUrl: formEvent.generalTaskUrl ?? FALLBACK_TASK_URL,
+            generalQuestions,
+            divisions: divisionGroups,
+          });
+
+          // Bentuk flat tetap dipakai untuk validasi & auto-save (key = requirementId).
+          const allQuestions = [
+            ...generalQuestions,
+            ...divisionGroups.flatMap((group) => group.questions),
+          ];
 
           const data: QuestionSectionData = {
             section: "submission-links",
-            title: "Berkas Pendaftaran",
+            title: "Task Submission",
             description: "Masukkan link dokumen sesuai instruksi panitia.",
             order: 2,
-            questions: requirements.map((requirement) => ({
-              id: requirement.id,
-              question: requirement.title,
-              description: requirement.templateUrl
-                ? `${requirement.instruction}\nTemplate: ${requirement.templateUrl}`
-                : requirement.instruction,
-              order: requirement.sortOrder,
-              type: "INPUT",
-              inputType: "SHORT_TEXT",
-              isRequired: requirement.isRequired,
-              answer: draftLinks.get(requirement.id) ?? null,
-              options: [],
-            })),
+            questions: allQuestions,
           };
 
           setQuestionSection(data);
 
           const answerMap = new Map<string, string>();
-          data.questions.forEach((q) => {
+          allQuestions.forEach((q) => {
             if (q.answer) {
               answerMap.set(q.id, q.answer);
             }
@@ -411,7 +499,11 @@ export default function RegistrationFormModule({
   };
 
   const submitCurrentSection = async () => {
-    if (!validateCurrentSection()) return;
+    // Validasi gagal: toast sudah ditampilkan di validateCurrentSection.
+    // Lempar error supaya handleNext TIDAK lanjut pindah ke section berikutnya.
+    if (!validateCurrentSection()) {
+      throw new Error("VALIDATION_FAILED");
+    }
 
     try {
       setSubmitting(true);
@@ -495,27 +587,34 @@ export default function RegistrationFormModule({
       <main className="relative grid grid-cols-[1.3fr_4fr] max-lg:grid-cols-1 max-lg:gap-4 gap-10 z-10 max-w-7xl mx-auto px-4 py-8">
         {/* Progress Tabs */}
         <div className="bg-gradient-card-blur rounded-xl flex flex-col gap-2 h-fit p-3 overflow-x-auto">
-          {sections.map((section, index) => (
-            <Button
-              key={`${section.id}-${index}`}
-              onClick={() => setCurrentSectionIndex(index)}
-              disabled={index > currentSectionIndex}
-              variant={"secondary"}
-              className={`
-                ${
-                  index === currentSectionIndex
-                    ? ""
-                    : index < currentSectionIndex
-                    ? "bg-secondary-300/50 hover:bg-secondary-300/70"
-                    : "bg-transparent text-neutral-300 cursor-not-allowed"
-                }
-              `}
-            >
-              {section.name === "personal-info"
+          {sections.map((section, index) => {
+            const isActive = index === currentSectionIndex;
+            const isLocked = index > currentSectionIndex;
+            const label =
+              section.name === "personal-info"
                 ? "Personal Info"
-                : section.name}
-            </Button>
-          ))}
+                : "Task Submission";
+
+            return (
+              <Button
+                key={`${section.id}-${index}`}
+                onClick={() => setCurrentSectionIndex(index)}
+                // Saat sudah submit, semua tab bebas diklik (form read-only).
+                disabled={isSubmitted ? false : isLocked}
+                variant="secondary"
+                className={cn(
+                  "w-full justify-center transition-all",
+                  // Non-aktif = outline maroon (border dari variant tetap dipakai)
+                  !isActive && "bg-transparent text-neutral-200 hover:bg-marun/20",
+                  isLocked &&
+                    !isSubmitted &&
+                    "text-neutral-400 opacity-60 cursor-not-allowed hover:bg-transparent"
+                )}
+              >
+                {label}
+              </Button>
+            );
+          })}
         </div>
 
         {/* Form Card */}
@@ -524,7 +623,7 @@ export default function RegistrationFormModule({
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-2xl font-jakarta font-bold text-neutral-100">
                 {isPersonalInfo
-                  ? "Staff Semarak Apresiasi 2026"
+                  ? event.title
                   : questionSection?.title || currentSection?.name}
               </h2>
               {isSubmitted && (
@@ -542,7 +641,7 @@ export default function RegistrationFormModule({
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-8">
             {isPersonalInfo && personalInfo ? (
               <PersonalInfoForm
                 data={{ ...personalInfo, email, line: lineId, selectedDivisions }}
@@ -551,16 +650,68 @@ export default function RegistrationFormModule({
                 onDivisionSelect={handleDivisionSelect}
                 isReadOnly={isSubmitted}
               />
-            ) : questionSection ? (
-              questionSection.questions.map((question) => (
-                <QuestionItem
-                  key={question.id}
-                  question={question}
-                  value={answers.get(question.id) || ""}
-                  onAnswerChange={handleAnswerChange}
-                  isReadOnly={isSubmitted}
-                />
-              ))
+            ) : taskGroups ? (
+              <>
+                {/* Tugas Umum */}
+                {(taskGroups.generalGuidebookUrl ||
+                  taskGroups.generalQuestions.length > 0) && (
+                  <section className="space-y-4">
+                    <h3 className="text-lg font-jakarta font-bold text-neutral-50">
+                      Tugas Umum
+                    </h3>
+                    {taskGroups.generalGuidebookUrl && (
+                      <TaskLinkButton
+                        href={taskGroups.generalGuidebookUrl}
+                        icon={<BookOpen className="size-4" />}
+                      >
+                        Guidebook Tugas Umum
+                      </TaskLinkButton>
+                    )}
+                    {taskGroups.generalQuestions.map((question) => (
+                      <QuestionItem
+                        key={question.id}
+                        question={question}
+                        value={answers.get(question.id) || ""}
+                        onAnswerChange={handleAnswerChange}
+                        isReadOnly={isSubmitted}
+                      />
+                    ))}
+                  </section>
+                )}
+
+                {/* Tugas Khusus per divisi pilihan */}
+                {taskGroups.divisions.map((group) => (
+                  <section key={group.divisionId} className="space-y-4">
+                    <h3 className="text-lg font-jakarta font-bold text-neutral-50">
+                      Tugas Khusus Divisi Pilihan {group.priority}
+                    </h3>
+                    {group.guidebookUrl && (
+                      <TaskLinkButton
+                        href={group.guidebookUrl}
+                        icon={<BookOpen className="size-4" />}
+                      >
+                        Guidebook {group.divisionName}
+                      </TaskLinkButton>
+                    )}
+                    {group.questions.map((question) => (
+                      <QuestionItem
+                        key={question.id}
+                        question={question}
+                        value={answers.get(question.id) || ""}
+                        onAnswerChange={handleAnswerChange}
+                        isReadOnly={isSubmitted}
+                      />
+                    ))}
+                  </section>
+                ))}
+
+                {taskGroups.generalQuestions.length === 0 &&
+                  taskGroups.divisions.length === 0 && (
+                    <p className="text-sm text-neutral-300">
+                      Belum ada tugas yang perlu disubmit.
+                    </p>
+                  )}
+              </>
             ) : null}
           </div>
 
