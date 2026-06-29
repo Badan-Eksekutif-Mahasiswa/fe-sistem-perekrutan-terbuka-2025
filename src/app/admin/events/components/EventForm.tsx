@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Event } from "@/types/event";
 import {
   EventDocumentationItem,
@@ -76,6 +76,8 @@ function getStringField(value: unknown, key: string): string {
 type FieldErrors = Record<string, string>;
 const WHATSAPP_PATTERN = /^\+?[0-9][0-9\s-]{7,20}$/;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const genKey = () => Math.random().toString(36).slice(2, 10);
+type WithKey<T> = T & { _key: string };
 
 function getWhatsappError(value: unknown) {
   const text = String(value || "").trim();
@@ -134,44 +136,48 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     line: toStringValue(socialMediaData.line),
   });
 
-  const [timeline, setTimeline] = useState<EventTimelineItem[]>(
-    Array.isArray(initialData?.timeline) && initialData.timeline.length > 0 
+  const [timeline, setTimeline] = useState<WithKey<EventTimelineItem>[]>(
+    Array.isArray(initialData?.timeline) && initialData.timeline.length > 0
       ? initialData.timeline.map((item: unknown) => ({
           startDate: getStringField(item, "startDate"),
           endDate: getStringField(item, "endDate"),
           title: getStringField(item, "title"),
-          description: getStringField(item, "description")
+          description: getStringField(item, "description"),
+          _key: genKey(),
         }))
-      : [{ startDate: "", endDate: "", title: "", description: "" }]
+      : [{ startDate: "", endDate: "", title: "", description: "", _key: genKey() }]
   );
 
-  const [faqs, setFaqs] = useState<EventFaqItem[]>(
-    Array.isArray(initialData?.faqs) && initialData.faqs.length > 0 
+  const [faqs, setFaqs] = useState<WithKey<EventFaqItem>[]>(
+    Array.isArray(initialData?.faqs) && initialData.faqs.length > 0
       ? initialData.faqs.map((item: unknown) => ({
           question: getStringField(item, "question"),
-          answer: getStringField(item, "answer")
+          answer: getStringField(item, "answer"),
+          _key: genKey(),
         }))
-      : [{ question: "", answer: "" }]
+      : [{ question: "", answer: "", _key: genKey() }]
   );
 
-  const [testimonials, setTestimonials] = useState<EventTestimonialItem[]>(
-    Array.isArray(initialData?.testimonials) && initialData.testimonials.length > 0 
+  const [testimonials, setTestimonials] = useState<WithKey<EventTestimonialItem>[]>(
+    Array.isArray(initialData?.testimonials) && initialData.testimonials.length > 0
       ? initialData.testimonials.map((item: unknown) => ({
           name: getStringField(item, "name"),
           role: getStringField(item, "role"),
           message: getStringField(item, "message"),
-          photoUrl: getStringField(item, "photoUrl")
+          photoUrl: getStringField(item, "photoUrl"),
+          _key: genKey(),
         }))
-      : [{ name: "", role: "", message: "", photoUrl: "" }]
+      : [{ name: "", role: "", message: "", photoUrl: "", _key: genKey() }]
   );
 
-  const [documentations, setDocumentations] = useState<EventDocumentationItem[]>(
-    Array.isArray(initialData?.documentations) && initialData.documentations.length > 0 
+  const [documentations, setDocumentations] = useState<WithKey<EventDocumentationItem>[]>(
+    Array.isArray(initialData?.documentations) && initialData.documentations.length > 0
       ? initialData.documentations.map((item: unknown) => ({
           title: getStringField(item, "title"),
-          imageUrl: getStringField(item, "imageUrl")
+          imageUrl: getStringField(item, "imageUrl"),
+          _key: genKey(),
         }))
-      : [{ title: "", imageUrl: "" }]
+      : [{ title: "", imageUrl: "", _key: genKey() }]
   );
 
   // Divisions State
@@ -188,7 +194,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     isActive: true,
   };
 
-  const [divisions, setDivisions] = useState<EventFormDivision[]>(
+  const [divisions, setDivisions] = useState<WithKey<EventFormDivision>[]>(
     Array.isArray(initialData?.divisions) && initialData.divisions.length > 0
       ? initialData.divisions.map((division) => {
           const pic = toRecord(division.PIC);
@@ -204,9 +210,10 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             picContact: toStringValue(pic.contact),
             taskUrl: division.taskUrl || "",
             isActive: division.isActive !== undefined ? division.isActive : true,
+            _key: division.id || genKey(),
           };
         })
-      : [blankDivision]
+      : [{ ...blankDivision, _key: genKey() }]
   );
 
   const [deletedDivisions, setDeletedDivisions] = useState<string[]>([]);
@@ -220,6 +227,21 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   const FieldError = ({ name }: { name: string }) => (
     fieldErrors[name] ? <p className="text-sm font-medium text-red-100">{fieldErrors[name]}</p> : null
   );
+
+  const RequiredMark = () => <span className="text-red-400 ml-0.5">*</span>;
+
+  const isDirty = useRef(false);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty.current) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   const clearFieldError = (...names: string[]) => {
     setFieldErrors((prev) => {
@@ -245,6 +267,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    isDirty.current = true;
     if (name === "registrationOpen" || name === "registrationClose") {
       clearFieldError("registrationOpen", "registrationClose");
     } else {
@@ -269,22 +292,24 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const handleTimelineChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    isDirty.current = true;
     clearFieldError("timeline");
     const newTimeline = [...timeline];
     newTimeline[index] = { ...newTimeline[index], [name]: value };
     setTimeline(newTimeline);
   };
-  const addTimeline = () => setTimeline([...timeline, { startDate: "", endDate: "", title: "", description: "" }]);
+  const addTimeline = () => setTimeline([...timeline, { startDate: "", endDate: "", title: "", description: "", _key: genKey() }]);
   const removeTimeline = (index: number) => setTimeline(timeline.filter((_, i) => i !== index));
 
   const handleFaqChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    isDirty.current = true;
     clearFieldError("faqs");
     const newFaqs = [...faqs];
     newFaqs[index] = { ...newFaqs[index], [name]: value };
     setFaqs(newFaqs);
   };
-  const addFaq = () => setFaqs([...faqs, { question: "", answer: "" }]);
+  const addFaq = () => setFaqs([...faqs, { question: "", answer: "", _key: genKey() }]);
   const removeFaq = (index: number) => setFaqs(faqs.filter((_, i) => i !== index));
 
   const handleTestimonialChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -293,7 +318,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     newTestimonials[index] = { ...newTestimonials[index], [name]: value };
     setTestimonials(newTestimonials);
   };
-  const addTestimonial = () => setTestimonials([...testimonials, { name: "", role: "", message: "", photoUrl: "" }]);
+  const addTestimonial = () => setTestimonials([...testimonials, { name: "", role: "", message: "", photoUrl: "", _key: genKey() }]);
   const removeTestimonial = (index: number) => setTestimonials(testimonials.filter((_, i) => i !== index));
 
   const handleDocumentationChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -302,12 +327,13 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     newDocs[index] = { ...newDocs[index], [name]: value };
     setDocumentations(newDocs);
   };
-  const addDocumentation = () => setDocumentations([...documentations, { title: "", imageUrl: "" }]);
+  const addDocumentation = () => setDocumentations([...documentations, { title: "", imageUrl: "", _key: genKey() }]);
   const removeDocumentation = (index: number) => setDocumentations(documentations.filter((_, i) => i !== index));
 
 
   const handleDivisionChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    isDirty.current = true;
     clearFieldError("divisions");
     const newDivisions = [...divisions];
     newDivisions[index] = { 
@@ -318,7 +344,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   };
 
   const addDivision = () => {
-    setDivisions([...divisions, { id: "", name: "", coverUrl: "", maxQuota: "", description: "", jobdesc: "", picName: "", picContact: "", taskUrl: "", isActive: true }]);
+    setDivisions([...divisions, { ...blankDivision, _key: genKey() }]);
   };
 
   const removeDivision = (index: number) => {
@@ -356,6 +382,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
     if (Number(formData.maxDivisionChoices || 0) < 1) {
       errors.maxDivisionChoices = "Maks pilih divisi minimal 1.";
+    }
+
+    const activeDivisionCount = divisions.filter(d => d.isActive && d.name.trim() !== "").length;
+    if (!isDraft && activeDivisionCount > 0 && Number(formData.maxDivisionChoices) > activeDivisionCount) {
+      errors.maxDivisionChoices = `Maks pilih divisi (${formData.maxDivisionChoices}) tidak boleh melebihi jumlah divisi aktif (${activeDivisionCount}).`;
     }
 
     const whatsappError = getWhatsappError(formData.contactWhatsapp);
@@ -451,6 +482,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     submitData.socialMedia = cleanedSocialMedia;
     submitData.timeline = timeline
       .filter(t => t.title.trim() !== "" || t.startDate.trim() !== "")
+      .map(({ _key, ...rest }) => rest)
       .sort((a, b) => {
         const dateA = new Date(a.startDate).getTime();
         const dateB = new Date(b.startDate).getTime();
@@ -459,9 +491,9 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         if (Number.isNaN(dateB)) return -1;
         return dateA - dateB;
       });
-    submitData.faqs = faqs.filter(f => f.question.trim() !== "" || f.answer.trim() !== "");
-    submitData.testimonials = testimonials.filter(t => t.name.trim() !== "");
-    submitData.documentations = documentations.filter(d => d.title.trim() !== "" || d.imageUrl.trim() !== "");
+    submitData.faqs = faqs.filter(f => f.question.trim() !== "" || f.answer.trim() !== "").map(({ _key, ...rest }) => rest);
+    submitData.testimonials = testimonials.filter(t => t.name.trim() !== "").map(({ _key, ...rest }) => rest);
+    submitData.documentations = documentations.filter(d => d.title.trim() !== "" || d.imageUrl.trim() !== "").map(({ _key, ...rest }) => rest);
 
     // Prepare divisions payload
     const finalDivisions: EventFormDivision[] = divisions.filter(d => d.name.trim() !== "").map(d => ({
@@ -499,7 +531,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       )}
 
       <div className="flex flex-col gap-1">
-        <label className="font-bold text-m4">Nama Acara</label>
+        <label className="font-bold text-m4">Nama Acara<RequiredMark /></label>
         <input
           type="text"
           name="title"
@@ -513,7 +545,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="font-bold text-m4">URL Event (Slug)</label>
+        <label className="font-bold text-m4">URL Event (Slug)<RequiredMark /></label>
         <div className="flex items-center">
           <span className="bg-[#8F344A]/20 border border-[#8F344A] border-r-0 text-white/80 p-2 rounded-l-md font-mono text-sm">/events/</span>
           <input
@@ -531,7 +563,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="font-bold text-m4">Deskripsi Acara</label>
+        <label className="font-bold text-m4">Deskripsi Acara<RequiredMark /></label>
         <textarea
           name="description"
           value={formData.description}
@@ -553,10 +585,11 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400"
           placeholder="https://docs.google.com/..."
         />
+        <p className="text-xs text-white/60 mt-1">Pastikan URL diawali dengan <span className="font-mono">https://</span></p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="font-bold text-m4">Penyelenggara (Organizer)</label>
+        <label className="font-bold text-m4">Penyelenggara (Organizer)<RequiredMark /></label>
         <input
           type="text"
           name="organizer"
@@ -582,7 +615,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           />
         </div>
         <div className="flex-1 flex flex-col gap-1">
-          <label className="font-bold text-m4">ID Line Kontak</label>
+          <label className="font-bold text-m4">ID Line Kontak<RequiredMark /></label>
           <input
             type="text"
             name="contactLineId"
@@ -674,7 +707,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         className="flex gap-4 mt-2"
       >
         <div className="flex-1 flex flex-col gap-1">
-          <label className="font-bold text-m4">Waktu Buka Pendaftaran</label>
+          <label className="font-bold text-m4">Waktu Buka Pendaftaran<RequiredMark /></label>
           <input
             type="datetime-local"
             name="registrationOpen"
@@ -686,7 +719,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
           <FieldError name="registrationOpen" />
         </div>
         <div className="flex-1 flex flex-col gap-1">
-          <label className="font-bold text-m4">Waktu Tutup Pendaftaran</label>
+          <label className="font-bold text-m4">Waktu Tutup Pendaftaran<RequiredMark /></label>
           <input
             type="datetime-local"
             name="registrationClose"
@@ -714,7 +747,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         <FieldError name="divisions" />
         
         {divisions.map((item, index) => (
-          <div key={index} className="flex flex-col gap-4">
+          <div key={item._key} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <FileUpload
                 label="Upload Foto Cover Divisi"
@@ -728,7 +761,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-sm">Nama/Judul Divisi</label>
+              <label className="text-sm">Nama/Judul Divisi<RequiredMark /></label>
               <input type="text" name="name" value={item.name} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Humas" required={formData.status !== "DRAFT"} />
             </div>
             <div className="flex flex-col gap-1">
@@ -761,6 +794,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             <div className="flex flex-col gap-1">
               <label className="text-sm">Link Tugas Khusus Divisi</label>
               <input type="url" name="taskUrl" value={item.taskUrl} onChange={(e) => handleDivisionChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="https://docs.google.com/..." />
+              <p className="text-xs text-white/60 mt-1">Pastikan URL diawali dengan <span className="font-mono">https://</span></p>
             </div>
             {divisions.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeDivision(index)} itemName="Divisi" />
@@ -806,13 +840,13 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         <FieldError name="timeline" />
         
         {timeline.map((item, index) => (
-          <div key={index} className="flex flex-col gap-4">
+          <div key={item._key} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-sm">Tanggal Mulai</label>
+              <label className="text-sm">Tanggal Mulai<RequiredMark /></label>
               <input type="date" name="startDate" value={item.startDate} onChange={(e) => handleTimelineChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" required={formData.status !== "DRAFT"} />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-sm">Judul Timeline</label>
+              <label className="text-sm">Judul Timeline<RequiredMark /></label>
               <input type="text" name="title" value={item.title} onChange={(e) => handleTimelineChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Pembukaan Pendaftaran" required={formData.status !== "DRAFT"} />
             </div>
             <div className="flex flex-col gap-1">
@@ -836,7 +870,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         <FieldError name="faqs" />
         
         {faqs.map((item, index) => (
-          <div key={index} className="flex flex-col gap-4">
+          <div key={item._key} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm">Pertanyaan</label>
               <input type="text" name="question" value={item.question} onChange={(e) => handleFaqChange(index, e)} className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400" placeholder="Contoh: Apakah event ini berbayar?" />
@@ -861,7 +895,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         <label className="text-2xl font-bold">Testimoni</label>
         
         {testimonials.map((item, index) => (
-          <div key={index} className="flex flex-col gap-4">
+          <div key={item._key} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <FileUpload
                 label="Upload Foto Responden"
@@ -902,7 +936,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         <label className="text-2xl font-bold">Dokumentasi</label>
         
         {documentations.map((item, index) => (
-          <div key={index} className="flex flex-col gap-4">
+          <div key={item._key} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <FileUpload
                 label="Upload Foto Dokumentasi"
