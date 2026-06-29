@@ -692,7 +692,6 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
             name="registrationClose"
             value={formData.registrationClose as string}
             onChange={handleChange}
-            min={formData.registrationOpen as string}
             className={getInputClass(!!fieldErrors.registrationClose)}
             required={formData.status !== "DRAFT"}
           />
