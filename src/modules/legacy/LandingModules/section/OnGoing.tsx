@@ -73,7 +73,7 @@ const OngoingSection = ({
               <EventCard
                 key={event.id}
                 id={event.eventCode || undefined}
-                logo={event.logo ?? "/logo-clean.webp"}
+                logo={event.logo ?? "/assets/logo-bem-ui.png"}
                 title={event.title}
                 startDate={new Date(event.registrationOpen)}
                 endDate={new Date(event.registrationClose)}

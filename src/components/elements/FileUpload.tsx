@@ -45,6 +45,10 @@ export default function FileUpload({
         throw new Error("File harus berupa gambar (JPG, PNG, dll).");
       }
 
+      if (file.size > 3 * 1024 * 1024) {
+        throw new Error(`Ukuran file terlalu besar (${(file.size / 1024 / 1024).toFixed(1)} MB). Maksimal 3 MB.`);
+      }
+
       // Generate unique file name
       const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
