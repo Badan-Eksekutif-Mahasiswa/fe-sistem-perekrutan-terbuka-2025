@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Link tugas sementara selama admin belum mengisi link asli.
- * Nanti diganti otomatis oleh generalTaskUrl / taskUrl / interviewLink dari backend.
+ * Nanti diganti otomatis oleh generalTaskUrl / taskUrl dari backend.
  */
 const FALLBACK_TASK_URL = "https://google.com";
 
@@ -33,7 +33,6 @@ interface DivisionTaskGroup {
   divisionName: string;
   priority: number;
   guidebookUrl: string;
-  interviewUrl: string;
   questions: Question[];
 }
 
@@ -44,7 +43,7 @@ interface TaskGroups {
   divisions: DivisionTaskGroup[];
 }
 
-/** Tombol link (Guidebook / Jadwalkan Interview) yang membuka tab baru. */
+/** Tombol link guidebook yang membuka tab baru. */
 function TaskLinkButton({
   href,
   icon,
@@ -86,6 +85,7 @@ export default function RegistrationFormModule({
   // Refs for debounce timeouts
   const emailTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lineTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const divisionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Personal Info State
@@ -255,7 +255,6 @@ export default function RegistrationFormModule({
                 divisionName: division.name,
                 priority: choice.priority,
                 guidebookUrl: division.taskUrl ?? FALLBACK_TASK_URL,
-                interviewUrl: division.interviewLink ?? FALLBACK_TASK_URL,
                 questions: (division.requirements ?? [])
                   .slice()
                   .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -320,6 +319,47 @@ export default function RegistrationFormModule({
     [answers, email, eventId, lineId, selectedDivisions]
   );
 
+  const logAutosaveError = useCallback((label: string, error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`${label}: ${message}`);
+  }, []);
+
+  const saveDraftPatch = useCallback(
+    async (
+      patch: Partial<RegistrationPayload> & { eventId: string },
+      answerMap = answers
+    ) => {
+      try {
+        await registrationApi.partialUpdateRegistration(patch);
+        setHasRegistration(true);
+        return;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "";
+        if (!message.includes("No draft registration found")) {
+          throw error;
+        }
+      }
+
+      try {
+        await registrationApi.createRegistration({
+          ...buildRegistrationPayload(answerMap),
+          ...patch,
+          eventId,
+        });
+        setHasRegistration(true);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "";
+        if (message.includes("Draft already exists")) {
+          await registrationApi.partialUpdateRegistration(patch);
+          setHasRegistration(true);
+          return;
+        }
+        throw error;
+      }
+    },
+    [answers, buildRegistrationPayload, eventId]
+  );
+
   const handleEmailChange = useCallback(
     (value: string) => {
       if (isSubmitted) return;
@@ -332,16 +372,16 @@ export default function RegistrationFormModule({
 
       emailTimeoutRef.current = setTimeout(async () => {
         try {
-          await registrationApi.partialUpdateRegistration({
+          await saveDraftPatch({
             eventId,
             contactEmail: value,
           });
         } catch (error) {
-          console.error("Auto-save email failed:", error);
+          logAutosaveError("Auto-save email failed", error);
         }
       }, 1000);
     },
-    [eventId, isSubmitted]
+    [eventId, isSubmitted, logAutosaveError, saveDraftPatch]
   );
 
   const handleLineChange = useCallback(
@@ -358,16 +398,16 @@ export default function RegistrationFormModule({
       // Auto-save with debounce
       lineTimeoutRef.current = setTimeout(async () => {
         try {
-          await registrationApi.partialUpdateRegistration({
+          await saveDraftPatch({
             eventId,
             lineId: value,
           });
         } catch (error) {
-          console.error("Auto-save failed:", error);
+          logAutosaveError("Auto-save line failed", error);
         }
       }, 1000);
     },
-    [eventId, isSubmitted]
+    [eventId, isSubmitted, logAutosaveError, saveDraftPatch]
   );
 
   const handleDivisionSelect = useCallback(
@@ -393,25 +433,25 @@ export default function RegistrationFormModule({
         newDivisions.sort((a, b) => a.priority - b.priority);
 
         // Auto-save with debounce
-        if (lineTimeoutRef.current) {
-          clearTimeout(lineTimeoutRef.current);
+        if (divisionTimeoutRef.current) {
+          clearTimeout(divisionTimeoutRef.current);
         }
 
-        lineTimeoutRef.current = setTimeout(async () => {
+        divisionTimeoutRef.current = setTimeout(async () => {
           try {
-            await registrationApi.partialUpdateRegistration({
+            await saveDraftPatch({
               eventId,
               divisionChoices: newDivisions.map((d) => d.divisionId),
             });
           } catch (error) {
-            console.error("Auto-save divisions failed:", error);
+            logAutosaveError("Auto-save divisions failed", error);
           }
         }, 1000);
 
         return newDivisions;
       });
     },
-    [personalInfo, eventId, isSubmitted]
+    [personalInfo, eventId, isSubmitted, logAutosaveError, saveDraftPatch]
   );
 
   const handleAnswerChange = useCallback(
@@ -437,22 +477,25 @@ export default function RegistrationFormModule({
           try {
             const nextAnswers = new Map(answers);
             nextAnswers.set(questionId, value);
-            await registrationApi.partialUpdateRegistration({
-              eventId,
-              submissionLinks: Array.from(nextAnswers.entries())
-                .filter(([, submittedUrl]) => submittedUrl.trim())
-                .map(([requirementId, submittedUrl]) => ({
-                  requirementId,
-                  submittedUrl: submittedUrl.trim(),
-                })),
-            });
+            await saveDraftPatch(
+              {
+                eventId,
+                submissionLinks: Array.from(nextAnswers.entries())
+                  .filter(([, submittedUrl]) => submittedUrl.trim())
+                  .map(([requirementId, submittedUrl]) => ({
+                    requirementId,
+                    submittedUrl: submittedUrl.trim(),
+                  })),
+              },
+              nextAnswers
+            );
           } catch (error) {
-            console.error("Auto-save failed:", error);
+            logAutosaveError("Auto-save answer failed", error);
           }
         }
       }, 1000);
     },
-    [answers, eventId, currentSection]
+    [answers, eventId, currentSection, logAutosaveError, saveDraftPatch]
   );
 
   const validateCurrentSection = (): boolean => {

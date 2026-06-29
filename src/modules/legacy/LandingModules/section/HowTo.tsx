@@ -14,10 +14,10 @@ const step = [
     desc: "Tentukan pilihan divisi pertama dan keduamu, lalu upload tugas umum dan tugas divisi sesuai instruksi yang tertera di halaman pendaftaran event.",
   },
   {
-    desc: "Pilih dan booking slot jadwal interview yang tersedia untuk masing-masing divisi pilihanmu. Pastikan kamu memilih waktu yang benar-benar bisa kamu hadiri.",
+    desc: "Periksa kembali seluruh data pendaftaran dan link tugas yang sudah kamu isi. Jika semuanya sudah benar, submit pendaftaran untuk masuk ke proses seleksi berkas.",
   },
   {
-    desc: "Pantau status pendaftaranmu secara berkala melalui halaman profil. Cek email untuk notifikasi hasil seleksi dari panitia event.",
+    desc: "Pantau pendaftaranmu melalui dashboard. Informasi hasil seleksi berkas akan dikirimkan oleh panitia melalui email yang kamu cantumkan.",
   },
 ];
 

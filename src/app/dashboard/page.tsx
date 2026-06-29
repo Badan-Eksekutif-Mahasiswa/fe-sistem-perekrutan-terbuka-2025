@@ -29,6 +29,9 @@ import Link from "next/link";
 const isApplicationSubmitted = (application: MyApplication) =>
   application.status !== "DRAFT";
 
+const isResultStatus = (status: RegistrationStatus) =>
+  status === "PASSED_ADMINISTRATION" || status === "REJECTED_ADMINISTRATION";
+
 const getStatusLabel = (status: RegistrationStatus) => {
   const statusLabels: Record<RegistrationStatus, string> = {
     DRAFT: "Draft",
@@ -283,16 +286,14 @@ const DashboardPage = () => {
                     className="bg-gradient-card-glass backdrop-blur-sm border border-primary-300 rounded-xl p-6 hover:border-primary-200 transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row gap-6">
-                      {app.eventLogo && (
-                        <div className="relative w-20 h-20 flex-shrink-0">
-                          <Image
-                            src={app.eventLogo}
-                            alt={app.eventTitle}
-                            fill
-                            className="object-contain rounded-lg"
-                          />
-                        </div>
-                      )}
+                      <div className="relative w-20 h-20 flex-shrink-0">
+                        <Image
+                          src={app.eventLogo || "/assets/logo-bem-ui.png"}
+                          alt={app.eventTitle}
+                          fill
+                          className="object-contain rounded-lg"
+                        />
+                      </div>
 
                       <div className="flex-1 space-y-3">
                         <div>
@@ -310,13 +311,15 @@ const DashboardPage = () => {
                                 {app.eventLevel}
                               </span>
                             )}
-                            <span
-                              className={`text-p6 px-2 py-1 rounded ${getStatusColor(
-                                app.status
-                              )}`}
-                            >
-                              {getStatusLabel(app.status)}
-                            </span>
+                            {!isResultStatus(app.status) && (
+                              <span
+                                className={`text-p6 px-2 py-1 rounded ${getStatusColor(
+                                  app.status
+                                )}`}
+                              >
+                                {getStatusLabel(app.status)}
+                              </span>
+                            )}
                           </div>
                         </div>
 
