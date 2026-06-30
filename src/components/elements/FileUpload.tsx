@@ -134,14 +134,14 @@ export default function FileUpload({
               <CheckCircle2 className="size-6 text-green-500 shrink-0" />
             )}
             {isValidUploadUrl(value) ? (
-              <a
-                href={value}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-[#8F344A] truncate hover:underline"
-              >
-                {value}
-              </a>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[#8F344A] truncate">
+                  File berhasil tersimpan
+                </p>
+                <p className="text-xs text-neutral-500">
+                  URL file disimpan otomatis.
+                </p>
+              </div>
             ) : (
               <span className="text-sm text-red-500 truncate">
                 URL tersimpan tidak valid. Hapus lalu masukkan URL yang diawali https://

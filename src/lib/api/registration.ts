@@ -6,8 +6,9 @@ import {
   SectionsResponse,
   MyApplicationsResponse,
 } from "@/types/registration";
+import { BACKEND_URL } from "@/lib/api/config";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const BASE_URL = BACKEND_URL;
 
 export const registrationApi = {
   async getSections(eventId: string) {
