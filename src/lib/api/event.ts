@@ -1,7 +1,7 @@
 import { Division, Event, AllEventsResponse, EventByIdResponse } from "@/types/event";
+import { BACKEND_URL } from "@/lib/api/config";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const API_BASE_URL = BACKEND_URL;
 
 type ApiResponse<T> = {
   success: boolean;

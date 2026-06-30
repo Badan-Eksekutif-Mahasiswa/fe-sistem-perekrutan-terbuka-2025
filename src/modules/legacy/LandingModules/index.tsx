@@ -10,6 +10,7 @@ import FrequentlyAsked from "./section/Frequently";
 import MeetTheTeam from "./section/MeetTheTeam";
 import { Event } from "@/types/event";
 import { BalonUdara, LogoBackground } from "@/design-system";
+import { BACKEND_URL } from "@/lib/api/config";
 
 const LandingModules = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -18,11 +19,7 @@ const LandingModules = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
-          }/event`
-        );
+        const response = await fetch(`${BACKEND_URL}/event`);
         const result = await response.json();
         if (result.success) {
           setEvents(result.data);

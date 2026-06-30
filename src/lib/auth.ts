@@ -1,8 +1,5 @@
 import { AuthResponse } from "@/types/auth";
-
-// Configure your backend URL here
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+import { BACKEND_URL } from "@/lib/api/config";
 
 export const authApi = {
   /**

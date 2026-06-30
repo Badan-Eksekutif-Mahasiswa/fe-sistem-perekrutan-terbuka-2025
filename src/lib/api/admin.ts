@@ -1,4 +1,6 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+import { BACKEND_URL } from "@/lib/api/config";
+
+const BASE_URL = BACKEND_URL;
 
 export type AdminApplicationStatus =
   | "SUBMITTED"
