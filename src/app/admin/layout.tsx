@@ -6,9 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const publicAdminPaths = new Set([
-  "/admin/login",
-  "/admin/forgot-password",
-  "/admin/reset-password",
+  "/internal/spt-admin-2026/login",
+  "/internal/spt-admin-2026/forgot-password",
+  "/internal/spt-admin-2026/reset-password",
 ]);
 
 export default function AdminLayout({
@@ -25,7 +25,7 @@ export default function AdminLayout({
     if (isPublicAdminPath || isLoading) return;
 
     if (!user) {
-      router.replace("/admin/login");
+      router.replace("/internal/spt-admin-2026/login");
       return;
     }
 

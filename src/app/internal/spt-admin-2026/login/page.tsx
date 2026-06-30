@@ -112,7 +112,7 @@ export default function AdminLoginPage() {
         </Button>
 
         <div className="mt-4 text-center text-p5 text-white/65">
-          <Link className="text-secondary-100 hover:underline" href="/admin/forgot-password">
+          <Link className="text-secondary-100 hover:underline" href="/internal/spt-admin-2026/forgot-password">
             Lupa password?
           </Link>
         </div>

@@ -8,9 +8,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 
 const hiddenNavbarPaths = new Set([
-  "/admin/login",
-  "/admin/forgot-password",
-  "/admin/reset-password",
+  "/internal/spt-admin-2026/login",
+  "/internal/spt-admin-2026/forgot-password",
+  "/internal/spt-admin-2026/reset-password",
 ]);
 
 const Navbar = () => {

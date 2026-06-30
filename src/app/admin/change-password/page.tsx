@@ -9,7 +9,7 @@ import { authApi } from "@/lib/auth";
 import { Mail, Send } from "lucide-react";
 
 export default function ChangePasswordPage() {
-  const { user, isLoading } = useRequireAuth("/admin/login");
+  const { user, isLoading } = useRequireAuth("/internal/spt-admin-2026/login");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
