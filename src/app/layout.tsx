@@ -25,9 +25,9 @@ export const metadata: Metadata = {
   title: "Sistem Perekrutan Terbuka",
   description: "Sistem Perekrutan Terbuka BEM UI",
   icons: {
-    icon: "/assets/logo-spt-icon.png",
-    shortcut: "/assets/logo-spt-icon.png",
-    apple: "/assets/logo-spt-icon.png",
+    icon: "/assets/logo-bem-ui.png",
+    shortcut: "/assets/logo-bem-ui.png",
+    apple: "/assets/logo-bem-ui.png",
   },
 };
 

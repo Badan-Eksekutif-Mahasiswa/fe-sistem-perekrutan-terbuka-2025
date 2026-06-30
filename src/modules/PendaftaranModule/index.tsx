@@ -120,10 +120,8 @@ const PendaftaranModule = ({ events }: PendaftaranModuleProps) => {
       <div className="px-5 py-10 md:px-20 text-center gap-5 justify-center text-white flex flex-col">
         <h1 className="text-h3 md:text-h1">Cari Lowongan</h1>
         <p className="text-p4">
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aliquid
-          dicta vero dolorem eligendi sunt vitae facilis, maxime quae
-          exercitationem praesentium incidunt quia illo nisi, voluptates
-          aspernatur fugiat culpa repellendus non.
+          Jelajahi daftar rekrutmen yang sedang dibuka dan temukan posisi yang
+          sesuai dengan minat serta kontribusimu.
         </p>
 
         <div className="flex flex-col relative max-md:justify-center max-md:items-center lg:flex-row gap-5 w-full">
