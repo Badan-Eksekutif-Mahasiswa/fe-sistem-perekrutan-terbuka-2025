@@ -19,7 +19,7 @@ import {
 export default function SuperadminPage() {
   const { user, isLoading, isAuthorized } = useRequireRole(
     ["SUPERADMIN"],
-    "/admin/login",
+    "/internal/spt-admin-2026/login",
     "/admin"
   );
   const [admins, setAdmins] = useState<User[]>([]);

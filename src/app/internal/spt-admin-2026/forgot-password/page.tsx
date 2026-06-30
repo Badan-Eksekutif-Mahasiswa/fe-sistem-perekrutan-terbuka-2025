@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
 
         <Link
           className="mt-4 block text-center text-p5 text-secondary-100 hover:underline"
-          href="/admin/login"
+          href="/internal/spt-admin-2026/login"
         >
           Kembali ke login
         </Link>

@@ -53,9 +53,9 @@ const getRoleNavLinks = (role?: string | null): NavLink[] => {
 };
 
 const hiddenNavbarPaths = new Set([
-  '/admin/login',
-  '/admin/forgot-password',
-  '/admin/reset-password',
+  '/internal/spt-admin-2026/login',
+  '/internal/spt-admin-2026/forgot-password',
+  '/internal/spt-admin-2026/reset-password',
 ]);
 
 export default function Navbar({

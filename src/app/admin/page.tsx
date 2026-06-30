@@ -81,7 +81,7 @@ const getEffectiveAdminEventStatus = (event: AdminEvent): AdminEvent["status"] =
 };
 
 export default function AdminDashboardPage() {
-  const { user, isLoading } = useRequireAuth("/admin/login");
+  const { user, isLoading } = useRequireAuth("/internal/spt-admin-2026/login");
   const [events, setEvents] = useState<AdminEvent[]>([]);
   const [registrations, setRegistrations] = useState<AdminRegistrationListItem[]>([]);
   const [summary, setSummary] = useState<AdminEventSummary | null>(null);

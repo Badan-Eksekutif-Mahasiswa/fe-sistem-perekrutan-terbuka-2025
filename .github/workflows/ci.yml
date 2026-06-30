@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - dev
+      - main
   workflow_dispatch:
 
 jobs:
@@ -16,6 +17,7 @@ jobs:
       NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
       NEXT_PUBLIC_SUPABASE_URL: ""
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ""
+      NEXT_PUBLIC_SUPABASE_BUCKET: spt-media
 
     steps:
       - name: Checkout repository
