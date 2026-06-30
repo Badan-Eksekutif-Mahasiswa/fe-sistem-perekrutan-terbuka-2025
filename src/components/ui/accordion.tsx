@@ -11,9 +11,26 @@ type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Item> & {
 };
 
 function Accordion({
+  className,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Root>) {
-  return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
+  const [hasMounted, setHasMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) {
+    return <div className={cn("w-full", className)} />;
+  }
+
+  return (
+    <AccordionPrimitive.Root
+      data-slot="accordion"
+      className={className}
+      {...props}
+    />
+  );
 }
 
 function AccordionItem({

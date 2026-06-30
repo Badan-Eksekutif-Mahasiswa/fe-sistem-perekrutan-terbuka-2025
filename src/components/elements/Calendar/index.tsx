@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import Button from "@/design-system/components/atoms/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { DateRange, CalendarProps } from "./interface";
+import { CalendarProps } from "./interface";
 
 const Calendar: React.FC<CalendarProps> = ({
   availableRanges = [],
@@ -14,24 +14,19 @@ const Calendar: React.FC<CalendarProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Hard-coded available ranges as example
-  const defaultAvailableRanges: DateRange[] = [
-    {
-      start: new Date(2025, 6, 6),
-      end: new Date(2025, 6, 13),
-      label: "Summer Workshop",
-      available: true,
-    },
-    {
-      start: new Date(2025, 6, 18),
-      end: new Date(2025, 6, 26),
-      label: "Summer Workshop",
-      available: true,
-    },
-  ];
+  const ranges = useMemo(
+    () => [...availableRanges].sort((a, b) => a.start.getTime() - b.start.getTime()),
+    [availableRanges]
+  );
 
-  const ranges =
-    availableRanges.length > 0 ? availableRanges : defaultAvailableRanges;
+  useEffect(() => {
+    if (ranges.length === 0) return;
+
+    const firstRange = ranges[0];
+    setCurrentDate(
+      new Date(firstRange.start.getFullYear(), firstRange.start.getMonth(), 1)
+    );
+  }, [ranges]);
 
   // Navigation functions
   const goToPreviousMonth = () => {
@@ -72,6 +67,26 @@ const Calendar: React.FC<CalendarProps> = ({
       days,
     };
   }, [currentDate]);
+
+  const visibleRanges = useMemo(() => {
+    const monthStart = new Date(monthData.year, monthData.month, 1);
+    const monthEnd = new Date(monthData.year, monthData.month + 1, 0);
+
+    return ranges.filter((range) => {
+      const rangeStart = new Date(
+        range.start.getFullYear(),
+        range.start.getMonth(),
+        range.start.getDate()
+      );
+      const rangeEnd = new Date(
+        range.end.getFullYear(),
+        range.end.getMonth(),
+        range.end.getDate()
+      );
+
+      return rangeStart <= monthEnd && rangeEnd >= monthStart;
+    });
+  }, [ranges, monthData.month, monthData.year]);
 
   // Check if a date is within any available range
   const getDateStatus = (date: Date) => {
@@ -154,17 +169,13 @@ const Calendar: React.FC<CalendarProps> = ({
   const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   return (
-    <div className="w-full rounded-xl border border-primary-300 bg-linear-to-r from-primary-200 to-primary-400 flex flex-col gap-2 max-lg:grid max-lg:grid-cols-[2fr_1fr] max-md:flex">
+    <div className="w-full rounded-xl bg-gradient-card-blue flex flex-col gap-2" style={{ boxShadow: 'var(--shadow-glass)' }}>
       <div className={cn("w-full mx-auto px-6 pt-6", className)}>
         {/* Header */}
         <div className="rounded-xl w-full cursor-default text-m3 text-white font-jakarta py-2 px-2 flex items-center justify-between">
-          <Button className="w-9 h-9 p-2" onClick={goToPreviousMonth}>
-            <ChevronLeft />
-          </Button>
+          <Button variant="secondary" onClick={goToPreviousMonth} className="w-9 h-9 p-0" leftIcon={<ChevronLeft size={16} />} />
           {monthNames[monthData.month]} {monthData.year}
-          <Button className="w-9 h-9 p-2" onClick={goToNextMonth}>
-            <ChevronRight />
-          </Button>
+          <Button variant="secondary" onClick={goToNextMonth} className="w-9 h-9 p-0" leftIcon={<ChevronRight size={16} />} />
         </div>
 
         {/* Day headers */}
@@ -187,7 +198,6 @@ const Calendar: React.FC<CalendarProps> = ({
             const isCurrentMonth = date.getMonth() === monthData.month;
             const status = getDateStatus(date);
             const selected = isSelected(date);
-            const isToday = new Date().toDateString() === date.toDateString();
 
             return (
               <button
@@ -201,19 +211,15 @@ const Calendar: React.FC<CalendarProps> = ({
                     "text-white": isCurrentMonth,
                     "text-neutral-600": !isCurrentMonth,
 
-                    // Today styling
-                    "after:content-[''] after:z-0 after:absolute after:w-full after:h-full after:rounded-xl after:top-0 after:left-0 after:border-2 after:border-neutral-50":
-                      isToday && !selected,
-
                     // Selected range styling - connected without rounded corners
                     " text-white": selected,
 
                     // Only round the start and end dates of each range
-                    "rounded-l-lg border-l-2 border-y-2 border-secondary-200":
+                    "rounded-l-lg border-l-2 border-y-2 border-white":
                       status.isStart && status.inRange,
-                    "rounded-r-lg border-r-2  border-y-2 border-secondary-200  ":
+                    "rounded-r-lg border-r-2  border-y-2 border-white  ":
                       status.isEnd && status.inRange,
-                    "border-y-2 border-secondary-200":
+                    "border-y-2 border-white":
                       !status.isStart && status.inRange && !status.isEnd, // Single day range
 
                     // Disabled styling
@@ -232,16 +238,26 @@ const Calendar: React.FC<CalendarProps> = ({
 
       {/* Schedule */}
       <div className="w-full max-lg:border-l max-md:border-l-0 justify-center font-jakarta text-p6 mx-auto flex flex-col gap-2 text-neutral-100 shadow-lg px-6 py-2 pb-6">
-        {ranges.map((range, index) => (
-          <div key={index} className="flex ">
-            <p className=" bg-clip-text font-bold bg-gradient-kiwi">
-              {range.start.getDate() === range.end.getDate()
-                ? `${range.start.getDate()} `
-                : `${range.start.getDate()} - ${range.end.getDate()} `}
-            </p>
-            <p>: {range.label}</p>
-          </div>
-        ))}
+        {visibleRanges.length > 0 ? (
+          visibleRanges.map((range, index) => {
+            const fmt = (d: Date) => d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+            const sameDay = range.start.toDateString() === range.end.toDateString();
+            const sameMonth = range.start.getMonth() === range.end.getMonth();
+            const dateLabel = sameDay
+              ? fmt(range.start)
+              : sameMonth
+                ? `${range.start.getDate()} - ${fmt(range.end)}`
+                : `${fmt(range.start)} - ${fmt(range.end)}`;
+            return (
+              <div key={index} className="flex gap-1">
+                <p className="font-bold text-white shrink-0">{dateLabel}</p>
+                <p>: {range.label}</p>
+              </div>
+            );
+          })
+        ) : (
+          <p className="text-neutral-200/80">Tidak ada jadwal pendaftaran pada bulan ini.</p>
+        )}
       </div>
     </div>
   );

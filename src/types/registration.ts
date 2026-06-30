@@ -1,3 +1,5 @@
+import type { Event } from "./event";
+
 export type QuestionType = "INPUT" | "INFORMATION";
 
 export type QuestionInputType =
@@ -49,7 +51,7 @@ export interface PersonalInfoData {
   studyProgram: string;
   line: string;
   availableDivisions: Division[];
-  maxChooseDivision: number;
+  maxDivisionChoices: number;
   selectedDivisions: SelectedDivision[];
 }
 
@@ -71,12 +73,20 @@ export interface RegistrationFormResponse {
   success: boolean;
   message: string;
   data: {
-    section: string;
-    title: string;
-    description: string;
-    data?: PersonalInfoData;
-    order?: number;
-    questions?: Question[];
+    event: Event;
+    applicant: {
+      id: string;
+      name: string;
+      email: string | null;
+      npm: string | null;
+      faculty: string | null;
+      studyProgram: string | null;
+      year: string | null;
+    };
+    canRegister: boolean;
+    hasRegistration: boolean;
+    registrationId: string | null;
+    draft: RegistrationDraft | null;
   };
 }
 
@@ -95,8 +105,51 @@ export interface SubmitResponse {
   success: boolean;
   message: string;
   data: {
-    applicationId: string;
+    registrationId: string;
+    eventId: string;
+    status: RegistrationStatus;
+    submittedAt?: string;
   } | null;
+}
+
+export interface RegistrationSubmissionLinkInput {
+  requirementId: string;
+  submittedUrl: string;
+}
+
+export interface RegistrationPayload {
+  eventId: string;
+  contactEmail: string;
+  whatsappNumber?: string | null;
+  lineId?: string | null;
+  divisionChoices: string[];
+  submissionLinks: RegistrationSubmissionLinkInput[];
+}
+
+export interface RegistrationDraft {
+  id: string;
+  eventId: string;
+  userId: string;
+  contactEmail: string;
+  whatsappNumber: string | null;
+  lineId: string | null;
+  status: RegistrationStatus;
+  submittedAt: string;
+  reviewedAt: string | null;
+  decidedAt: string | null;
+  choices: Array<{
+    id: string;
+    registrationId: string;
+    divisionId: string;
+    choiceOrder: number;
+  }>;
+  submissionLinks: Array<{
+    id: string;
+    registrationId: string;
+    requirementId: string;
+    submittedUrl: string;
+    createdAt: string;
+  }>;
 }
 
 export interface PersonalInfoSubmit {
@@ -117,51 +170,61 @@ export interface QuestionSectionSubmit {
   answers: AnswerSubmit[];
 }
 
-export interface ApplicationStatusResponse {
+export type RegistrationStatus =
+  | "DRAFT"
+  | "SUBMITTED"
+  | "UNDER_REVIEW"
+  | "PASSED_ADMINISTRATION"
+  | "REJECTED_ADMINISTRATION";
+
+export interface RegistrationStatusResponse {
   success: boolean;
   message: string;
   data: {
-    hasApplication: boolean;
-    applicationId?: string;
-    isSubmitted: boolean;
-    submittedAt?: string;
-    lastEditedAt?: string;
-    stage?: string;
-    allRequiredFieldsFilled?: boolean;
-    canModify?: boolean;
-    selectedDivisions?: SelectedDivision[];
+    hasRegistration: boolean;
+    canRegister: boolean;
+    registration?: {
+      id: string;
+      status: RegistrationStatus;
+      contactEmail: string;
+      whatsappNumber: string | null;
+      lineId: string | null;
+      submittedAt: string;
+      reviewedAt: string | null;
+      decidedAt: string | null;
+      choices: Array<{
+        choiceOrder: number;
+        divisionId: string;
+        division: { id: string; name: string };
+      }>;
+      submissionLinks: Array<{
+        requirementId: string;
+        submittedUrl: string;
+        requirement: { title: string; scope: "EVENT" | "DIVISION" };
+      }>;
+      emailLogs: unknown[];
+    };
   };
 }
-
-export type SelectionStage =
-  | "DOCUMENT_SCREENING"
-  | "INTERVIEW"
-  | "ACCEPTED"
-  | "REJECTED";
 
 export interface ApplicationDivision {
   divisionId: string;
   divisionName: string;
-  priority: number;
-  stage: SelectionStage | null;
+  choiceOrder: number;
 }
 
 export interface MyApplication {
   id: string;
   eventId: string;
+  eventCode: string | null;
   eventTitle: string;
   eventLogo: string | null;
-  typeOfEvent: string;
-  eventLevel: string;
-  openRegistration: string;
-  closeRegistration: string;
-  isSubmitted: boolean;
+  typeOfEvent: Event["typeOfEvent"];
+  eventLevel: Event["eventLevel"];
+  status: RegistrationStatus;
   submittedAt: string | null;
-  lastEditedAt: string;
-  stage: SelectionStage | null;
+  lastEditedAt: string | null;
   selectedDivisions: ApplicationDivision[];
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface MyApplicationsResponse {

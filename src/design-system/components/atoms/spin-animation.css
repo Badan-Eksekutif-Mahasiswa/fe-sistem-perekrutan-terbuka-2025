@@ -1,0 +1,233 @@
+.propeller-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: transparent;
+}
+
+.animated-propellers {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+  --primary-color: #ffffff;
+  --secondary-color: #64b5f6;
+  --idle-opacity: 0.35;
+  --idle-duration: 6s;
+  --cycle-duration: 9.6s;
+}
+
+.propeller-spin {
+  display: inline-block;
+  animation: idleSpin var(--idle-duration) linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.propeller-spin.spin-slow {
+  animation-duration: calc(var(--idle-duration) * 1.6);
+}
+
+.propeller-spin.spin-medium {
+  animation-duration: var(--idle-duration);
+}
+
+.propeller-spin.spin-fast {
+  animation-duration: calc(var(--idle-duration) * 0.6);
+}
+
+.propeller-spin.spin-reverse {
+  animation-direction: reverse;
+}
+
+@keyframes idleSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.propeller {
+  display: block;
+  will-change: filter;
+  animation: highlightGlow var(--cycle-duration) ease-in-out infinite;
+}
+
+.propeller-blade,
+.propeller-dot {
+  fill: transparent;
+  stroke: var(--primary-color);
+  stroke-opacity: var(--idle-opacity);
+  vector-effect: non-scaling-stroke;
+  animation: highlightFill var(--cycle-duration) ease-in-out infinite;
+}
+
+.propeller-dot {
+  stroke-opacity: calc(var(--idle-opacity) * 0.8);
+  animation-name: highlightFillDot;
+}
+
+@keyframes highlightGlow {
+  0%,
+  90%,
+  100% {
+    filter: none;
+  }
+  5%,
+  10% {
+    filter: drop-shadow(0 0 14px var(--secondary-color));
+  }
+}
+
+@keyframes highlightFill {
+  0%,
+  90%,
+  100% {
+    stroke: var(--primary-color);
+    stroke-opacity: var(--idle-opacity);
+  }
+  5%,
+  10% {
+    stroke: var(--secondary-color);
+    stroke-opacity: 1;
+  }
+}
+
+@keyframes highlightFillDot {
+  0%,
+  90%,
+  100% {
+    stroke: var(--primary-color);
+    stroke-opacity: calc(var(--idle-opacity) * 0.8);
+  }
+  5%,
+  10% {
+    stroke: var(--secondary-color);
+    stroke-opacity: 0.9;
+  }
+}
+
+.propeller[data-index="1"],
+.propeller[data-index="1"] .propeller-blade,
+.propeller[data-index="1"] .propeller-dot {
+  animation-delay: 0s;
+}
+.propeller[data-index="2"],
+.propeller[data-index="2"] .propeller-blade,
+.propeller[data-index="2"] .propeller-dot {
+  animation-delay: 1.2s;
+}
+.propeller[data-index="3"],
+.propeller[data-index="3"] .propeller-blade,
+.propeller[data-index="3"] .propeller-dot {
+  animation-delay: 2.4s;
+}
+.propeller[data-index="4"],
+.propeller[data-index="4"] .propeller-blade,
+.propeller[data-index="4"] .propeller-dot {
+  animation-delay: 3.6s;
+}
+.propeller[data-index="5"],
+.propeller[data-index="5"] .propeller-blade,
+.propeller[data-index="5"] .propeller-dot {
+  animation-delay: 4.8s;
+}
+.propeller[data-index="6"],
+.propeller[data-index="6"] .propeller-blade,
+.propeller[data-index="6"] .propeller-dot {
+  animation-delay: 6s;
+}
+.propeller[data-index="7"],
+.propeller[data-index="7"] .propeller-blade,
+.propeller[data-index="7"] .propeller-dot {
+  animation-delay: 7.2s;
+}
+.propeller[data-index="8"],
+.propeller[data-index="8"] .propeller-blade,
+.propeller[data-index="8"] .propeller-dot {
+  animation-delay: 8.4s;
+}
+
+.propeller:hover {
+  filter: drop-shadow(0 0 10px var(--secondary-color));
+}
+
+.propeller:hover .propeller-blade,
+.propeller:hover .propeller-dot {
+  stroke: var(--secondary-color);
+  stroke-opacity: 1;
+  stroke-width: 3;
+}
+@media (max-width: 768px) {
+  .propeller-container {
+    padding: 20px;
+  }
+
+  .animated-propellers {
+    max-width: 90vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .animated-propellers {
+    max-width: 95vw;
+  }
+}
+.propeller-container.active .propeller-blade,
+.propeller-container.active .propeller-dot {
+  stroke-opacity: 0.6;
+}
+
+.propeller-container.no-spin .propeller-spin {
+  animation: none;
+}
+
+.propeller-container.completed .propeller {
+  animation: completionGlow 2s ease-in-out infinite alternate;
+}
+
+.propeller-container.completed .propeller-blade,
+.propeller-container.completed .propeller-dot {
+  animation: none;
+  stroke: var(--secondary-color);
+  stroke-opacity: 1;
+}
+
+@keyframes completionGlow {
+  0% {
+    filter: drop-shadow(0 0 20px var(--secondary-color)) brightness(1.2);
+  }
+  100% {
+    filter: drop-shadow(0 0 30px var(--secondary-color)) brightness(1.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .propeller-spin,
+  .propeller,
+  .propeller-blade,
+  .propeller-dot {
+    animation: none !important;
+  }
+
+  .propeller-blade,
+  .propeller-dot {
+    stroke-opacity: 1;
+  }
+}
+
+.propeller-spin {
+  contain: layout style paint;
+  transform-origin: center center;
+}
+
+.propeller-blade,
+.propeller-dot {
+  shape-rendering: geometricPrecision;
+  text-rendering: optimizeSpeed;
+}

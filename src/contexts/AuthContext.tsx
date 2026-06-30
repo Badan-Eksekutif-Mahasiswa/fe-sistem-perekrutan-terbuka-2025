@@ -18,9 +18,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       const response = await authApi.getSession();
+      const sessionUser = response.data?.user ?? response.user;
 
-      if (response.success && response.user) {
-        setUser(response.user);
+      if (response.success && sessionUser) {
+        setUser(sessionUser);
       } else {
         setUser(null);
       }
@@ -36,6 +37,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authApi.login(redirectPath);
   };
 
+  const internalLogin = async (email: string, password: string) => {
+    const response = await authApi.internalLogin(email, password);
+    if (response.success) {
+      await checkAuth();
+    }
+
+    return response;
+  };
+
   const logout = async () => {
     try {
       setIsLoading(true);
@@ -44,8 +54,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.success) {
         setUser(null);
         show("success", "Successfully logged out");
-        // Redirect to home page after logout
-        // window.location.href = "/";
         router.push("/");
       } else {
         show("error", response.message || "Logout failed");
@@ -66,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     isLoading,
     login,
+    internalLogin,
     logout,
     checkAuth,
   };

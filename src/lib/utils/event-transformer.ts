@@ -5,12 +5,14 @@ import { EventType } from "@/modules/PendaftaranModule/type";
  * Get event status based on registration dates
  */
 export function getEventStatus(
-  openRegistration: string,
-  closeRegistration: string
+  event?: Event | null
 ): "Dibuka" | "Akan Datang" | "Ditutup" {
+  if (!event) return "Ditutup";
+  if (event.status === "CLOSED") return "Ditutup";
+
   const now = new Date();
-  const openDate = new Date(openRegistration);
-  const closeDate = new Date(closeRegistration);
+  const openDate = new Date(event.registrationOpen);
+  const closeDate = new Date(event.registrationClose);
 
   if (now < openDate) {
     return "Akan Datang";
@@ -27,7 +29,7 @@ export function getEventStatus(
 export function mapEventLevelToCategory(
   eventLevel: Event["eventLevel"]
 ): string {
-  return eventLevel;
+  return eventLevel || "Umum";
 }
 
 /**
@@ -36,7 +38,9 @@ export function mapEventLevelToCategory(
 export function mapTypeOfEventToCategory(
   typeOfEvent: Event["typeOfEvent"]
 ): string {
-  const typeMapping: Record<Event["typeOfEvent"], string> = {
+  if (!typeOfEvent) return "Event";
+
+  const typeMapping: Record<NonNullable<Event["typeOfEvent"]>, string> = {
     ORGANISASI: "Organisasi",
     KEPANITIAAN: "Kepanitiaan",
     UKM: "UKM",
@@ -55,12 +59,13 @@ export function transformEventToEventType(event: Event): EventType {
 
   return {
     id: event.id,
+    eventCode: event.eventCode || undefined,
     title: event.title,
-    logo: event.logo || "/placeholders/logo-event.webp",
+    logo: event.logo || "/assets/logo-bem-ui.png",
     desc: event.description,
-    status: getEventStatus(event.openRegistration, event.closeRegistration),
-    startedAt: new Date(event.openRegistration),
-    closedAt: new Date(event.closeRegistration),
+    status: getEventStatus(event),
+    startedAt: new Date(event.registrationOpen),
+    closedAt: new Date(event.registrationClose),
     categories: categories as readonly string[],
     isSaved: false,
   };
@@ -70,5 +75,8 @@ export function transformEventToEventType(event: Event): EventType {
  * Transform multiple API Events to EventType array
  */
 export function transformEventsToEventTypes(events: Event[]): EventType[] {
-  return events.map(transformEventToEventType);
+  return events
+    .filter(Boolean)
+    .filter((event) => event.status !== "DRAFT" && event.status !== "ARCHIVED")
+    .map(transformEventToEventType);
 }

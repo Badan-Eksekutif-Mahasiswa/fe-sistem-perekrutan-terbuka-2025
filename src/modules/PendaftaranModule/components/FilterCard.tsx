@@ -1,6 +1,6 @@
 "use client";
 import { SquareIcon, SquareCheckBigIcon } from "lucide-react";
-import AnimatedPuzzle from "@/components/elements/AnimatedPuzzle";
+import Image from "next/image";
 import type { FilterCategoryType } from "../type";
 
 type FilterCardProps = {
@@ -56,12 +56,8 @@ const FilterCard = ({
           </div>
         ))}
       </div>
-      <div className="absolute z-0 inset-0 flex justify-end -bottom-96 -right-30 lg:-right-60 items-center pointer-events-none">
-        <AnimatedPuzzle
-          width={800}
-          height={700}
-          className="opacity-40 rotate-45 "
-        />
+      <div className="absolute z-0 -bottom-20 -right-20 w-60 h-60 opacity-15 pointer-events-none rotate-45" aria-hidden="true">
+        <Image src="/assets/spt-pattern.png" alt="" fill className="object-contain" />
       </div>
     </div>
   );

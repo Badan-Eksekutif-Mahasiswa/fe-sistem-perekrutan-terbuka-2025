@@ -131,7 +131,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 
             <div className="text-center space-y-2">
               <img
-                src={"/logo-clean.webp"}
+                src={"/assets/logo-bem-ui.png"}
                 alt="logo-bem"
                 className={`mx-auto w-32 h-32 ${!files && "grayscale"}`}
               />

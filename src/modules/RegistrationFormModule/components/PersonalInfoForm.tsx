@@ -12,6 +12,7 @@ import {
 
 interface PersonalInfoFormProps {
   data: PersonalInfoData;
+  onEmailChange: (value: string) => void;
   onLineChange: (value: string) => void;
   onDivisionSelect: (divisionId: string, priority: number) => void;
   isReadOnly?: boolean;
@@ -19,6 +20,7 @@ interface PersonalInfoFormProps {
 
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
   data,
+  onEmailChange,
   onLineChange,
   onDivisionSelect,
   isReadOnly = false,
@@ -77,8 +79,9 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
         <Input
           label="Email"
           value={data.email}
-          disabled
-          className="cursor-not-allowed"
+          onChange={(e) => onEmailChange(e.target.value)}
+          placeholder="Masukkan email aktif"
+          disabled={isReadOnly}
         />
 
         <Input
@@ -93,7 +96,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
       {/* Division Selection */}
       <div className="space-y-2">
         <div className="grid grid-cols-2 gap-4">
-          {Array.from({ length: data.maxChooseDivision }).map((_, index) => {
+          {Array.from({ length: data.maxDivisionChoices }).map((_, index) => {
             const priority = index + 1;
             const selectedDivisionId = selectedDivisions[index] || "";
 

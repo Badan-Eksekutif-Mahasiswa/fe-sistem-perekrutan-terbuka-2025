@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRedirectIfAuth } from "@/hooks/useAuth";
 import { AuthLoading, LoadingSpinner } from "@/components/ui/loading";

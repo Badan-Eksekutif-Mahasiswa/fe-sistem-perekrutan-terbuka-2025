@@ -13,7 +13,7 @@ import { BackgroundDecoration } from "./components/BackgroundDecoration";
 import { useEventFiltering, TabType } from "./hooks/useEventFiltering";
 import { filterCategory } from "./const";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-legacy/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
@@ -29,7 +29,7 @@ import {
   PaginationNext,
   PaginationPrevious,
   PaginationEllipsis,
-} from "@/components/ui/pagination";
+} from "@/components/ui-legacy/pagination";
 import { Event } from "@/types/event";
 import { transformEventsToEventTypes } from "@/lib/utils/event-transformer";
 

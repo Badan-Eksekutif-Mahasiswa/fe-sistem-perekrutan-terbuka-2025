@@ -1,49 +1,75 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui-legacy/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { TestimonyType } from "@/modules/EventModule/type";
-import { testimoniData } from "@/modules/EventModule/const";
+} from "@/components/ui-legacy/carousel";
+import { TestimonyType } from "@/modules/legacy/EventModule/type";
 
 type CarouselElementProps = {
   testimonyData: TestimonyType[];
 };
 
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "?";
+
+const ProfileAvatar = ({ item }: { item: TestimonyType }) => {
+  if (item.profilePicture) {
+    return (
+      <img
+        src={item.profilePicture}
+        alt={`Foto ${item.name}`}
+        className="w-full h-full object-cover"
+      />
+    );
+  }
+
+  return (
+    <div className="w-full h-full flex items-center justify-center bg-primary-500 text-white text-h3">
+      {getInitials(item.name)}
+    </div>
+  );
+};
+
 const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const total = testimonyData.length;
 
   const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % testimonyData.length);
+    setActiveIndex((prev) => (prev + 1) % total);
   };
 
   const handlePrev = () => {
-    setActiveIndex(
-      (prev) => (prev - 1 + testimonyData.length) % testimonyData.length
-    );
+    setActiveIndex((prev) => (prev - 1 + total) % total);
   };
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || total <= 1) return;
 
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % testimonyData.length);
+      setActiveIndex((prev) => (prev + 1) % total);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isPaused, testimonyData.length]);
+  }, [isPaused, total]);
+
+  if (total === 0) {
+    return null;
+  }
 
   const getSlideStyles = (index: number) => {
-    const total = testimoniData.length;
-
     let distance = (index - activeIndex) % total;
 
     if (distance > total / 2) distance -= total;
@@ -79,13 +105,13 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
           <ChevronLeftIcon className="size-6" />
         </button>
 
-        <div className="w-full max-w-4xl  grid place-items-center perspective-1000">
+        <div className="w-full max-w-4xl grid place-items-center perspective-1000">
           {testimonyData.map((item: TestimonyType, index) => {
             const styles = getSlideStyles(index);
 
             return (
               <div
-                key={index}
+                key={`${item.name}-${index}`}
                 className="col-start-1 row-start-1 w-full max-w-sm space-x-16 transition-all duration-500 ease-in-out"
                 style={{
                   transform: styles.transform,
@@ -96,21 +122,9 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                     styles.pointerEvents as React.CSSProperties["pointerEvents"],
                 }}
               >
-                <div
-                  className={`rounded-2xl px-8 pt-2 pb-6 flex flex-col items-center text-center transition-all duration-500 relative
-                  ${
-                    styles.zIndex === 10
-                      ? "bg-gradient-card shadow-2xl"
-                      : "bg-gradient-card-blur"
-                  }
-                `}
-                >
+                <div className="rounded-2xl px-8 pt-2 pb-6 flex flex-col items-center text-center transition-all duration-500 relative bg-gradient-card-blue border-none shadow-glass backdrop-blur-md">
                   <div className="w-36 h-36 rounded-full absolute -top-24 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
-                    <img
-                      src={`https://picsum.photos/seed/${index + 1}/200/200`}
-                      alt="profile picture"
-                      className="w-full h-full object-cover"
-                    />
+                    <ProfileAvatar item={item} />
                   </div>
 
                   <div className="mt-12 space-y-3 text-white">
@@ -132,36 +146,29 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
         </button>
       </div>
 
-      {/* Mobile Carousel */}
       <div className="h-full lg:hidden">
         <Carousel
-          opts={{ loop: true, align: "center" }}
-          className="max-md:w-11/16 max-w-xl  mx-auto"
+          opts={{ loop: total > 1, align: "center" }}
+          className="max-md:w-11/16 max-w-xl mx-auto"
         >
           <CarouselContent className="items-stretch pt-20">
-            {testimoniData.map((item: TestimonyType, index) => {
+            {testimonyData.map((item: TestimonyType, index) => {
               return (
                 <CarouselItem
-                  key={index}
+                  key={`${item.name}-${index}`}
                   className="mx-10 flex h-full relative"
                 >
                   <div className="p-1 h-full">
-                    <Card className="w-full h-full flex-1 flex flex-col  ">
+                    <Card className="w-full h-full flex-1 flex flex-col bg-gradient-card-blue border-none text-white shadow-glass backdrop-blur-md">
                       <CardContent className="flex items-center justify-center p-1">
                         <div className="w-30 h-30 rounded-full absolute -top-18 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">
-                          <img
-                            src={`https://picsum.photos/seed/${
-                              index + 1
-                            }/200/200`}
-                            alt="profile picture"
-                            className="w-full h-full object-cover"
-                          />
+                          <ProfileAvatar item={item} />
                         </div>
 
-                        <div className=" mt-5  space-y-3 text-white">
+                        <div className="mt-5 space-y-3 text-white">
                           <h3 className="text-h3 text-white">{item.name}</h3>
                           <p className="text-m3">{item.jabatan}</p>
-                          <p className="text-p6 max-h-[150px] overflow-y-auto ">
+                          <p className="text-p6 max-h-[150px] overflow-y-auto">
                             {item.desc}
                           </p>
                         </div>

@@ -1,4 +1,4 @@
-import { AirBalloon } from "../../../../public/svgs/AirBaloon";
+import { AirBalloon } from "../../../../public/assets-legacy/svgs/AirBaloon";
 
 export const BackgroundDecoration = () => {
   return (

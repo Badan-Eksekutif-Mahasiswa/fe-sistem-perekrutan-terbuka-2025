@@ -2,10 +2,27 @@
 export interface ApiResponse<T> {
   success: boolean;
   status: "success" | "error";
-  message: string;
+  message: string | null;
   data: T;
-  errors: null;
-  meta: null;
+  errors: unknown[] | null;
+  meta: Record<string, unknown> | null;
+}
+
+export type RequirementScope = "EVENT" | "DIVISION";
+
+export interface SubmissionRequirement {
+  id: string;
+  eventId: string;
+  divisionId: string | null;
+  scope: RequirementScope;
+  title: string;
+  instruction: string;
+  templateUrl: string | null;
+  isRequired: boolean;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Division Type
@@ -20,32 +37,60 @@ export interface Division {
     [key: string]: unknown;
   };
   eventId: string;
+  cover: string | null;
   interviewLink: string | null;
+  taskUrl: string | null;
+  maxQuota: number | null;
+  hasDivisionTask: boolean;
+  taskDescription: string | null;
+  sortOrder: number;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  requirements?: SubmissionRequirement[];
 }
+
+export type EventStatus = "DRAFT" | "ACTIVE" | "CLOSED" | "ARCHIVED";
 
 // Event Type
 export interface Event {
   id: string;
+  eventCode: string | null;
   title: string;
   description: string;
   logo: string | null;
-  openRegistration: string;
-  closeRegistration: string;
+  status: EventStatus;
+  registrationOpen: string;
+  registrationClose: string;
+  closedAt: string | null;
+  maxRegistrants: number | null;
+  requiresGeneralTask: boolean;
+  generalTaskUrl: string | null;
   timeline: {
     [key: string]: unknown;
-  };
+  } | null;
   booklet: string | null;
   socialMedia: {
     [key: string]: unknown;
-  };
-  maxChooseDivision: number;
-  typeOfEvent: "ORGANISASI" | "KEPANITIAAN" | "UKM";
-  eventLevel: "Universitas" | "Fakultas" | "ProgramStudi";
+  } | null;
+  faqs?: Array<{ question: string; answer: string }> | null;
+  testimonials?: Array<{ name: string; role: string; message: string; photoUrl?: string }> | null;
+  documentations?: Array<{ title: string; imageUrl: string }> | null;
+  maxDivisionChoices: number;
+  organizer: string;
+  contactLineId: string;
+  contactName?: string | null;
+  contactWhatsapp?: string | null;
+  contactEmail?: string | null;
+  bannerUrl?: string;
+  publishedAt?: string | null;
+  archivedAt?: string | null;
+  typeOfEvent: "ORGANISASI" | "KEPANITIAAN" | "UKM" | null;
+  eventLevel: "Universitas" | "Fakultas" | "ProgramStudi" | null;
   createdAt: string;
   updatedAt: string;
   divisions: Division[];
+  requirements?: SubmissionRequirement[];
 }
 
 // API Response Types
