@@ -58,9 +58,8 @@ const OngoingSection = ({
     <div className="w-full flex flex-col gap-2 font-jakarta text-neutral-50">
       <h1 className="text-h1">Pendaftaran Ongoing</h1>
       <p className="text-m4">
-        Lorem ipsum et volutpat at massa eget ut urna tellus sapien purus
-        viverra id interdum egestas sed sed adipiscing neque et quisque vivamus
-        consectetur.
+        Temukan pendaftaran yang sedang dibuka dan segera lengkapi berkasmu
+        sebelum periode pendaftaran berakhir.
       </p>
       <div className="rounded-3xl border border-primary-300 w-full p-6 max-lg:p-4 flex flex-col gap-2 bg-gradient-card-blur">
         <p className="text-h4">Ayo Daftar sebelum ketinggalan!</p>
