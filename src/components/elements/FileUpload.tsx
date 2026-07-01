@@ -1,11 +1,7 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
-import {
-  isSupabaseConfigured,
-  SUPABASE_MEDIA_BUCKET,
-  supabase,
-} from "@/lib/supabaseClient";
+import { uploadMediaFile } from "@/lib/api/media";
 import { Loader2, UploadCloud, CheckCircle2, X } from "lucide-react";
 
 interface FileUploadProps {
@@ -13,8 +9,8 @@ interface FileUploadProps {
   onChange: (url: string) => void;
   label?: string;
   placeholder?: string;
-  bucketName?: string;
   accept?: string;
+  folder?: string;
 }
 
 function isValidUploadUrl(value: string) {
@@ -37,12 +33,12 @@ export default function FileUpload({
   onChange,
   label,
   placeholder = "Upload gambar",
-  bucketName = SUPABASE_MEDIA_BUCKET,
   accept = "image/*",
+  folder = "uploads",
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const uploadDisabled = uploading || !isSupabaseConfigured;
+  const uploadDisabled = uploading;
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -52,44 +48,16 @@ export default function FileUpload({
       const file = e.target.files?.[0];
       if (!file) return;
 
-      if (!isSupabaseConfigured || !supabase) {
-        throw new Error(
-          "Upload file belum dikonfigurasi. Masukkan URL gambar secara manual."
-        );
-      }
-
-      // Ensure file is an image if accept="image/*"
       if (accept.includes("image") && !file.type.startsWith("image/")) {
-        throw new Error("File harus berupa gambar (JPG, PNG, dll).");
+        throw new Error("File harus berupa gambar (JPG, PNG, WEBP, dll)." );
       }
 
       if (file.size > 3 * 1024 * 1024) {
         throw new Error(`Ukuran file terlalu besar (${(file.size / 1024 / 1024).toFixed(1)} MB). Maksimal 3 MB.`);
       }
 
-      // Generate unique file name
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-      const filePath = `uploads/${fileName}`;
-
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from(bucketName)
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      // Get public URL
-      const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
-
-      if (data?.publicUrl) {
-        onChange(data.publicUrl);
-      }
+      const uploadedUrl = await uploadMediaFile(file, folder);
+      onChange(uploadedUrl);
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -99,6 +67,7 @@ export default function FileUpload({
       setError(message);
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -158,7 +127,7 @@ export default function FileUpload({
           </button>
         </div>
       ) : (
-        <label className={`relative flex items-center justify-center w-full min-h-[100px] border-2 border-dashed border-[#8F344A] rounded-md transition-colors ${isSupabaseConfigured ? "cursor-pointer hover:bg-blue-50/50 group" : "cursor-not-allowed bg-neutral-100/80"}`}>
+        <label className="relative flex items-center justify-center w-full min-h-[100px] border-2 border-dashed border-[#8F344A] rounded-md transition-colors cursor-pointer hover:bg-blue-50/50 group">
           <input
             type="file"
             className="hidden"
@@ -167,14 +136,7 @@ export default function FileUpload({
             disabled={uploadDisabled}
           />
           <div className="flex flex-col items-center justify-center gap-2 p-4 text-center">
-            {!isSupabaseConfigured ? (
-              <>
-                <UploadCloud className="size-8 text-neutral-400" />
-                <span className="text-sm text-neutral-600">
-                  Upload file belum dikonfigurasi. Gunakan URL gambar manual di bawah.
-                </span>
-              </>
-            ) : uploading ? (
+            {uploading ? (
               <>
                 <Loader2 className="size-8 text-[#8F344A] animate-spin" />
                 <span className="text-sm text-neutral-600">Mengunggah...</span>
@@ -198,7 +160,7 @@ export default function FileUpload({
             placeholder="Atau masukkan URL gambar..."
             className="border border-[#8F344A] bg-white p-2 rounded-md text-sm text-neutral-900 placeholder:text-neutral-400 flex-1"
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 handleManualUrl(e.currentTarget.value);
               }

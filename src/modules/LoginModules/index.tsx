@@ -13,11 +13,11 @@ const LoginContent = () => {
   const searchParams = useSearchParams();
   const [isLoginLoading, setIsLoginLoading] = useState(false);
 
-  // Redirect if already authenticated
-  useRedirectIfAuth("/dashboard");
-
   // Get redirect path from URL params (for post-login redirect)
   const redirectPath = searchParams.get("redirect") || "/dashboard";
+
+  // Redirect if already authenticated
+  useRedirectIfAuth(redirectPath);
 
   const handleLogin = () => {
     setIsLoginLoading(true);

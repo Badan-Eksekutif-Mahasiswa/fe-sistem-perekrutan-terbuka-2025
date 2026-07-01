@@ -96,7 +96,7 @@ const DashboardPage = () => {
   }
 
   if (!user) {
-    return null;
+    return <Loader />;
   }
 
   const getGreeting = () => {
