@@ -2,10 +2,18 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@/types/auth";
 
 type UserRole = NonNullable<User["role"]>;
+
+const getLoginRedirectUrl = (redirectTo: string, pathname: string) => {
+  if (redirectTo !== "/login") {
+    return redirectTo;
+  }
+
+  return `/login?redirect=${encodeURIComponent(pathname)}`;
+};
 
 /**
  * Hook to protect routes that require authentication
@@ -14,12 +22,13 @@ type UserRole = NonNullable<User["role"]>;
 export function useRequireAuth(redirectTo: string = "/login") {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push(redirectTo);
+      router.replace(getLoginRedirectUrl(redirectTo, pathname));
     }
-  }, [user, isLoading, router, redirectTo]);
+  }, [user, isLoading, router, redirectTo, pathname]);
 
   return { user, isLoading };
 }
@@ -33,7 +42,7 @@ export function useRedirectIfAuth(redirectTo: string = "/dashboard") {
 
   useEffect(() => {
     if (!isLoading && user) {
-      router.push(redirectTo);
+      router.replace(redirectTo);
     }
   }, [user, isLoading, router, redirectTo]);
 
@@ -50,19 +59,20 @@ export function useRequireRole(
 ) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (isLoading) return;
 
     if (!user) {
-      router.push(redirectTo);
+      router.replace(getLoginRedirectUrl(redirectTo, pathname));
       return;
     }
 
     if (!user.role || !allowedRoles.includes(user.role)) {
-      router.push(forbiddenRedirectTo);
+      router.replace(forbiddenRedirectTo);
     }
-  }, [allowedRoles, forbiddenRedirectTo, isLoading, redirectTo, router, user]);
+  }, [allowedRoles, forbiddenRedirectTo, isLoading, redirectTo, router, user, pathname]);
 
   return {
     user,
