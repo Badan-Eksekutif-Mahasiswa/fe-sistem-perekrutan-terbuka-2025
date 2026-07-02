@@ -1,29 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
+﻿import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-export const SUPABASE_MEDIA_BUCKET =
-  process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "spt-media";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-function isValidHttpUrl(value: string) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-export const isSupabaseConfigured = Boolean(
-  isValidHttpUrl(supabaseUrl) && supabaseAnonKey
-);
-
-if (!isSupabaseConfigured) {
-  console.warn(
-    "Supabase credentials are missing or invalid. File uploads are disabled."
-  );
-}
+export const supabaseBucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "spt-media";
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey && supabaseBucket);
 
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl as string, supabaseAnonKey as string)
   : null;
