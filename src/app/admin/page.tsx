@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/elements/Loader";
 import ActionDialog from "@/components/elements/ActionDialog";
+import ContactPerson from "@/components/elements/ContactPerson";
 import { useRequireAuth } from "@/hooks/useAuth";
 import {
   AdminAnnouncementSummary,
@@ -319,7 +320,32 @@ export default function AdminDashboardPage() {
             </Button>
           )}
         </header>
-
+        <ContactPerson
+          title="Butuh Bantuan Mengelola Pendaftaran?"
+          description="Hubungi tim SPT untuk kendala pembuatan event, seleksi berkas, atau pengumuman hasil."
+          contact={[
+            {
+              name: "Zidan",
+              method: "WhatsApp",
+              link: "https://wa.me/6282141535328",
+            },
+            {
+              name: "Dyah",
+              method: "Line",
+              link: "https://line.me/ti/p/~dyazhaa",
+            },
+            {
+              name: "Dyah",
+              method: "WhatsApp",
+              link: "https://wa.me/62859106884466",
+            },
+            {
+              name: "Septian",
+              method: "Line",
+              link: "https://line.me/ti/p/~aseptian21",
+            },
+          ]}
+        />
         {error && (
           <div className="rounded-md border border-red-200/30 bg-red-300/15 px-4 py-3 text-p5 text-red-100">
             {error}
