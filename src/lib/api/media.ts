@@ -1,58 +1,53 @@
-﻿import { BACKEND_URL } from "@/lib/api/config";
+﻿import { isSupabaseConfigured, supabase, supabaseBucket } from "@/lib/supabaseClient";
 
-type PresignUploadResponse = {
-  success: boolean;
-  message: string | null;
-  data: {
-    objectKey: string;
-    publicUrl: string;
-    uploadUrl: string;
-    expiresIn: number;
-  } | null;
-};
+function sanitizeFolder(folder?: string) {
+  return (folder || "uploads")
+    .split("/")
+    .map((segment) => segment.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"))
+    .filter(Boolean)
+    .join("/") || "uploads";
+}
 
-async function readError(response: Response, fallback: string) {
-  try {
-    const result = await response.json() as Partial<PresignUploadResponse>;
-    return result.message || fallback;
-  } catch {
-    return fallback;
-  }
+function sanitizeExtension(fileName: string, contentType: string) {
+  const fromName = fileName.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (fromName) return fromName;
+
+  const subtype = contentType.split("/")[1]?.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return subtype || "bin";
+}
+
+function createObjectPath(file: File, folder?: string) {
+  const safeFolder = sanitizeFolder(folder);
+  const ext = sanitizeExtension(file.name, file.type || "application/octet-stream");
+  const id = typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  return `${safeFolder}/${id}.${ext}`;
 }
 
 export async function uploadMediaFile(file: File, folder = "uploads") {
-  const presignResponse = await fetch(`${BACKEND_URL}/media/presign-upload`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({
-      fileName: file.name,
-      contentType: file.type || "application/octet-stream",
-      size: file.size,
-      folder,
-    }),
-  });
-
-  if (!presignResponse.ok) {
+  if (!isSupabaseConfigured || !supabase) {
     throw new Error(
-      await readError(presignResponse, "Gagal menyiapkan upload file.")
+      "Upload file belum dikonfigurasi. Pastikan variabel Supabase sudah tersedia."
     );
   }
 
-  const presignResult = await presignResponse.json() as PresignUploadResponse;
-  if (!presignResult.success || !presignResult.data) {
-    throw new Error(presignResult.message || "Gagal menyiapkan upload file.");
-  }
-
-  const uploadResponse = await fetch(presignResult.data.uploadUrl, {
-    method: "PUT",
-    headers: { "Content-Type": file.type || "application/octet-stream" },
-    body: file,
+  const objectPath = createObjectPath(file, folder);
+  const { error } = await supabase.storage.from(supabaseBucket).upload(objectPath, file, {
+    cacheControl: "3600",
+    contentType: file.type || "application/octet-stream",
+    upsert: false,
   });
 
-  if (!uploadResponse.ok) {
-    throw new Error("Gagal mengunggah file ke penyimpanan media.");
+  if (error) {
+    throw new Error(error.message || "Gagal mengunggah file ke Supabase Storage.");
   }
 
-  return presignResult.data.publicUrl;
+  const { data } = supabase.storage.from(supabaseBucket).getPublicUrl(objectPath);
+  if (!data.publicUrl) {
+    throw new Error("Gagal mengambil URL publik file yang diunggah.");
+  }
+
+  return data.publicUrl;
 }
