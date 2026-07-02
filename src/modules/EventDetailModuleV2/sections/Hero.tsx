@@ -95,12 +95,12 @@ const Hero = ({ event }: HeroProps) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex px-5 mt-10 py-14 max-lg:mt-20 md:px-20 lg:px-36 lg:py-0 lg:gap-40 z-50 w-full min-h-screen max-lg:flex-col flex-row gap-12 lg:justify-between items-center">
+      <div className="flex px-5 pt-32 pb-14 max-lg:mt-20 md:px-20 md:pt-36 lg:px-36 lg:pt-44 lg:pb-20 lg:gap-40 z-50 w-full min-h-screen max-lg:flex-col flex-row gap-12 lg:justify-between items-center">
         <div
           className="flex flex-col text-center z-50 items-center gap-5
          lg:gap-15 text-white"
         >
-          <h1 className="font-extrabold font-jakarta text-h1 tracking-wide leading-normal  text-shadow-lg text-shadow-black">
+          <h1 className="max-w-3xl font-extrabold font-jakarta text-h1 tracking-wide leading-tight text-shadow-lg text-shadow-black">
             {event.title}
           </h1>
           <div className="relative w-32 h-32 md:w-72 md:h-72">
