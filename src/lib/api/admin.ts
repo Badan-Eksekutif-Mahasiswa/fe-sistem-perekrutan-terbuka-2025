@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "@/lib/api/config";
+﻿import { BACKEND_URL } from "@/lib/api/config";
 
 const BASE_URL = BACKEND_URL;
 
@@ -102,6 +102,14 @@ export type AdminAnnouncementSummary = {
   sent: number;
   failed: number;
   skipped: number;
+  quota?: {
+    limit: number | null;
+    sentToday: number;
+    remaining: number | null;
+    target: number;
+    canSend: boolean;
+    resetAt: string;
+  };
 };
 
 export type AdminEmailLog = {

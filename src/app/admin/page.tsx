@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -746,6 +746,10 @@ function AnnouncementPanel({
   }, [event?.id]);
 
   useEffect(() => {
+    setSummary(null);
+  }, [type, divisionId, force]);
+
+  useEffect(() => {
     void loadEmailLogs();
   }, [loadEmailLogs]);
 
@@ -776,6 +780,9 @@ function AnnouncementPanel({
 
   const selectedType = announcementTypes.find((item) => item.value === type);
   const isArchived = event?.status === "ARCHIVED";
+  const quotaBlocksSend = Boolean(
+    summary?.dryRun && summary.quota && !summary.quota.canSend
+  );
 
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
@@ -894,7 +901,7 @@ function AnnouncementPanel({
                 size="lg"
                 variant="primary"
                 onClick={() => setSendDialogOpen(true)}
-                disabled={isSending || isArchived}
+                disabled={isSending || isArchived || quotaBlocksSend}
               >
                 <Send className="size-4" />
                 {isSending ? "Memproses..." : "Kirim Email"}
@@ -913,14 +920,40 @@ function AnnouncementPanel({
             />
 
             {summary && (
-              <div className="grid grid-cols-2 gap-3 rounded-md border border-white/10 bg-white/[0.05] p-4 md:grid-cols-4">
-                <SummaryValue label="Eligible" value={summary.eligible} />
-                <SummaryValue
-                  label={summary.dryRun ? "Akan dikirim" : "Terkirim"}
-                  value={summary.sent}
-                />
-                <SummaryValue label="Gagal" value={summary.failed} />
-                <SummaryValue label="Dilewati" value={summary.skipped} />
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 rounded-md border border-white/10 bg-white/[0.05] p-4 md:grid-cols-4">
+                  <SummaryValue label="Eligible" value={summary.eligible} />
+                  <SummaryValue
+                    label={summary.dryRun ? "Akan dikirim" : "Terkirim"}
+                    value={summary.sent}
+                  />
+                  <SummaryValue label="Gagal" value={summary.failed} />
+                  <SummaryValue label="Dilewati" value={summary.skipped} />
+                </div>
+
+                {summary.quota && (
+                  <div
+                    className={`rounded-md border px-4 py-3 text-p5 ${
+                      summary.quota.canSend
+                        ? "border-white/10 bg-white/[0.05] text-white/70"
+                        : "border-red-200/30 bg-red-300/15 text-red-100"
+                    }`}
+                  >
+                    <p className="font-semibold text-white">Kuota email harian</p>
+                    <p className="mt-1">
+                      Target pengiriman {summary.quota.target} email. {" "}
+                      {summary.quota.limit === null
+                        ? "Limit harian belum dikonfigurasi."
+                        : `Terkirim hari ini ${summary.quota.sentToday} dari ${summary.quota.limit}. Sisa kuota ${summary.quota.remaining ?? 0}.`}
+                    </p>
+                    {!summary.quota.canSend && (
+                      <p className="mt-2">
+                        Kuota tidak cukup untuk target ini. Gunakan filter divisi,
+                        kirim besok, atau upgrade email provider sebelum mengirim.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
