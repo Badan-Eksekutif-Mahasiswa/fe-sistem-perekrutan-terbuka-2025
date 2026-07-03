@@ -64,7 +64,6 @@ export type AdminApplicationDetail = {
     faculty: string | null;
     studyProgram: string | null;
     line_id: string | null;
-    whatsapp: string | null;
   };
   division_choice_1: { id: string; name: string } | null;
   division_choice_2: { id: string; name: string } | null;
