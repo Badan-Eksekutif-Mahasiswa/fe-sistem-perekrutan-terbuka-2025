@@ -649,8 +649,7 @@ function ApplicationDetailPanel({
 
       <div className="grid gap-4 md:grid-cols-2">
         <InfoBlock label="Email" value={application.user.email || "-"} />
-        <InfoBlock label="LINE" value={application.user.line_id || "-"} />
-        <InfoBlock label="WhatsApp" value={application.user.whatsapp || "-"} />
+        <InfoBlock label="ID Line" value={application.user.line_id || "-"} />
         <InfoBlock label="Submit" value={formatDateTime(application.submitted_at)} />
         <InfoBlock
           label="Pilihan divisi 1"

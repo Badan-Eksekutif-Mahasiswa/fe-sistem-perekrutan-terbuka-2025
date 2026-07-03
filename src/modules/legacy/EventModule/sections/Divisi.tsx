@@ -62,17 +62,19 @@ const Divisi = ({ event }: DivisiProps) => {
       {/*  Details Divisi Desktop */}
       <div className="flex max-md:hidden flex-col lg:flex-row gap-6">
         {/* List Divisi */}
-        <div className="flex w-fit max-lg:hidden flex-col  gap-5 ">
+        <div className="flex w-72 max-lg:hidden flex-col gap-5">
           {divisiData.map((item, i) => (
             <Button
               key={item.id}
-              className={`w-full md:w-55 hover:from-primary-200 overflow-hidden active:to-primary-300 ${
+              className={`min-h-12 h-auto w-full hover:from-primary-200 active:to-primary-300 ${
                 indexDivisi === i ? "from-primary-200" : "from-primary-300"
-              } cursor-pointer to-primary-400 justify-start items-center`}
+              } cursor-pointer to-primary-400 justify-start items-start whitespace-normal px-5 py-3 text-left`}
               onClick={() => setIndexDivisi(i)}
             >
-              <DiamondIcon className="size-4" />
-              <p className="text-p4">{item.name}</p>
+              <DiamondIcon className="mt-1 size-4 shrink-0" />
+              <p className="min-w-0 flex-1 whitespace-normal break-words text-p4 leading-snug">
+                {item.name}
+              </p>
             </Button>
           ))}
         </div>
