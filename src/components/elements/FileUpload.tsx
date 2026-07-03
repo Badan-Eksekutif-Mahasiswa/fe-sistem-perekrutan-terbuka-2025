@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React, { useState } from "react";
-import { uploadMediaFile } from "@/lib/api/media";
+import { deleteMediaFile, uploadMediaFile } from "@/lib/api/media";
 import { Loader2, UploadCloud, CheckCircle2, X } from "lucide-react";
 
 interface FileUploadProps {
@@ -37,8 +37,9 @@ export default function FileUpload({
   folder = "uploads",
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const uploadDisabled = uploading;
+  const uploadDisabled = uploading || deleting;
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -71,8 +72,29 @@ export default function FileUpload({
     }
   };
 
-  const clearFile = () => {
+  const clearFile = async () => {
+    const fileUrl = value?.trim();
+    if (!fileUrl) {
+      onChange("");
+      return;
+    }
+
+    setError(null);
+    setDeleting(true);
     onChange("");
+
+    try {
+      await deleteMediaFile(fileUrl);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "File dihapus dari form, tetapi gagal dihapus dari storage.";
+      console.error("Delete upload error:", message);
+      setError(message);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleManualUrl = (rawUrl: string) => {
@@ -120,10 +142,15 @@ export default function FileUpload({
           <button
             type="button"
             onClick={clearFile}
+            disabled={deleting}
             className="p-2 hover:bg-red-100 rounded-full text-red-500 transition-colors"
-            title="Hapus"
+            title={deleting ? "Menghapus..." : "Hapus"}
           >
-            <X className="size-4" />
+            {deleting ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <X className="size-4" />
+            )}
           </button>
         </div>
       ) : (

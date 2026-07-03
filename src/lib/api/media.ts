@@ -1,4 +1,11 @@
-﻿import { isSupabaseConfigured, supabase, supabaseBucket } from "@/lib/supabaseClient";
+﻿import { BACKEND_URL } from "@/lib/api/config";
+import { isSupabaseConfigured, supabase, supabaseBucket } from "@/lib/supabaseClient";
+
+type ApiResponse<T> = {
+  success: boolean;
+  message: string | null;
+  data: T;
+};
 
 function sanitizeFolder(folder?: string) {
   return (folder || "uploads")
@@ -50,4 +57,26 @@ export async function uploadMediaFile(file: File, folder = "uploads") {
   }
 
   return data.publicUrl;
+}
+
+export async function deleteMediaFile(url: string) {
+  const response = await fetch(`${BACKEND_URL}/admin/media/delete`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ url }),
+  });
+
+  let result: Partial<ApiResponse<unknown>> = {};
+  try {
+    result = await response.json();
+  } catch {
+    result = {};
+  }
+
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message || "Gagal menghapus file dari storage.");
+  }
+
+  return result.data;
 }
