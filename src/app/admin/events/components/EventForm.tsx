@@ -16,6 +16,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import FileUpload from "@/components/elements/FileUpload";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { deleteMediaFile } from "@/lib/api/media";
 
 function DeleteConfirmModal({ onConfirm, itemName }: { onConfirm: () => void, itemName: string }) {
   return (
@@ -66,6 +67,33 @@ function toRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : {};
+}
+
+function isManagedStorageUrl(value?: string | null) {
+  const url = value?.trim();
+  if (!url || url.startsWith("/")) return false;
+
+  try {
+    const parsedUrl = new URL(url);
+    return (
+      (parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:") &&
+      parsedUrl.pathname.includes("/storage/v1/object/public/")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function deleteRemovedMedia(url?: string | null) {
+  if (!isManagedStorageUrl(url)) return;
+
+  deleteMediaFile(url as string).catch((error: unknown) => {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "File lama gagal dihapus dari storage.";
+    console.error("Delete removed media error:", message);
+  });
 }
 
 function toStringValue(value: unknown): string {
@@ -322,7 +350,10 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     setTestimonials(newTestimonials);
   };
   const addTestimonial = () => setTestimonials([...testimonials, { name: "", role: "", message: "", photoUrl: "", _key: genKey() }]);
-  const removeTestimonial = (index: number) => setTestimonials(testimonials.filter((_, i) => i !== index));
+  const removeTestimonial = (index: number) => {
+    deleteRemovedMedia(testimonials[index]?.photoUrl);
+    setTestimonials(testimonials.filter((_, i) => i !== index));
+  };
 
   const handleDocumentationChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -331,7 +362,10 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
     setDocumentations(newDocs);
   };
   const addDocumentation = () => setDocumentations([...documentations, { title: "", imageUrl: "", _key: genKey() }]);
-  const removeDocumentation = (index: number) => setDocumentations(documentations.filter((_, i) => i !== index));
+  const removeDocumentation = (index: number) => {
+    deleteRemovedMedia(documentations[index]?.imageUrl);
+    setDocumentations(documentations.filter((_, i) => i !== index));
+  };
 
 
   const handleDivisionChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -352,6 +386,7 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const removeDivision = (index: number) => {
     const divToRemove = divisions[index];
+    deleteRemovedMedia(divToRemove?.coverUrl);
     if (divToRemove.id) {
       setDeletedDivisions([...deletedDivisions, divToRemove.id]);
     }
