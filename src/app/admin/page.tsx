@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -72,6 +72,29 @@ const announcementTypes: Array<{ value: AdminEmailType; label: string; hint: str
   },
 ];
 
+
+function buildAnnouncementDraft(type: AdminEmailType, eventTitle: string) {
+  switch (type) {
+    case "REGISTRATION_CONFIRMATION":
+      return `Terima kasih sudah mendaftar pada ${eventTitle}.
+
+Berkas pendaftaran kamu sudah kami terima dan akan diproses oleh panitia. Pastikan data dan tautan tugas yang kamu kirim sudah dapat diakses.
+
+Informasi berikutnya akan dikirim melalui email ini.`;
+    case "PASSED_ADMINISTRATION":
+      return `Selamat, kamu dinyatakan lulus seleksi berkas pada ${eventTitle}.
+
+Silakan pantau informasi lanjutan dari panitia melalui kanal komunikasi resmi event. Pastikan email dan kontak yang kamu cantumkan tetap aktif.`;
+    case "REJECTED_ADMINISTRATION":
+      return `Terima kasih sudah mengikuti proses pendaftaran ${eventTitle}.
+
+Setelah proses peninjauan berkas, kamu belum dinyatakan lulus seleksi berkas pada kesempatan ini. Tetap semangat dan terima kasih atas antusiasmenya.`;
+    default: {
+      const exhaustive: never = type;
+      return exhaustive;
+    }
+  }
+}
 const getEffectiveAdminEventStatus = (event: AdminEvent): AdminEvent["status"] => {
   if (event.status !== "ACTIVE") return event.status;
 
@@ -706,7 +729,7 @@ function AnnouncementPanel({
   const [type, setType] = useState<AdminEmailType>("PASSED_ADMINISTRATION");
   const [statusFilter, setStatusFilter] = useState<AdminEmailStatus | "ALL">("ALL");
   const [divisionId, setDivisionId] = useState("");
-  const [additionalMessage, setAdditionalMessage] = useState("");
+  const [messageDraft, setMessageDraft] = useState("");
   const [force, setForce] = useState(false);
   const [summary, setSummary] = useState<AdminAnnouncementSummary | null>(null);
   const [logs, setLogs] = useState<AdminEmailLog[]>([]);
@@ -741,9 +764,18 @@ function AnnouncementPanel({
   useEffect(() => {
     setSummary(null);
     setDivisionId("");
-    setAdditionalMessage("");
+    setMessageDraft("");
     setForce(false);
   }, [event?.id]);
+
+  const defaultMessageDraft = useMemo(
+    () => (event ? buildAnnouncementDraft(type, event.title) : ""),
+    [event, type]
+  );
+
+  useEffect(() => {
+    setMessageDraft(defaultMessageDraft);
+  }, [defaultMessageDraft]);
 
   useEffect(() => {
     setSummary(null);
@@ -756,13 +788,17 @@ function AnnouncementPanel({
   const processAnnouncement = async (dryRun: boolean) => {
     if (!event) return;
 
+    if (!dryRun && !messageDraft.trim()) {
+      onError("Isi pesan email wajib diisi sebelum mengirim.");
+      return;
+    }
 
     try {
       onError(null);
       setIsSending(true);
       const result = await adminApi.sendAnnouncement(event.id, {
         type,
-        additionalMessage: additionalMessage.trim() || null,
+        message: messageDraft.trim() || null,
         divisionId: divisionId || null,
         force,
         dryRun,
@@ -777,13 +813,15 @@ function AnnouncementPanel({
       setIsSending(false);
     }
   };
-
   const selectedType = announcementTypes.find((item) => item.value === type);
   const isArchived = event?.status === "ARCHIVED";
   const quotaBlocksSend = Boolean(
     summary?.dryRun && summary.quota && !summary.quota.canSend
   );
-
+  const needsRecipientCheck = !summary?.dryRun;
+  const noRecipientsToSend = Boolean(summary?.dryRun && summary.sent === 0);
+  const sendDisabled =
+    isSending || isArchived || quotaBlocksSend || needsRecipientCheck || noRecipientsToSend;
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
       <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -793,8 +831,7 @@ function AnnouncementPanel({
           </p>
           <h2 className="mt-1 text-h4">Kirim Email Status Kelulusan</h2>
           <p className="mt-1 text-p5 text-white/60">
-            Email memakai pesan default sistem. Pesan tambahan akan ditaruh di
-            dalam email yang sama.
+            Cek penerima terlebih dahulu, lalu edit draf pesan sebelum email dikirim.
           </p>
         </div>
         <Button
@@ -859,19 +896,26 @@ function AnnouncementPanel({
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-p5 font-semibold">
-                Pesan tambahan
-              </span>
+              <div className="mb-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <span className="block text-p5 font-semibold">Draf pesan email</span>
+                <button
+                  type="button"
+                  onClick={() => setMessageDraft(defaultMessageDraft)}
+                  className="text-left text-p6 font-semibold text-secondary-100 underline-offset-4 hover:underline md:text-right"
+                >
+                  Reset ke template
+                </button>
+              </div>
               <textarea
-                value={additionalMessage}
-                onChange={(changeEvent) =>
-                  setAdditionalMessage(changeEvent.target.value)
-                }
-                placeholder="Opsional. Contoh: Mohon bergabung ke grup LINE paling lambat besok."
-                className="min-h-28 w-full rounded-md border border-white/15 bg-white px-3 py-2 text-p5 text-[#1D2642] outline-none focus:border-primary-300"
+                value={messageDraft}
+                onChange={(changeEvent) => setMessageDraft(changeEvent.target.value)}
+                placeholder="Tulis isi pesan yang akan dikirim ke penerima."
+                className="min-h-44 w-full rounded-md border border-white/15 bg-white px-3 py-2 text-p5 text-[#1D2642] outline-none focus:border-primary-300"
               />
+              <span className="mt-1 block text-p6 text-white/55">
+                Template ini menjadi isi utama email. Subjek dan footer otomatis tetap ditambahkan sistem.
+              </span>
             </label>
-
             <label className="flex items-start gap-3 rounded-md border border-white/10 bg-white/[0.05] px-4 py-3 text-p5 text-white/75">
               <input
                 type="checkbox"
@@ -901,18 +945,38 @@ function AnnouncementPanel({
                 size="lg"
                 variant="primary"
                 onClick={() => setSendDialogOpen(true)}
-                disabled={isSending || isArchived || quotaBlocksSend}
+                disabled={sendDisabled}
               >
                 <Send className="size-4" />
                 {isSending ? "Memproses..." : "Kirim Email"}
               </Button>
             </div>
 
+            {needsRecipientCheck && (
+              <p className="text-p6 text-white/55">
+                Klik Cek Penerima untuk menghitung target sebelum tombol kirim dapat digunakan.
+              </p>
+            )}
+
+            {summary?.dryRun && noRecipientsToSend && (
+              <div className="rounded-md border border-yellow-200/30 bg-yellow-300/15 px-4 py-3 text-p5 text-yellow-50">
+                {summary.skipped > 0
+                  ? "Tidak ada penerima baru karena seluruh penerima eligible sudah pernah mendapat email tipe ini. Centang kirim ulang jika ingin mengirim ulang."
+                  : "Tidak ada penerima yang cocok dengan target email dan filter divisi saat ini."}
+              </div>
+            )}
+
+            {summary?.dryRun && summary.sent > 0 && (
+              <div className="rounded-md border border-emerald-200/25 bg-emerald-300/10 px-4 py-3 text-p5 text-emerald-50">
+                Cek penerima selesai. {summary.sent} email akan dikirim jika kamu menekan Kirim Email.
+              </div>
+            )}
+
             <ActionDialog
               open={sendDialogOpen}
               onOpenChange={setSendDialogOpen}
               title="Kirim email pengumuman?"
-              description={`Email "${announcementLabel(type)}" akan dikirim untuk event "${event.title}". Pastikan target dan filter divisi sudah benar.`}
+              description={`Email "${announcementLabel(type)}" akan dikirim ke ${summary?.sent ?? 0} penerima untuk event "${event.title}". Pastikan target, filter divisi, dan isi pesan sudah benar.`}
               confirmLabel="Kirim Email"
               variant="primary"
               loading={isSending}
@@ -946,6 +1010,11 @@ function AnnouncementPanel({
                         ? "Limit harian belum dikonfigurasi."
                         : `Terkirim hari ini ${summary.quota.sentToday} dari ${summary.quota.limit}. Sisa kuota ${summary.quota.remaining ?? 0}.`}
                     </p>
+                    {summary.dryRun && summary.skipped > 0 && (
+                      <p className="mt-2">
+                        Dilewati berarti penerima eligible yang sudah pernah menerima email tipe ini.
+                      </p>
+                    )}
                     {!summary.quota.canSend && (
                       <p className="mt-2">
                         Kuota tidak cukup untuk target ini. Gunakan filter divisi,

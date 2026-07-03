@@ -1,4 +1,4 @@
-﻿import { BACKEND_URL } from "@/lib/api/config";
+import { BACKEND_URL } from "@/lib/api/config";
 
 const BASE_URL = BACKEND_URL;
 
@@ -282,7 +282,7 @@ export const adminApi = {
     eventId: string,
     payload: {
       type: AdminEmailType;
-      additionalMessage?: string | null;
+      message?: string | null;
       divisionId?: string | null;
       force?: boolean;
       dryRun?: boolean;
