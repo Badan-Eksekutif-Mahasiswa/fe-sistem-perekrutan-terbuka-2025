@@ -16,7 +16,6 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import FileUpload from "@/components/elements/FileUpload";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteMediaFile } from "@/lib/api/media";
 
 function DeleteConfirmModal({ onConfirm, itemName }: { onConfirm: () => void, itemName: string }) {
   return (
@@ -30,7 +29,7 @@ function DeleteConfirmModal({ onConfirm, itemName }: { onConfirm: () => void, it
         <DialogHeader>
           <DialogTitle>Konfirmasi Hapus</DialogTitle>
           <DialogDescription>
-            Apakah Anda yakin ingin menghapus {itemName} ini? Data yang dihapus tidak dapat dikembalikan.
+            Apakah Anda yakin ingin menghapus {itemName} ini dari form? Perubahan akan diterapkan setelah event disimpan.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -67,33 +66,6 @@ function toRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : {};
-}
-
-function isManagedStorageUrl(value?: string | null) {
-  const url = value?.trim();
-  if (!url || url.startsWith("/")) return false;
-
-  try {
-    const parsedUrl = new URL(url);
-    return (
-      (parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:") &&
-      parsedUrl.pathname.includes("/storage/v1/object/public/")
-    );
-  } catch {
-    return false;
-  }
-}
-
-function deleteRemovedMedia(url?: string | null) {
-  if (!isManagedStorageUrl(url)) return;
-
-  deleteMediaFile(url as string).catch((error: unknown) => {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "File lama gagal dihapus dari storage.";
-    console.error("Delete removed media error:", message);
-  });
 }
 
 function toStringValue(value: unknown): string {
@@ -351,7 +323,6 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   };
   const addTestimonial = () => setTestimonials([...testimonials, { name: "", role: "", message: "", photoUrl: "", _key: genKey() }]);
   const removeTestimonial = (index: number) => {
-    deleteRemovedMedia(testimonials[index]?.photoUrl);
     setTestimonials(testimonials.filter((_, i) => i !== index));
   };
 
@@ -363,7 +334,6 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
   };
   const addDocumentation = () => setDocumentations([...documentations, { title: "", imageUrl: "", _key: genKey() }]);
   const removeDocumentation = (index: number) => {
-    deleteRemovedMedia(documentations[index]?.imageUrl);
     setDocumentations(documentations.filter((_, i) => i !== index));
   };
 
@@ -386,7 +356,6 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const removeDivision = (index: number) => {
     const divToRemove = divisions[index];
-    deleteRemovedMedia(divToRemove?.coverUrl);
     if (divToRemove.id) {
       setDeletedDivisions([...deletedDivisions, divToRemove.id]);
     }
@@ -531,7 +500,9 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
       });
     submitData.faqs = faqs.filter(f => f.question.trim() !== "" || f.answer.trim() !== "").map(({ _key, ...rest }) => rest);
     submitData.testimonials = testimonials.filter(t => t.name.trim() !== "").map(({ _key, ...rest }) => rest);
-    submitData.documentations = documentations.filter(d => d.title.trim() !== "" || d.imageUrl.trim() !== "").map(({ _key, ...rest }) => rest);
+    submitData.documentations = documentations
+      .filter(d => d.imageUrl.trim() !== "")
+      .map(({ _key, ...rest }) => rest);
 
     // Prepare divisions payload
     const finalDivisions: EventFormDivision[] = divisions.filter(d => d.name.trim() !== "").map(d => ({

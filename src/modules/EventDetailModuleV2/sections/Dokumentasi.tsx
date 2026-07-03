@@ -108,6 +108,13 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
                       fill
                       className="object-cover hover:scale-105 transition-transform duration-500"
                     />
+                    {item.title?.trim() && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-4 pb-4 pt-12">
+                        <p className="text-white text-base md:text-lg font-semibold drop-shadow-md line-clamp-2">
+                          {item.title}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CarouselItem>

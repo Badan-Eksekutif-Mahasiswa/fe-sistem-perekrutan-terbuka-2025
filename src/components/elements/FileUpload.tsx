@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React, { useState } from "react";
-import { deleteMediaFile, uploadMediaFile } from "@/lib/api/media";
+import { uploadMediaFile } from "@/lib/api/media";
 import { Loader2, UploadCloud, CheckCircle2, X } from "lucide-react";
 
 interface FileUploadProps {
@@ -28,13 +28,6 @@ function isImageUrl(value: string) {
   return /\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i.test(value);
 }
 
-function isManagedStorageUrl(value?: string) {
-  const url = value?.trim();
-  if (!url || !isValidUploadUrl(url) || url.startsWith("/")) return false;
-
-  return url.includes("/storage/v1/object/public/");
-}
-
 export default function FileUpload({
   value,
   onChange,
@@ -44,9 +37,8 @@ export default function FileUpload({
   folder = "uploads",
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const uploadDisabled = uploading || deleting;
+  const uploadDisabled = uploading;
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -64,25 +56,8 @@ export default function FileUpload({
         throw new Error(`Ukuran file terlalu besar (${(file.size / 1024 / 1024).toFixed(1)} MB). Maksimal 3 MB.`);
       }
 
-      const previousUrl = value?.trim();
       const uploadedUrl = await uploadMediaFile(file, folder);
       onChange(uploadedUrl);
-
-      if (
-        isManagedStorageUrl(previousUrl) &&
-        previousUrl !== uploadedUrl
-      ) {
-        try {
-          await deleteMediaFile(previousUrl as string);
-        } catch (deleteError) {
-          const message =
-            deleteError instanceof Error
-              ? deleteError.message
-              : "File baru tersimpan, tetapi file lama gagal dihapus dari storage.";
-          console.error("Delete previous upload error:", message);
-          setError(message);
-        }
-      }
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -96,31 +71,9 @@ export default function FileUpload({
     }
   };
 
-  const clearFile = async () => {
-    const fileUrl = value?.trim();
-    if (!fileUrl) {
-      onChange("");
-      return;
-    }
-
+  const clearFile = () => {
     setError(null);
-    setDeleting(true);
     onChange("");
-
-    try {
-      if (isManagedStorageUrl(fileUrl)) {
-        await deleteMediaFile(fileUrl);
-      }
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "File dihapus dari form, tetapi gagal dihapus dari storage.";
-      console.error("Delete upload error:", message);
-      setError(message);
-    } finally {
-      setDeleting(false);
-    }
   };
 
   const handleManualUrl = (rawUrl: string) => {
@@ -168,15 +121,10 @@ export default function FileUpload({
           <button
             type="button"
             onClick={clearFile}
-            disabled={deleting}
             className="p-2 hover:bg-red-100 rounded-full text-red-500 transition-colors"
-            title={deleting ? "Menghapus..." : "Hapus"}
+            title="Hapus dari form"
           >
-            {deleting ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <X className="size-4" />
-            )}
+            <X className="size-4" />
           </button>
         </div>
       ) : (
