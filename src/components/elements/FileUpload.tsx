@@ -28,10 +28,13 @@ function isImageUrl(value: string) {
   return /\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i.test(value);
 }
 
+const r2PublicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL?.replace(/\/$/, "") ?? "";
+
 function isManagedStorageUrl(value?: string) {
   const url = value?.trim();
   if (!url || !isValidUploadUrl(url) || url.startsWith("/")) return false;
 
+  if (r2PublicUrl && url.startsWith(r2PublicUrl)) return true;
   return url.includes("/storage/v1/object/public/");
 }
 
@@ -60,8 +63,8 @@ export default function FileUpload({
         throw new Error("File harus berupa gambar (JPG, PNG, WEBP, dll)." );
       }
 
-      if (file.size > 3 * 1024 * 1024) {
-        throw new Error(`Ukuran file terlalu besar (${(file.size / 1024 / 1024).toFixed(1)} MB). Maksimal 3 MB.`);
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error(`Ukuran file terlalu besar (${(file.size / 1024 / 1024).toFixed(1)} MB). Maksimal 5 MB.`);
       }
 
       const previousUrl = value?.trim();

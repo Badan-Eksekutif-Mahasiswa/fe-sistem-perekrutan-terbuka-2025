@@ -207,6 +207,36 @@ export const authApi = {
     }
   },
 
+  deleteAdmin: async (userId: string): Promise<AuthResponse> => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/auth/admins/${userId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || "Gagal menghapus akun",
+          errors: data.errors,
+        };
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Delete admin failed:", error);
+      return {
+        success: false,
+        message: "Network error or server unavailable",
+      };
+    }
+  },
+
   forgotPassword: async (email: string): Promise<AuthResponse> => {
     try {
       const response = await fetch(`${BACKEND_URL}/auth/forgot-password`, {

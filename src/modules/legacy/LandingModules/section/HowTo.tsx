@@ -26,7 +26,7 @@ const HowTo = () => {
     <section className="relative overflow-hidden flex flex-col text-white font-jakarta gap-4 px-12 max-lg:px-10 max-md:px-8">
       <BalonUdara width={130} height={192} className="absolute -z-10 -left-6 top-1/3 opacity-70 max-lg:hidden animate-float [animation-delay:2s]" />
       <h1 className="text-center text-h1">Cara menggunakan SPT</h1>
-      <div className="flex gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
         {step.map((item, index) => (
           <div
             key={index}

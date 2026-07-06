@@ -15,7 +15,7 @@ const EventDetailModuleV2 = ({ event }: EventModuleProps) => {
   return (
     <main className="min-h-screen flex flex-col overflow-hidden relative">
       <Hero event={event} />
-      <div className="bg-gradient-page flex flex-col gap-14 relative z-0 overflow-hidden">
+      <div className="bg-gradient-page flex flex-col gap-6 md:gap-14 relative z-0 overflow-hidden">
         <Timeline event={event} />
         <Divisi event={event} />
         <Testimoni event={event} />
