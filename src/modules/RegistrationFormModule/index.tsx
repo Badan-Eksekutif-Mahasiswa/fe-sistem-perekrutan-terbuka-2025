@@ -661,7 +661,7 @@ export default function RegistrationFormModule({
         </div>
 
         {/* Form Card */}
-        <div className="bg-gradient-card-blur backdrop-blur-md rounded-2xl p-8 shadow-2xl">
+        <div className="bg-gradient-card-blur backdrop-blur-md rounded-2xl p-4 md:p-8 shadow-2xl">
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-2xl font-jakarta font-bold text-neutral-100">

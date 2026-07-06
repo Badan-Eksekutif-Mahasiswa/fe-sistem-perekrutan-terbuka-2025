@@ -12,6 +12,7 @@ import {
   KeyRound,
   Mail,
   ShieldCheck,
+  Trash2,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -34,6 +35,8 @@ export default function SuperadminPage() {
     type: "success" | "error";
     message: string;
   } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchAdmins = useCallback(async () => {
     setIsFetchingAdmins(true);
@@ -85,6 +88,27 @@ export default function SuperadminPage() {
     setIsSubmitting(false);
   };
 
+  const handleDeleteConfirm = async () => {
+    if (!confirmDelete) return;
+    setIsDeleting(true);
+
+    const response = await authApi.deleteAdmin(confirmDelete.id);
+
+    if (response.success) {
+      setFeedback({ type: "success", message: "Akun berhasil dihapus." });
+      setConfirmDelete(null);
+      await fetchAdmins();
+    } else {
+      setFeedback({
+        type: "error",
+        message: response.message || "Gagal menghapus akun.",
+      });
+      setConfirmDelete(null);
+    }
+
+    setIsDeleting(false);
+  };
+
   if (isLoading) {
     return <Loader />;
   }
@@ -94,6 +118,7 @@ export default function SuperadminPage() {
   }
 
   return (
+    <>
     <main className="min-h-screen bg-[var(--bg-main)] px-5 pb-8 pt-32 text-white md:px-8 lg:px-12">
       <div className="mx-auto flex max-w-7xl flex-col gap-8">
         <header className="flex flex-col gap-5 border-b border-white/10 pb-6 md:flex-row md:items-start md:justify-between">
@@ -214,18 +239,19 @@ export default function SuperadminPage() {
                     <th className="px-4 py-3 font-semibold">Nama</th>
                     <th className="px-4 py-3 font-semibold">Email</th>
                     <th className="px-4 py-3 font-semibold">Role</th>
+                    <th className="px-4 py-3 font-semibold">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {isFetchingAdmins ? (
                     <tr className="text-p5">
-                      <td className="px-4 py-4 text-white/70" colSpan={3}>
+                      <td className="px-4 py-4 text-white/70" colSpan={4}>
                         Memuat akun internal...
                       </td>
                     </tr>
                   ) : admins.length === 0 ? (
                     <tr className="text-p5">
-                      <td className="px-4 py-4 text-white/70" colSpan={3}>
+                      <td className="px-4 py-4 text-white/70" colSpan={4}>
                         Belum ada akun internal di database.
                       </td>
                     </tr>
@@ -243,6 +269,18 @@ export default function SuperadminPage() {
                             {account.role || "ADMIN"}
                           </span>
                         </td>
+                        <td className="px-4 py-4">
+                          {account.role !== "SUPERADMIN" && account.id !== user.id && (
+                            <button
+                              type="button"
+                              onClick={() => setConfirmDelete(account)}
+                              className="flex items-center gap-1.5 rounded-md border border-red-200/30 bg-red-300/10 px-2.5 py-1 text-p6 text-red-300 transition-colors hover:bg-red-300/20"
+                            >
+                              <Trash2 className="size-3.5" />
+                              Hapus
+                            </button>
+                          )}
+                        </td>
                       </tr>
                     ))
                   )}
@@ -253,6 +291,39 @@ export default function SuperadminPage() {
         </section>
       </div>
     </main>
+
+    {confirmDelete && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="w-full max-w-sm rounded-xl border border-white/10 bg-[#1a1a2e] p-6 shadow-xl">
+          <div className="mb-4 flex size-11 items-center justify-center rounded-md bg-red-300/15">
+            <Trash2 className="size-5 text-red-300" />
+          </div>
+          <h3 className="text-h4 text-white">Hapus Akun?</h3>
+          <p className="mt-2 text-p5 text-white/70">
+            Akun <span className="font-semibold text-white">{confirmDelete.name}</span> ({confirmDelete.email}) akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.
+          </p>
+          <div className="mt-6 flex gap-3">
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(null)}
+              disabled={isDeleting}
+              className="flex-1 rounded-md border border-white/10 px-4 py-2 text-p5 text-white/70 transition-colors hover:bg-white/5"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="flex-1 rounded-md bg-red-600 px-4 py-2 text-p5 font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+            >
+              {isDeleting ? "Menghapus..." : "Ya, Hapus"}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 

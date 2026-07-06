@@ -158,7 +158,7 @@ const CarouselElement = ({ testimonyData }: CarouselElementProps) => {
                   key={`${item.name}-${index}`}
                   className="mx-10 flex h-full relative"
                 >
-                  <div className="p-1 h-full">
+                  <div className="p-1 h-full w-full">
                     <Card className="w-full h-full flex-1 flex flex-col bg-gradient-card-blue border-none text-white shadow-glass backdrop-blur-md">
                       <CardContent className="flex items-center justify-center p-1">
                         <div className="w-30 h-30 rounded-full absolute -top-18 border-8 overflow-hidden shadow-lg transition-all border-primary-400 duration-500">

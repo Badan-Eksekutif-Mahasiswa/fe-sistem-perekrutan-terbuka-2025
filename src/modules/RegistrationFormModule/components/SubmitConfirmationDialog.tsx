@@ -38,20 +38,19 @@ export function SubmitConfirmationDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <div className="flex gap-2 justify-between">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-between">
             <Button
               variant="ghost"
               onClick={() => onOpenChange(false)}
               disabled={loading}
-              className="w-full sm:w-auto order-2 sm:order-1"
+              className="w-full"
             >
               Batal
             </Button>
             <Button
-              // variant="secondary"
               onClick={onConfirm}
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2"
+              className="w-full"
             >
               {loading ? "Mengirim..." : "Ya, Submit Sekarang"}
             </Button>
