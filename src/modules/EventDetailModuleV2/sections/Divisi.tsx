@@ -33,7 +33,7 @@ const Divisi = ({ event }: DivisiProps) => {
 
   if (!divisiData || divisiData.length === 0 || !divisiDipilih) {
     return (
-      <main className="min-h-screen justify-center flex px-5 py-2.5 gap-5 md:px-20 md:py-10 md:gap-10 flex-col items-center text-center text-white">
+      <main className="justify-center flex px-5 py-10 gap-5 md:px-20 md:py-16 md:gap-10 flex-col items-center text-center text-white">
         <h1 className="text-h3 md:text-h1">Divisi-Divisi Kami</h1>
         <p className="text-p4 text-neutral-300">Event ini belum memiliki divisi yang terdaftar.</p>
       </main>
@@ -62,7 +62,7 @@ const Divisi = ({ event }: DivisiProps) => {
     picData.length > 0 ? picData.map((p) => p.name).join(" dan ") : "PIC Name";
 
   return (
-    <main className=" min-h-screen justify-center flex px-5 py-2.5 gap-5 md:px-20 md:py-10 md:gap-10 flex-col items-center">
+    <main className="justify-center flex px-5 py-10 gap-5 md:px-20 md:py-16 md:gap-10 flex-col items-center">
       <h1 className="text-h3 md:text-h1 text-white">Divisi-Divisi Kami</h1>
       {/*  Details Divisi Desktop */}
       <div className="flex max-md:hidden flex-col lg:flex-row gap-6">
@@ -233,7 +233,7 @@ const Divisi = ({ event }: DivisiProps) => {
             <div className="flex gap-5 flex-col w-full items-center">
               <Card className="text-center w-full rounded-3xl z-20 justify-center items-center flex flex-col bg-gradient-card-blue border-none text-white shadow-glass backdrop-blur-md">
                 <CardContent className="gap-2 px-3 py-3">
-                  <div className="w-64 h-42 relative rounded-lg overflow-hidden">
+                  <div className="w-full aspect-[4/3] relative rounded-lg overflow-hidden">
                     <Image
                       src={divisiDipilih.cover || "/assets/logo-bem-ui.png"}
                       alt="Gambar PIC"

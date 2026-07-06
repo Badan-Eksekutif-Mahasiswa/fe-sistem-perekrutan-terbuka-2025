@@ -71,7 +71,7 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
       <BalonUdara width={128} height={160} className="absolute max-lg:hidden left-80 top-0 animate-float" />
       <BalonUdara width={128} height={160} className="absolute max-sm:hidden right-80 top-0 animate-float" />
 
-      <h1 className="text-4xl font-bold text-white text-center">Dokumentasi</h1>
+      <h1 className="text-2xl md:text-4xl font-bold text-white text-center">Dokumentasi</h1>
 
       <div className="w-full mx-auto px-4 md:px-8 relative">
         <Carousel

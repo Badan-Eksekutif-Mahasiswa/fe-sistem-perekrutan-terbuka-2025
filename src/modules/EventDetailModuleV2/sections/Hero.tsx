@@ -26,7 +26,7 @@ const Hero = ({ event }: HeroProps) => {
   return (
     <main
       id="hero-section"
-      className="relative w-screen overflow-x-hidden"
+      className="relative w-full overflow-x-hidden"
       style={{ backgroundImage: 'linear-gradient(90deg, #0B102D -50%, #9CB3D3 50%, #0B102D 150%)' }}
     >
       {/* Left Cloud */}

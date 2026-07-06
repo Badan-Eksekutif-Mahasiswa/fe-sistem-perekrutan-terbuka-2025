@@ -32,7 +32,7 @@ const FAQ = ({ event }: FAQProps) => {
   }
 
   return (
-    <section className="flex relative mb-11 min-h-screen justify-center flex-col gap-4 px-12 max-lg:px-10 max-md:px-8">
+    <section className="flex relative py-10 justify-center flex-col gap-4 px-12 max-lg:px-10 max-md:px-8">
       <BalonUdara width={128} height={160} className="absolute max-lg:hidden left-80 -top-30 animate-float" />
 
       <h1 className="text-center text-h1 text-neutral-50 font-jakarta">
@@ -50,7 +50,7 @@ const FAQ = ({ event }: FAQProps) => {
         ))}
       </Accordion>
       <div className="w-full h-full flex px-4 md:px-20 py-10 flex-col justify-center gap-12 items-center">
-        <h1 className="font-bold text-5xl text-white text-center">
+        <h1 className="font-bold text-3xl md:text-5xl text-white text-center">
           Ayo Join Sekarang
         </h1>
 

@@ -1,5 +1,7 @@
-﻿import { BACKEND_URL } from "@/lib/api/config";
-import { isSupabaseConfigured, supabase, supabaseBucket } from "@/lib/supabaseClient";
+import { BACKEND_URL } from "@/lib/api/config";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 type ApiResponse<T> = {
   success: boolean;
@@ -7,59 +9,52 @@ type ApiResponse<T> = {
   data: T;
 };
 
-function sanitizeFolder(folder?: string) {
-  return (folder || "uploads")
-    .split("/")
-    .map((segment) => segment.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"))
-    .filter(Boolean)
-    .join("/") || "uploads";
-}
-
-function sanitizeExtension(fileName: string, contentType: string) {
-  const fromName = fileName.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (fromName) return fromName;
-
-  const subtype = contentType.split("/")[1]?.toLowerCase().replace(/[^a-z0-9]/g, "");
-  return subtype || "bin";
-}
-
-function createObjectPath(file: File, folder?: string) {
-  const safeFolder = sanitizeFolder(folder);
-  const ext = sanitizeExtension(file.name, file.type || "application/octet-stream");
-  const id = typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-  return `${safeFolder}/${id}.${ext}`;
-}
-
-export async function uploadMediaFile(file: File, folder = "uploads") {
-  if (!isSupabaseConfigured || !supabase) {
-    throw new Error(
-      "Upload file belum dikonfigurasi. Pastikan variabel Supabase sudah tersedia."
-    );
+export async function uploadMediaFile(file: File, folder = "uploads"): Promise<string> {
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error("Ukuran file melebihi batas 5 MB.");
   }
 
-  const objectPath = createObjectPath(file, folder);
-  const { error } = await supabase.storage.from(supabaseBucket).upload(objectPath, file, {
-    cacheControl: "3600",
-    contentType: file.type || "application/octet-stream",
-    upsert: false,
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error("Hanya file JPEG, PNG, WebP, dan GIF yang diizinkan.");
+  }
+
+  const urlRes = await fetch(`${BACKEND_URL}/admin/media/upload-url`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      fileName: file.name,
+      contentType: file.type,
+      fileSize: file.size,
+      folder,
+    }),
   });
 
-  if (error) {
-    throw new Error(error.message || "Gagal mengunggah file ke Supabase Storage.");
+  const urlData = (await urlRes.json()) as ApiResponse<{
+    signedUrl: string;
+    publicUrl: string;
+  }>;
+
+  if (!urlRes.ok || !urlData.success) {
+    throw new Error(urlData.message || "Gagal mendapatkan URL upload.");
   }
 
-  const { data } = supabase.storage.from(supabaseBucket).getPublicUrl(objectPath);
-  if (!data.publicUrl) {
-    throw new Error("Gagal mengambil URL publik file yang diunggah.");
+  const { signedUrl, publicUrl } = urlData.data;
+
+  const uploadRes = await fetch(signedUrl, {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file,
+  });
+
+  if (!uploadRes.ok) {
+    throw new Error("Gagal mengunggah file ke storage.");
   }
 
-  return data.publicUrl;
+  return publicUrl;
 }
 
-export async function deleteMediaFile(url: string) {
+export async function deleteMediaFile(url: string): Promise<void> {
   const response = await fetch(`${BACKEND_URL}/admin/media/delete`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -77,6 +72,4 @@ export async function deleteMediaFile(url: string) {
   if (!response.ok || result.success === false) {
     throw new Error(result.message || "Gagal menghapus file dari storage.");
   }
-
-  return result.data;
 }
