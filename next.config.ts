@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Pastikan folder logo proker ikut ter-bundle saat deploy, sehingga
+  // pembacaan folder `public/partners` tetap valid di semua host.
+  outputFileTracingIncludes: {
+    "/": ["./public/partners/**"],
+  },
 };
 
 export default nextConfig;
