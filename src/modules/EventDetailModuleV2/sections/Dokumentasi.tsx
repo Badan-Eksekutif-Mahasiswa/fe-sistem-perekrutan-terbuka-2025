@@ -101,12 +101,12 @@ const Dokumentasi = ({ event }: DokumentasiProps) => {
                     boxShadow: "var(--shadow-glass)"
                   }}
                 >
-                  <div className="w-full h-full relative rounded-2xl overflow-hidden">
+                  <div className="w-full h-full relative rounded-2xl overflow-hidden bg-gradient-card-blue">
                     <Image
                       src={item.imageUrl}
                       alt={item.title || `Dokumentasi ${index + 1}`}
                       fill
-                      className="object-cover hover:scale-105 transition-transform duration-500"
+                      className="object-contain hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                 </div>
