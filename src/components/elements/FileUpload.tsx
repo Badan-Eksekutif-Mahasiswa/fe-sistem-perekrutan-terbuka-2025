@@ -147,8 +147,8 @@ export default function FileUpload({
         <div className="relative border border-[#8F344A] bg-neutral-50 rounded-md p-2 flex items-center justify-between">
           <div className="flex items-center gap-3 overflow-hidden">
             {isValidUploadUrl(value) && (isImageUrl(value) || accept.includes("image")) ? (
-              <div className="relative w-12 h-12 rounded-md overflow-hidden shrink-0 border border-neutral-200">
-                <img src={value} alt="Uploaded" className="w-full h-full object-cover" />
+              <div className="relative w-16 h-16 rounded-md overflow-hidden shrink-0 border border-neutral-200 bg-gradient-card-blue">
+                <img src={value} alt="Uploaded" className="w-full h-full object-contain" />
               </div>
             ) : (
               <CheckCircle2 className="size-6 text-green-500 shrink-0" />
