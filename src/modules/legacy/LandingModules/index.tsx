@@ -11,7 +11,12 @@ import { Event } from "@/types/event";
 import { LogoBackground } from "@/design-system";
 import { BACKEND_URL } from "@/lib/api/config";
 
-const LandingModules = () => {
+interface LandingModulesProps {
+  /** Daftar path logo proker, dibaca otomatis dari `public/partners` di server. */
+  partnerLogos: string[];
+}
+
+const LandingModules = ({ partnerLogos }: LandingModulesProps) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +43,7 @@ const LandingModules = () => {
       <Hero events={events} loading={loading} />
       <About />
       <HowTo />
-      <Partners />
+      <Partners logos={partnerLogos} />
       <FrequentlyAsked />
       <MeetTheTeam />
       <div className="absolute z-[-1] inset-0 flex justify-end items-end pointer-events-none overflow-hidden" aria-hidden="true">
