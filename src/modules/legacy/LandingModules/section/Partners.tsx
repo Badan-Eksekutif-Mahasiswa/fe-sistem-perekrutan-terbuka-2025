@@ -47,9 +47,7 @@ const Partners = ({ logos }: PartnersProps) => {
       width={0}
       height={0}
       sizes="(max-width: 1024px) 96px, 160px"
-      // Tinggi tetap, lebar mengikuti rasio asli foto (frame = ukuran foto,
-      // tidak dipaksa kotak 160x160 seperti sebelumnya).
-      className="mr-8 h-16 w-auto max-w-none object-contain lg:mr-16 lg:h-24"
+      className="mr-8 h-20 w-auto max-w-none object-contain lg:mr-16 lg:h-32"
       style={{ width: "auto" }}
     />
   );
