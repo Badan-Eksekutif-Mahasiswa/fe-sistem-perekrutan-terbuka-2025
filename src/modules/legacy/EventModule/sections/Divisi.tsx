@@ -109,12 +109,12 @@ const Divisi = ({ event }: DivisiProps) => {
             <div className="flex gap-5 flex-col w-fit">
               <Card className="text-center w-fit rounded-3xl z-20 justify-center flex flex-col">
                 <CardContent className="gap-2 px-3 py-3">
-                  <div className="max-lg:w-[72vw] w-96 h-72 relative rounded-lg overflow-hidden">
+                  <div className="max-lg:w-[72vw] w-96 h-72 relative rounded-lg overflow-hidden bg-gradient-card-blue">
                     <Image
                       src={divisiDipilih.cover || "/assets/logo-bem-ui.png"}
                       alt="Gambar PIC"
                       layout="fill"
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
                   <h3 className="text-h4 ">
@@ -222,12 +222,12 @@ const Divisi = ({ event }: DivisiProps) => {
             <div className="flex gap-5 flex-col w-full items-center">
               <Card className="text-center w-full rounded-3xl z-20 justify-center items-center flex flex-col">
                 <CardContent className="gap-2 px-3 py-3">
-                  <div className="w-64 h-42 relative rounded-lg overflow-hidden">
+                  <div className="w-64 h-42 relative rounded-lg overflow-hidden bg-gradient-card-blue">
                     <Image
                       src={divisiDipilih.cover || "/assets/logo-bem-ui.png"}
                       alt="Gambar PIC"
                       layout="fill"
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
                   <h3 className="text-h3 ">
