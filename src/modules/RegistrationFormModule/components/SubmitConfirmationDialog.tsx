@@ -38,7 +38,7 @@ export function SubmitConfirmationDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-between">
+          <div className="flex flex-row gap-2 justify-between">
             <Button
               variant="ghost"
               onClick={() => onOpenChange(false)}
