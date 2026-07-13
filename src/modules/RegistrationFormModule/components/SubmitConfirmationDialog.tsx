@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui-legacy/dialog";
@@ -37,25 +36,21 @@ export function SubmitConfirmationDialog({
             </span>
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <div className="flex flex-row gap-2 justify-between">
-            <Button
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-              className="w-full"
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={onConfirm}
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? "Mengirim..." : "Ya, Submit Sekarang"}
-            </Button>
-          </div>
-        </DialogFooter>
+        <div className="flex flex-col justify-center gap-2 mt-2">
+          <Button
+            onClick={onConfirm}
+            disabled={loading}
+          >
+            {loading ? "Mengirim..." : "Ya, Submit Sekarang"}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Batal
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
