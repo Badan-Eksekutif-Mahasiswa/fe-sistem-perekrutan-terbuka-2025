@@ -47,8 +47,7 @@ export type AdminRegistrationListItem = {
     email: string | null;
     npm: string | null;
   };
-  division_choice_1: { id: string; name: string } | null;
-  division_choice_2: { id: string; name: string } | null;
+  division_choices: Array<{ id: string; name: string }>;
 };
 
 export type AdminApplicationDetail = {
@@ -65,8 +64,7 @@ export type AdminApplicationDetail = {
     studyProgram: string | null;
     line_id: string | null;
   };
-  division_choice_1: { id: string; name: string } | null;
-  division_choice_2: { id: string; name: string } | null;
+  division_choices: Array<{ id: string; name: string }>;
   submission_links: Array<{
     requirement: string;
     scope: string;

@@ -91,21 +91,20 @@ const Divisi = ({ event }: DivisiProps) => {
         </div>
 
         <div className="lg:hidden">
-          <Select>
+          <Select
+            value={divisiDipilih.name.toLowerCase()}
+            onValueChange={(val) => {
+              const idx = divisiData.findIndex((d) => d.name.toLowerCase() === val);
+              if (idx !== -1) setIndexDivisi(idx);
+            }}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue
-                placeholder="Multimedia"
-                defaultValue={"multimedia"}
-              />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {divisiData.map((item, i) => (
-                  <SelectItem
-                    onClick={() => setIndexDivisi(i)}
-                    key={item.id}
-                    value={item.name.toLowerCase()}
-                  >
+                  <SelectItem key={item.id} value={item.name.toLowerCase()}>
                     {item.name}
                   </SelectItem>
                 ))}
@@ -189,18 +188,20 @@ const Divisi = ({ event }: DivisiProps) => {
 
       {/* Details Divisi Mobile */}
       <div className="md:hidden flex flex-col items-center gap-5 w-full">
-        <Select>
+        <Select
+          value={divisiDipilih.name.toLowerCase()}
+          onValueChange={(val) => {
+            const idx = divisiData.findIndex((d) => d.name.toLowerCase() === val);
+            if (idx !== -1) setIndexDivisi(idx);
+          }}
+        >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Multimedia" defaultValue={"multimedia"} />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               {divisiData.map((item, i) => (
-                <SelectItem
-                  onClick={() => setIndexDivisi(i)}
-                  key={item.id}
-                  value={item.name.toLowerCase()}
-                >
+                <SelectItem key={item.id} value={item.name.toLowerCase()}>
                   {item.name}
                 </SelectItem>
               ))}
