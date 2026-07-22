@@ -535,11 +535,14 @@ export default function AdminDashboardPage() {
                               </p>
                             </td>
                             <td className="px-4 py-4 text-white/70">
-                              <p>{registration.division_choice_1?.name || "-"}</p>
-                              {registration.division_choice_2 && (
-                                <p className="text-p6 text-white/55">
-                                  {registration.division_choice_2.name}
-                                </p>
+                              {registration.division_choices.length === 0 ? (
+                                <p>-</p>
+                              ) : (
+                                registration.division_choices.map((choice, i) => (
+                                  <p key={choice.id} className={i > 0 ? "text-p6 text-white/55" : ""}>
+                                    {choice.name}
+                                  </p>
+                                ))
                               )}
                             </td>
                             <td className="px-4 py-4">
@@ -651,14 +654,13 @@ function ApplicationDetailPanel({
         <InfoBlock label="Email" value={application.user.email || "-"} />
         <InfoBlock label="ID Line" value={application.user.line_id || "-"} />
         <InfoBlock label="Submit" value={formatDateTime(application.submitted_at)} />
-        <InfoBlock
-          label="Pilihan divisi 1"
-          value={application.division_choice_1?.name || "-"}
-        />
-        <InfoBlock
-          label="Pilihan divisi 2"
-          value={application.division_choice_2?.name || "-"}
-        />
+        {application.division_choices.length === 0 ? (
+          <InfoBlock label="Pilihan divisi" value="-" />
+        ) : (
+          application.division_choices.map((choice, i) => (
+            <InfoBlock key={choice.id} label={`Pilihan divisi ${i + 1}`} value={choice.name} />
+          ))
+        )}
       </div>
 
       <div className="mt-6">
