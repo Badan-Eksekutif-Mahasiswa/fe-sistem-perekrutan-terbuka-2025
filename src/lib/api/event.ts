@@ -119,13 +119,13 @@ export async function getAllEvents(): Promise<Event[]> {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch events: ${response.statusText}`);
+      throw new Error("Gagal memuat daftar event, silakan coba lagi.");
     }
 
     const result: AllEventsResponse = await response.json();
 
     if (!result.success) {
-      throw new Error(result.message || "Failed to fetch events");
+      throw new Error(result.message || "Gagal memuat daftar event, silakan coba lagi.");
     }
 
     return result.data;
@@ -152,15 +152,15 @@ export async function getEventById(id: string): Promise<Event> {
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error("Event not found");
+        throw new Error("Event tidak ditemukan.");
       }
-      throw new Error(`Failed to fetch event: ${response.statusText}`);
+      throw new Error("Gagal memuat detail event, silakan coba lagi.");
     }
 
     const result: EventByIdResponse = await response.json();
 
     if (!result.success) {
-      throw new Error(result.message || "Failed to fetch event");
+      throw new Error(result.message || "Gagal memuat detail event, silakan coba lagi.");
     }
 
     return result.data;
@@ -186,15 +186,15 @@ export async function getAdminEventById(id: string): Promise<Event> {
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error("Event not found");
+        throw new Error("Event tidak ditemukan.");
       }
-      throw new Error(`Failed to fetch event: ${response.statusText}`);
+      throw new Error("Gagal memuat detail event, silakan coba lagi.");
     }
 
     const result = await parseJson<EventWrappedResponse>(response);
 
     if (!result.success) {
-      throw new Error(result.message || "Failed to fetch event");
+      throw new Error(result.message || "Gagal memuat detail event, silakan coba lagi.");
     }
 
     return unwrapEvent(result.data);
@@ -285,6 +285,50 @@ export async function updateDivision(id: string, data: DivisionPayload): Promise
   const result = await parseJson<DivisionWrappedResponse>(response);
   if (!result.success) throw new Error(result.message || "Failed to update division");
   return unwrapDivision(result.data);
+}
+
+export type TaskToggleResult = { active: boolean; required: boolean };
+
+/**
+ * Toggle whether Tugas Umum (event-level task) is shown to peserta (active) and/or mandatory (required).
+ */
+export async function toggleEventGeneralTask(
+  eventId: string,
+  active: boolean,
+  required: boolean
+): Promise<TaskToggleResult> {
+  const response = await fetch(`${API_BASE_URL}/admin/events/${eventId}/general-task/toggle`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ active, required }),
+  });
+
+  if (!response.ok) throw await readApiError(response, "Failed to toggle Tugas Umum");
+  const result = await parseJson<TaskToggleResult>(response);
+  if (!result.success) throw new Error(result.message || "Failed to toggle Tugas Umum");
+  return result.data;
+}
+
+/**
+ * Toggle whether Tugas Khusus (division-level task) is shown to peserta (active) and/or mandatory (required).
+ */
+export async function toggleDivisionTask(
+  divisionId: string,
+  active: boolean,
+  required: boolean
+): Promise<TaskToggleResult> {
+  const response = await fetch(`${API_BASE_URL}/admin/divisions/${divisionId}/task/toggle`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ active, required }),
+  });
+
+  if (!response.ok) throw await readApiError(response, "Failed to toggle Tugas Khusus");
+  const result = await parseJson<TaskToggleResult>(response);
+  if (!result.success) throw new Error(result.message || "Failed to toggle Tugas Khusus");
+  return result.data;
 }
 
 /**
