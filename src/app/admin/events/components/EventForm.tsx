@@ -9,6 +9,8 @@ import {
   EventPayload,
   EventTestimonialItem,
   EventTimelineItem,
+  toggleEventGeneralTask,
+  toggleDivisionTask,
 } from "@/lib/api/event";
 import { Button } from "@/components/ui/button";
 import { Info, Plus, Trash2 } from "lucide-react";
@@ -249,6 +251,63 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
 
   const [deletedDivisions, setDeletedDivisions] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  // Status Tugas Umum/Tugas Khusus (SubmissionRequirement.isActive/isRequired), independen dari isi Link Tugas.
+  // isActive = tampil/tidak ke peserta. isRequired = wajib diisi/tidak (hanya berlaku jika aktif).
+  const generalTaskRequirement = initialData?.requirements?.find((req) => req.scope === "EVENT");
+  const [generalTaskActive, setGeneralTaskActive] = useState<boolean>(generalTaskRequirement?.isActive ?? false);
+  const [generalTaskRequired, setGeneralTaskRequired] = useState<boolean>(generalTaskRequirement?.isRequired ?? false);
+  const [generalTaskToggling, setGeneralTaskToggling] = useState(false);
+
+  const [divisionTaskActive, setDivisionTaskActive] = useState<Record<string, boolean>>(() => {
+    const map: Record<string, boolean> = {};
+    (initialData?.requirements || [])
+      .filter((req) => req.scope === "DIVISION" && req.divisionId)
+      .forEach((req) => {
+        map[req.divisionId as string] = req.isActive;
+      });
+    return map;
+  });
+  const [divisionTaskRequired, setDivisionTaskRequired] = useState<Record<string, boolean>>(() => {
+    const map: Record<string, boolean> = {};
+    (initialData?.requirements || [])
+      .filter((req) => req.scope === "DIVISION" && req.divisionId)
+      .forEach((req) => {
+        map[req.divisionId as string] = req.isRequired;
+      });
+    return map;
+  });
+  const [divisionTaskToggling, setDivisionTaskToggling] = useState<Record<string, boolean>>({});
+
+  const handleToggleGeneralTask = async (nextActive: boolean, nextRequired: boolean) => {
+    if (!initialData?.id) return;
+    setGeneralTaskToggling(true);
+    try {
+      const result = await toggleEventGeneralTask(initialData.id, nextActive, nextRequired);
+      setGeneralTaskActive(result.active);
+      setGeneralTaskRequired(result.required);
+      toast.success(result.active ? "Tugas Umum diaktifkan" : "Tugas Umum dinonaktifkan");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal mengubah status Tugas Umum");
+    } finally {
+      setGeneralTaskToggling(false);
+    }
+  };
+
+  const handleToggleDivisionTask = async (divisionId: string, nextActive: boolean, nextRequired: boolean) => {
+    if (!divisionId) return;
+    setDivisionTaskToggling((prev) => ({ ...prev, [divisionId]: true }));
+    try {
+      const result = await toggleDivisionTask(divisionId, nextActive, nextRequired);
+      setDivisionTaskActive((prev) => ({ ...prev, [divisionId]: result.active }));
+      setDivisionTaskRequired((prev) => ({ ...prev, [divisionId]: result.required }));
+      toast.success(result.active ? "Tugas Khusus diaktifkan" : "Tugas Khusus dinonaktifkan");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal mengubah status Tugas Khusus");
+    } finally {
+      setDivisionTaskToggling((prev) => ({ ...prev, [divisionId]: false }));
+    }
+  };
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const setSectionRef = (name: string) => (node: HTMLElement | null) => {
@@ -632,6 +691,37 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
         >
           Buka template dokumen tugas
         </a>
+        <div className="flex flex-col gap-1 mt-2">
+          <label className="text-sm">Tampilkan Tugas Umum ke peserta</label>
+          <select
+            value={generalTaskActive ? "true" : "false"}
+            disabled={!initialData?.id || generalTaskToggling}
+            onChange={(e) => handleToggleGeneralTask(e.target.value === "true", generalTaskRequired)}
+            className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400 disabled:opacity-60"
+          >
+            <option value="false">Nonaktif (tidak ditampilkan ke peserta)</option>
+            <option value="true">Aktif (ditampilkan ke peserta)</option>
+          </select>
+        </div>
+        <div className="flex flex-col gap-1 mt-2">
+          <label className="text-sm">Wajib diisi peserta</label>
+          <select
+            value={generalTaskRequired ? "true" : "false"}
+            disabled={!initialData?.id || !generalTaskActive || generalTaskToggling}
+            onChange={(e) => handleToggleGeneralTask(generalTaskActive, e.target.value === "true")}
+            className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400 disabled:opacity-60"
+          >
+            <option value="false">Opsional (boleh dikosongkan)</option>
+            <option value="true">Wajib (harus diisi sebelum submit)</option>
+          </select>
+          <p className="text-xs text-white/60 mt-1">
+            {!initialData?.id
+              ? "Simpan event terlebih dahulu sebelum mengatur Tugas Umum."
+              : !generalTaskActive
+                ? "Aktifkan dulu supaya bisa diatur wajib/opsional. Perubahan langsung tersimpan."
+                : "Perubahan status langsung tersimpan."}
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-col gap-1">
@@ -849,6 +939,43 @@ export default function EventForm({ initialData, onSubmit, loading }: EventFormP
               >
                 Buka template dokumen tugas
               </a>
+              <div className="flex flex-col gap-1 mt-2">
+                <label className="text-sm">Tampilkan Tugas Khusus ke peserta</label>
+                <select
+                  value={item.id && divisionTaskActive[item.id] ? "true" : "false"}
+                  disabled={!item.id || !!divisionTaskToggling[item.id]}
+                  onChange={(e) =>
+                    item.id &&
+                    handleToggleDivisionTask(item.id, e.target.value === "true", !!divisionTaskRequired[item.id])
+                  }
+                  className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400 disabled:opacity-60"
+                >
+                  <option value="false">Nonaktif (tidak ditampilkan ke peserta)</option>
+                  <option value="true">Aktif (ditampilkan ke peserta)</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1 mt-2">
+                <label className="text-sm">Wajib diisi peserta</label>
+                <select
+                  value={item.id && divisionTaskRequired[item.id] ? "true" : "false"}
+                  disabled={!item.id || !(item.id && divisionTaskActive[item.id]) || !!divisionTaskToggling[item.id]}
+                  onChange={(e) =>
+                    item.id &&
+                    handleToggleDivisionTask(item.id, !!divisionTaskActive[item.id], e.target.value === "true")
+                  }
+                  className="border border-[#8F344A] bg-white p-2 rounded-md text-neutral-900 placeholder:text-neutral-400 disabled:opacity-60"
+                >
+                  <option value="false">Opsional (boleh dikosongkan)</option>
+                  <option value="true">Wajib (harus diisi sebelum submit)</option>
+                </select>
+                <p className="text-xs text-white/60 mt-1">
+                  {!item.id
+                    ? "Simpan divisi terlebih dahulu sebelum mengatur Tugas Khusus."
+                    : !divisionTaskActive[item.id]
+                      ? "Aktifkan dulu supaya bisa diatur wajib/opsional. Perubahan langsung tersimpan."
+                      : "Perubahan status langsung tersimpan."}
+                </p>
+              </div>
             </div>
             {divisions.length > 1 && (
               <DeleteConfirmModal onConfirm={() => removeDivision(index)} itemName="Divisi" />
