@@ -28,14 +28,13 @@ copy .env.example .env.local
 NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 ```
 
-4. Jika ingin upload gambar event ke Supabase Storage, isi juga:
+4. Jika ingin upload gambar event, isi juga alamat publik bucket Cloudflare R2:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_R2_PUBLIC_URL=https://pub-xxxx.r2.dev
 ```
 
-Jika dua env Supabase kosong, upload file akan dinonaktifkan dan form tetap bisa memakai input URL gambar manual.
+Kredensial R2 yang sebenarnya ada di backend, bukan di sini. Lihat `R2_*` pada `.env.example` repo `be-spt-compro`. Kalau backend belum dikonfigurasi, tombol upload membalas 503 dengan pesan yang jelas dan form event tetap bisa memakai input URL gambar manual.
 
 5. Jalankan frontend:
 
