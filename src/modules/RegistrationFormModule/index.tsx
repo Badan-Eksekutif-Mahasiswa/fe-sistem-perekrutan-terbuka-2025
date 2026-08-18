@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { PersonalInfoForm } from "./components/PersonalInfoForm";
 import { QuestionItem } from "./components/QuestionItem";
 import { SubmitConfirmationDialog } from "./components/SubmitConfirmationDialog";
-import { registrationApi } from "@/lib/api/registration";
+import { registrationApi, RegistrationApiError } from "@/lib/api/registration";
 import Loader from "@/components/elements/Loader";
 import { useRouter } from "next/navigation";
 import {
@@ -26,6 +26,14 @@ import { cn } from "@/lib/utils";
  * Nanti diganti otomatis oleh generalTaskUrl / taskUrl dari backend.
  */
 const FALLBACK_TASK_URL = "https://google.com";
+
+/**
+ * Cocokkan error dengan kode status HTTP-nya, bukan dengan kalimat errornya.
+ * Pesan backend bisa berubah kata atau bahasa kapan saja, kode statusnya tidak.
+ */
+function isApiStatus(error: unknown, status: number) {
+  return error instanceof RegistrationApiError && error.status === status;
+}
 
 /** Satu grup Tugas Khusus untuk satu divisi pilihan pendaftar. */
 interface DivisionTaskGroup {
@@ -334,8 +342,9 @@ export default function RegistrationFormModule({
         setHasRegistration(true);
         return;
       } catch (error) {
-        const message = error instanceof Error ? error.message : "";
-        if (!message.includes("No draft registration found")) {
+        // 404 berarti pendaftar ini belum punya draft, jadi lanjut ke create
+        // di bawah. Selain itu lempar lagi supaya pemanggil yang menangani.
+        if (!isApiStatus(error, 404)) {
           throw error;
         }
       }
@@ -348,8 +357,9 @@ export default function RegistrationFormModule({
         });
         setHasRegistration(true);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "";
-        if (message.includes("Draft already exists")) {
+        // 409 berarti draftnya keburu dibuat, biasanya karena dua autosave
+        // berjalan berdekatan. Cukup ulangi sebagai pembaruan.
+        if (isApiStatus(error, 409)) {
           await registrationApi.partialUpdateRegistration(patch);
           setHasRegistration(true);
           return;
