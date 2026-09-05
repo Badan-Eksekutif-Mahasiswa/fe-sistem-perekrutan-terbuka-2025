@@ -10,6 +10,34 @@ import { BACKEND_URL } from "@/lib/api/config";
 
 const BASE_URL = BACKEND_URL;
 
+/**
+ * Error dari endpoint registrasi, lengkap dengan kode status HTTP.
+ *
+ * Pemanggil perlu membedakan "draft belum ada" (404) dari "draft sudah ada"
+ * (409). Sebelum ini pembedaannya dilakukan dengan mencocokkan kalimat error,
+ * yang langsung putus begitu pesan backend diterjemahkan ke bahasa Indonesia.
+ */
+export class RegistrationApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "RegistrationApiError";
+    this.status = status;
+  }
+}
+
+async function toApiError(response: Response, fallback: string) {
+  let message = fallback;
+  try {
+    const body = await response.json();
+    if (body?.message) message = body.message;
+  } catch {
+    // Respons tanpa badan JSON, pakai pesan cadangan saja.
+  }
+  return new RegistrationApiError(message, response.status);
+}
+
 export const registrationApi = {
   async getSections(eventId: string) {
     const response = await fetch(
@@ -24,8 +52,7 @@ export const registrationApi = {
     );
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to fetch registration sections");
+      throw await toApiError(response, "Gagal memuat bagian formulir pendaftaran");
     }
 
     const result = (await response.json()) as SectionsResponse;
@@ -49,7 +76,7 @@ export const registrationApi = {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch registration form");
+      throw await toApiError(response, "Gagal memuat formulir pendaftaran");
     }
 
     return response.json();
@@ -67,8 +94,7 @@ export const registrationApi = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to create registration");
+      throw await toApiError(response, "Gagal membuat draft pendaftaran");
     }
 
     return response.json();
@@ -86,8 +112,7 @@ export const registrationApi = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to update registration");
+      throw await toApiError(response, "Gagal memperbarui draft pendaftaran");
     }
 
     return response.json();
@@ -107,10 +132,7 @@ export const registrationApi = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(
-        error.message || "Failed to partially update registration"
-      );
+      throw await toApiError(response, "Gagal menyimpan perubahan pendaftaran");
     }
 
     if (response.status === 204) return { success: true } as SubmitResponse;
@@ -129,8 +151,7 @@ export const registrationApi = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to submit registration");
+      throw await toApiError(response, "Gagal mengirim pendaftaran");
     }
 
     return response.json();
@@ -152,8 +173,7 @@ export const registrationApi = {
     );
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to get application status");
+      throw await toApiError(response, "Gagal memuat status pendaftaran");
     }
 
     return response.json();
@@ -170,8 +190,7 @@ export const registrationApi = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to get my applications");
+      throw await toApiError(response, "Gagal memuat daftar pendaftaran");
     }
 
     return response.json();

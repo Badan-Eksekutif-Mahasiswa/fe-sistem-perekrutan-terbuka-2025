@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { PersonalInfoForm } from "./components/PersonalInfoForm";
 import { QuestionItem } from "./components/QuestionItem";
 import { SubmitConfirmationDialog } from "./components/SubmitConfirmationDialog";
-import { registrationApi } from "@/lib/api/registration";
+import { registrationApi, RegistrationApiError } from "@/lib/api/registration";
 import Loader from "@/components/elements/Loader";
 import { useRouter } from "next/navigation";
 import {
@@ -21,11 +21,11 @@ import { useToast } from "@/hooks/useToast";
 import { Event, SubmissionRequirement } from "@/types/event";
 import { cn } from "@/lib/utils";
 
-/**
- * Link tugas sementara selama admin belum mengisi link asli.
- * Nanti diganti otomatis oleh generalTaskUrl / taskUrl dari backend.
- */
 const FALLBACK_TASK_URL = "https://google.com";
+
+function isApiStatus(error: unknown, status: number) {
+  return error instanceof RegistrationApiError && error.status === status;
+}
 
 /** Satu grup Tugas Khusus untuk satu divisi pilihan pendaftar. */
 interface DivisionTaskGroup {
@@ -332,8 +332,7 @@ export default function RegistrationFormModule({
         setHasRegistration(true);
         return;
       } catch (error) {
-        const message = error instanceof Error ? error.message : "";
-        if (!message.includes("No draft registration found") && !message.includes("Draft pendaftaran tidak ditemukan")) {
+        if (!isApiStatus(error, 404)) {
           throw error;
         }
       }
@@ -346,8 +345,7 @@ export default function RegistrationFormModule({
         });
         setHasRegistration(true);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "";
-        if (message.includes("Draft already exists")) {
+        if (isApiStatus(error, 409)) {
           await registrationApi.partialUpdateRegistration(patch);
           setHasRegistration(true);
           return;
