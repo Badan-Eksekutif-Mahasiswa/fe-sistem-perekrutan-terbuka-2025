@@ -730,46 +730,44 @@ export default function RegistrationFormModule({
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-primary-300/30">
-            <Button
-              variant="ghost"
-              onClick={handlePrevious}
-              disabled={currentSectionIndex === 0 || submitting}
-            >
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              Previous
-            </Button>
-
-            <div className="flex gap-3">
-              {isLastSection && !isSubmitted && (
-                <Button
-                  variant="ghost"
-                  onClick={async () => {
-                    try {
-                      setSubmitting(true);
-                      await saveDraftPatch({
-                        eventId,
-                        submissionLinks: Array.from(answers.entries())
-                          .filter(([, url]) => url.trim())
-                          .map(([requirementId, submittedUrl]) => ({
-                            requirementId,
-                            submittedUrl: submittedUrl.trim(),
-                          })),
-                      });
-                      toast.show("success", "Draft berhasil disimpan");
-                    } catch (error) {
-                      toast.show("error", error instanceof Error ? error.message : "Gagal menyimpan draft");
-                    } finally {
-                      setSubmitting(false);
-                    }
-                  }}
-                  disabled={submitting}
-                >
-                  Simpan Draft
-                </Button>
-              )}
-
-              {/* Hide Next/Submit button only on last section when already submitted */}
+          <div className="flex flex-col gap-3 mt-8 pt-6 border-t border-primary-300/30">
+            {isLastSection && !isSubmitted && (
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={async () => {
+                  try {
+                    setSubmitting(true);
+                    await saveDraftPatch({
+                      eventId,
+                      submissionLinks: Array.from(answers.entries())
+                        .filter(([, url]) => url.trim())
+                        .map(([requirementId, submittedUrl]) => ({
+                          requirementId,
+                          submittedUrl: submittedUrl.trim(),
+                        })),
+                    });
+                    toast.show("success", "Draft berhasil disimpan");
+                  } catch (error) {
+                    toast.show("error", error instanceof Error ? error.message : "Gagal menyimpan draft");
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }}
+                disabled={submitting}
+              >
+                Simpan Draft
+              </Button>
+            )}
+            <div className="flex justify-between">
+              <Button
+                variant="ghost"
+                onClick={handlePrevious}
+                disabled={currentSectionIndex === 0 || submitting}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Previous
+              </Button>
               {!(isSubmitted && isLastSection) && (
                 <Button
                   variant="secondary"

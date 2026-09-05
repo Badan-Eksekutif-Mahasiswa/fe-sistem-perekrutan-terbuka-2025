@@ -3,6 +3,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Loader from "@/components/elements/Loader";
 import ActionDialog from "@/components/elements/ActionDialog";
 import ContactPerson from "@/components/elements/ContactPerson";
@@ -1241,17 +1247,14 @@ function AdminFAQ() {
   return (
     <section className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
       <h2 className="text-h4 mb-5">Pertanyaan Umum (Admin)</h2>
-      <div className="divide-y divide-white/10">
+      <Accordion type="single" collapsible className="w-full">
         {items.map((item, i) => (
-          <details key={i} className="group py-4 first:pt-0 last:pb-0">
-            <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-p4 font-semibold text-white">
-              {item.q}
-              <span className="mt-0.5 shrink-0 text-white/50 transition-transform group-open:rotate-180">▾</span>
-            </summary>
-            <p className="mt-3 text-p5 text-white/70">{item.a}</p>
-          </details>
+          <AccordionItem key={i} value={`item-${i}`}>
+            <AccordionTrigger>{item.q}</AccordionTrigger>
+            <AccordionContent>{item.a}</AccordionContent>
+          </AccordionItem>
         ))}
-      </div>
+      </Accordion>
     </section>
   );
 }
