@@ -135,6 +135,7 @@ export const registrationApi = {
       throw await toApiError(response, "Gagal menyimpan perubahan pendaftaran");
     }
 
+    if (response.status === 204) return { success: true } as SubmitResponse;
     return response.json();
   },
 

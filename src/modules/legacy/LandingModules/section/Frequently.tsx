@@ -63,6 +63,22 @@ const FrequentlyAsked = () => {
             </p>
           </AccordionContent>
         </AccordionItem>
+        <AccordionItem value="item-7">
+          <AccordionTrigger>Kenapa tidak bisa login atau muncul pesan masa berlaku akun telah habis?</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-4 text-balance">
+            <p>
+              SPT menggunakan SSO UI untuk proses login. Jika muncul pesan bahwa masa berlaku akun telah habis atau tidak bisa login, kemungkinan hal ini berkaitan dengan sistem SSO milik UI, bukan SPT. Coba akses layanan lain yang menggunakan SSO UI untuk memastikan akun masih aktif. Jika masalah berlanjut, hubungi pihak UI yang menangani SSO.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-8">
+          <AccordionTrigger>Kenapa link tugas yang sudah diisi tidak tersimpan setelah keluar dari halaman?</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-4 text-balance">
+            <p>
+              Patikan untuk menyimpan perubahan secara berkala. Pada halaman pertama tekan tombol <strong>Lanjut</strong> untuk menyimpan data diri, lalu pada halaman kedua tekan tombol <strong>Simpan Draft</strong> setelah mengisi link tugas agar data tersimpan sebelum keluar dari halaman.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
     </section>
   );
