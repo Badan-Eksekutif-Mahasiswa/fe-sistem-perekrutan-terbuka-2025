@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/elements/Loader";
@@ -113,6 +113,7 @@ export default function AdminDashboardPage() {
   const [statusFilter, setStatusFilter] = useState<AdminApplicationStatus | "ALL">("ALL");
   const [divisionFilter, setDivisionFilter] = useState("");
   const [search, setSearch] = useState("");
+  const [expandedRegistrationCode, setExpandedRegistrationCode] = useState<string | null>(null);
   const [selectedApplication, setSelectedApplication] =
     useState<AdminApplicationDetail | null>(null);
   const [statusDraft, setStatusDraft] = useState<AdminApplicationStatus>("SUBMITTED");
@@ -201,13 +202,18 @@ export default function AdminDashboardPage() {
     setDivisionFilter("");
     setSearch("");
     setSelectedApplication(null);
+    setExpandedRegistrationCode(null);
   };
 
   const openApplicationDetail = async (registrationId: string) => {
-    if (selectedApplication?.registration_code === registrationId) {
+    if (expandedRegistrationCode === registrationId) {
+      setExpandedRegistrationCode(null);
       setSelectedApplication(null);
       return;
     }
+
+    setExpandedRegistrationCode(registrationId);
+    setSelectedApplication(null);
 
     try {
       setError(null);
@@ -221,6 +227,7 @@ export default function AdminDashboardPage() {
           ? fetchError.message
           : "Gagal memuat detail pendaftar."
       );
+      setExpandedRegistrationCode(null);
     } finally {
       setIsFetchingDetail(false);
     }
@@ -383,6 +390,7 @@ export default function AdminDashboardPage() {
           <MetricCard icon={XCircle} label="Tidak Lulus" value={rejectedCount} />
         </section>
 
+        <div className="flex flex-col gap-6">
         <section className="grid gap-6 lg:grid-cols-[0.95fr_1.55fr]">
           <aside className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
             <div className="mb-5 flex items-start justify-between gap-4">
@@ -440,6 +448,7 @@ export default function AdminDashboardPage() {
           </aside>
 
           <section className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6">
             <div className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
               <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                 <div>
@@ -526,47 +535,63 @@ export default function AdminDashboardPage() {
                         </tr>
                       ) : (
                         registrations.map((registration) => (
-                          <tr key={registration.registration_code} className="text-p5">
-                            <td className="px-4 py-4">
-                              <p className="font-semibold">{registration.user.name}</p>
-                              <p className="text-p6 text-white/55">
-                                {registration.user.npm || "-"} {" "}
-                                {registration.user.email || "-"}
-                              </p>
-                            </td>
-                            <td className="px-4 py-4 text-white/70">
-                              {registration.division_choices.length === 0 ? (
-                                <p>-</p>
-                              ) : (
-                                registration.division_choices.map((choice, i) => (
-                                  <p key={choice.id} className={i > 0 ? "text-p6 text-white/55" : ""}>
-                                    {choice.name}
-                                  </p>
-                                ))
-                              )}
-                            </td>
-                            <td className="px-4 py-4">
-                              <StatusBadge status={registration.status} />
-                            </td>
-                            <td className="px-4 py-4 text-white/70">
-                              {formatDateTime(registration.submitted_at)}
-                            </td>
-                            <td className="px-4 py-4">
-                              <Button
-                                type="button"
-                                size="md"
-                                variant="stroke"
-                                onClick={() =>
-                                  void openApplicationDetail(
-                                    registration.registration_code
-                                  )
-                                }
-                              >
-                                <Eye className="size-4" />
-                                Detail
-                              </Button>
-                            </td>
-                          </tr>
+                          <React.Fragment key={registration.registration_code}>
+                            <tr className="text-p5">
+                              <td className="px-4 py-4">
+                                <p className="font-semibold">{registration.user.name}</p>
+                                <p className="text-p6 text-white/55">
+                                  {registration.user.npm || "-"} {" "}
+                                  {registration.user.email || "-"}
+                                </p>
+                              </td>
+                              <td className="px-4 py-4 text-white/70">
+                                {registration.division_choices.length === 0 ? (
+                                  <p>-</p>
+                                ) : (
+                                  registration.division_choices.map((choice, i) => (
+                                    <p key={choice.id} className={i > 0 ? "text-p6 text-white/55" : ""}>
+                                      {choice.name}
+                                    </p>
+                                  ))
+                                )}
+                              </td>
+                              <td className="px-4 py-4">
+                                <StatusBadge status={registration.status} />
+                              </td>
+                              <td className="px-4 py-4 text-white/70">
+                                {formatDateTime(registration.submitted_at)}
+                              </td>
+                              <td className="px-4 py-4">
+                                <Button
+                                  type="button"
+                                  size="md"
+                                  variant={expandedRegistrationCode === registration.registration_code ? "primary" : "stroke"}
+                                  onClick={() =>
+                                    void openApplicationDetail(
+                                      registration.registration_code
+                                    )
+                                  }
+                                >
+                                  <Eye className="size-4" />
+                                  {expandedRegistrationCode === registration.registration_code ? "Tutup" : "Detail"}
+                                </Button>
+                              </td>
+                            </tr>
+                            {expandedRegistrationCode === registration.registration_code && (
+                              <tr>
+                                <td colSpan={5} className="px-4 pb-4 pt-0">
+                                  <ApplicationDetailPanel
+                                    application={selectedApplication}
+                                    isLoading={isFetchingDetail}
+                                    statusDraft={statusDraft}
+                                    onStatusDraftChange={setStatusDraft}
+                                    onUpdateStatus={updateSelectedStatus}
+                                    isUpdating={isUpdatingStatus}
+                                  />
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
                         ))
                       )}
                     </tbody>
@@ -575,18 +600,13 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            <ApplicationDetailPanel
-              application={selectedApplication}
-              isLoading={isFetchingDetail}
-              statusDraft={statusDraft}
-              onStatusDraftChange={setStatusDraft}
-              onUpdateStatus={updateSelectedStatus}
-              isUpdating={isUpdatingStatus}
-            />
-
             <AnnouncementPanel event={selectedEvent} onError={setError} />
+            </div>
           </section>
         </section>
+
+        <AdminFAQ />
+        </div>
       </div>
     </main>
   );
@@ -1172,6 +1192,68 @@ function statusLabel(status: string) {
     default:
       return status;
   }
+}
+
+function AdminFAQ() {
+  const items = [
+    {
+      q: "Apakah data hasil export CSV ter-update secara real-time? Apakah SPT terintegrasi dengan spreadsheet seperti Google Forms?",
+      a: "Data yang di-export ke CSV mengikuti data terbaru yang tersimpan di sistem saat export dilakukan. Saat ini, SPT belum terintegrasi langsung dengan spreadsheet seperti Google Forms.",
+    },
+    {
+      q: "Berapa orang yang bisa memegang akun admin proker?",
+      a: "Satu proker bisa dikelola oleh lebih dari satu admin, sehingga beberapa orang dapat memiliki akses untuk mengelola proker tersebut.",
+    },
+    {
+      q: "Kenapa SSO tidak bisa terhubung atau data yang muncul tidak sesuai?",
+      a: "SSO terintegrasi dengan sistem milik UI, sehingga kendala terkait login, akun, password, atau data yang tidak valid berada di sisi sistem SSO UI, bukan SPT. Jika mengalami kendala terkait SSO atau menemukan data yang tidak sesuai, silakan menghubungi pihak UI yang menangani SSO.",
+    },
+    {
+      q: "Kenapa jurusan tidak muncul atau jurusan yang ditampilkan tidak sesuai?",
+      a: "Data jurusan diambil dari data yang terhubung dengan akun SSO. Jika jurusan tidak muncul atau tidak sesuai, kemungkinan terdapat ketidaksesuaian pada data di sistem SSO. Untuk masalah terkait data SSO, silakan menghubungi pihak UI yang menangani SSO.",
+    },
+    {
+      q: "Apakah admin bisa melihat preview draft sebelum dipublikasikan?",
+      a: "Untuk saat ini, fitur preview sebelum publikasi belum tersedia. Fitur ini sudah masuk ke dalam daftar fitur yang akan dikembangkan ke depannya.",
+    },
+    {
+      q: "Bagaimana sistem mengirim email kepada pendaftar?",
+      a: "SPT menyediakan fitur untuk mengirim email secara massal kepada pendaftar. Admin dapat memilih penerima berdasarkan kebutuhan, misalnya peserta yang diterima, ditolak, atau kelompok peserta lainnya. Setelah memilih penerima, admin cukup memasukkan isi dan detail email, lalu email akan dikirimkan kepada peserta yang dipilih.",
+    },
+    {
+      q: "Kalau periode pendaftaran diperpanjang, apakah pendaftar yang ditolak di batch 1 bisa mendaftar lagi?",
+      a: "Tidak bisa. Karena SPT menggunakan SSO, setiap orang hanya dapat memiliki satu akun sesuai dengan kebijakan UI. Jadi, pendaftar yang sudah terdaftar sebelumnya tidak dapat membuat akun atau melakukan pendaftaran baru menggunakan akun lain.",
+    },
+    {
+      q: "Link form pendaftaran SPT diambil dari mana?",
+      a: "Link pendaftaran dibuat berdasarkan slug yang ditentukan saat membuat proker. Slug ini merupakan bagian unik dari link yang digunakan untuk mengakses halaman pendaftaran proker.",
+    },
+    {
+      q: "Apakah tugas yang diberikan wajib dikerjakan?",
+      a: "Tergantung pengaturan yang dibuat oleh admin. Jika tugas ditandai sebagai wajib, pendaftar harus mengerjakannya untuk melanjutkan proses pendaftaran.",
+    },
+    {
+      q: "Kenapa tiba-tiba ada data yang tidak tersimpan?",
+      a: "Hal ini biasanya terjadi ketika sesi login sudah expired. Jika pengguna terlalu lama tidak melakukan aktivitas, sesi dapat berakhir dan data yang belum sempat tersimpan bisa hilang. Untuk menghindari hal ini, pastikan sesi masih aktif dan simpan data secara berkala.",
+    },
+  ];
+
+  return (
+    <section className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
+      <h2 className="text-h4 mb-5">Pertanyaan Umum (Admin)</h2>
+      <div className="divide-y divide-white/10">
+        {items.map((item, i) => (
+          <details key={i} className="group py-4 first:pt-0 last:pb-0">
+            <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-p4 font-semibold text-white">
+              {item.q}
+              <span className="mt-0.5 shrink-0 text-white/50 transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <p className="mt-3 text-p5 text-white/70">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function announcementLabel(type: AdminEmailType) {

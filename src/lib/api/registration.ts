@@ -113,6 +113,7 @@ export const registrationApi = {
       );
     }
 
+    if (response.status === 204) return { success: true } as SubmitResponse;
     return response.json();
   },
 
