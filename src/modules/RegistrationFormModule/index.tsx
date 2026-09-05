@@ -21,16 +21,8 @@ import { useToast } from "@/hooks/useToast";
 import { Event, SubmissionRequirement } from "@/types/event";
 import { cn } from "@/lib/utils";
 
-/**
- * Link tugas sementara selama admin belum mengisi link asli.
- * Nanti diganti otomatis oleh generalTaskUrl / taskUrl dari backend.
- */
 const FALLBACK_TASK_URL = "https://google.com";
 
-/**
- * Cocokkan error dengan kode status HTTP-nya, bukan dengan kalimat errornya.
- * Pesan backend bisa berubah kata atau bahasa kapan saja, kode statusnya tidak.
- */
 function isApiStatus(error: unknown, status: number) {
   return error instanceof RegistrationApiError && error.status === status;
 }
@@ -94,7 +86,6 @@ export default function RegistrationFormModule({
   const emailTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lineTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const divisionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Personal Info State
   const [personalInfo, setPersonalInfo] = useState<PersonalInfoData | null>(
@@ -277,7 +268,6 @@ export default function RegistrationFormModule({
             divisions: divisionGroups,
           });
 
-          // Bentuk flat tetap dipakai untuk validasi & auto-save (key = requirementId).
           const allQuestions = [
             ...generalQuestions,
             ...divisionGroups.flatMap((group) => group.questions),
@@ -342,8 +332,6 @@ export default function RegistrationFormModule({
         setHasRegistration(true);
         return;
       } catch (error) {
-        // 404 berarti pendaftar ini belum punya draft, jadi lanjut ke create
-        // di bawah. Selain itu lempar lagi supaya pemanggil yang menangani.
         if (!isApiStatus(error, 404)) {
           throw error;
         }
@@ -357,8 +345,6 @@ export default function RegistrationFormModule({
         });
         setHasRegistration(true);
       } catch (error) {
-        // 409 berarti draftnya keburu dibuat, biasanya karena dua autosave
-        // berjalan berdekatan. Cukup ulangi sebagai pembaruan.
         if (isApiStatus(error, 409)) {
           await registrationApi.partialUpdateRegistration(patch);
           setHasRegistration(true);
@@ -467,45 +453,13 @@ export default function RegistrationFormModule({
   const handleAnswerChange = useCallback(
     (questionId: string, value: string) => {
       setAnswers((prevAnswers) => {
-        // Only update if the value actually changed
-        if (prevAnswers.get(questionId) === value) {
-          return prevAnswers;
-        }
+        if (prevAnswers.get(questionId) === value) return prevAnswers;
         const newAnswers = new Map(prevAnswers);
         newAnswers.set(questionId, value);
         return newAnswers;
       });
-
-      // Clear previous timeout
-      if (answerTimeoutRef.current) {
-        clearTimeout(answerTimeoutRef.current);
-      }
-
-      // Auto-save with debounce
-      answerTimeoutRef.current = setTimeout(async () => {
-        if (currentSection) {
-          try {
-            const nextAnswers = new Map(answers);
-            nextAnswers.set(questionId, value);
-            await saveDraftPatch(
-              {
-                eventId,
-                submissionLinks: Array.from(nextAnswers.entries())
-                  .filter(([, submittedUrl]) => submittedUrl.trim())
-                  .map(([requirementId, submittedUrl]) => ({
-                    requirementId,
-                    submittedUrl: submittedUrl.trim(),
-                  })),
-              },
-              nextAnswers
-            );
-          } catch (error) {
-            logAutosaveError("Auto-save answer failed", error);
-          }
-        }
-      }, 1000);
     },
-    [answers, eventId, currentSection, logAutosaveError, saveDraftPatch]
+    []
   );
 
   const validateCurrentSection = (): boolean => {
@@ -565,6 +519,13 @@ export default function RegistrationFormModule({
       if (!hasRegistration) {
         await registrationApi.createRegistration(payload);
         setHasRegistration(true);
+      } else if (isPersonalInfo) {
+        await saveDraftPatch({
+          eventId,
+          contactEmail: email.trim(),
+          lineId,
+          divisionChoices: selectedDivisions.map((d) => d.divisionId),
+        });
       } else {
         await registrationApi.updateRegistration(payload);
       }
@@ -779,21 +740,51 @@ export default function RegistrationFormModule({
               Previous
             </Button>
 
-            {/* Hide Next/Submit button only on last section when already submitted */}
-            {!(isSubmitted && isLastSection) && (
-              <Button
-                variant="secondary"
-                onClick={handleNext}
-                disabled={submitting}
-              >
-                {submitting
-                  ? "Menyimpan..."
-                  : isLastSection
-                  ? "Submit"
-                  : "Next"}
-                {!isLastSection && <ChevronRight className="w-4 h-4 ml-1" />}
-              </Button>
-            )}
+            <div className="flex gap-3">
+              {isLastSection && !isSubmitted && (
+                <Button
+                  variant="ghost"
+                  onClick={async () => {
+                    try {
+                      setSubmitting(true);
+                      await saveDraftPatch({
+                        eventId,
+                        submissionLinks: Array.from(answers.entries())
+                          .filter(([, url]) => url.trim())
+                          .map(([requirementId, submittedUrl]) => ({
+                            requirementId,
+                            submittedUrl: submittedUrl.trim(),
+                          })),
+                      });
+                      toast.show("success", "Draft berhasil disimpan");
+                    } catch (error) {
+                      toast.show("error", error instanceof Error ? error.message : "Gagal menyimpan draft");
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  }}
+                  disabled={submitting}
+                >
+                  Simpan Draft
+                </Button>
+              )}
+
+              {/* Hide Next/Submit button only on last section when already submitted */}
+              {!(isSubmitted && isLastSection) && (
+                <Button
+                  variant="secondary"
+                  onClick={handleNext}
+                  disabled={submitting}
+                >
+                  {submitting
+                    ? "Menyimpan..."
+                    : isLastSection
+                    ? "Submit"
+                    : "Next"}
+                  {!isLastSection && <ChevronRight className="w-4 h-4 ml-1" />}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </main>
